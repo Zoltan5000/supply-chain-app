@@ -3,307 +3,452 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Label Scan Prototype</title>
+<title>Vis-a-Vis</title>
+<meta name="description" content="Visibility for consumers. Scan a clothing label and see forced labor risk, how confident the answer is, and how transparent the company is.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700;9..144,900&family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
+/*
+ * Design: Vis-a-Vis / Workprint design system (coral, sunflower, lime, cobalt, cream).
+ * Data and features: the label-scan prototype. Its data blocks in the script below are copied unchanged.
+ */
 :root{
-  --ink:#1D2550; --paper:#EEF1F2; --card:#FFFFFF; --line:#CDD3DA; --muted:#5B6275;
-  --accent:#2F43B8; --field:#F6F8F9;
-  --green:#23734F; --amber:#A66B00; --red:#B0261D; --grey:#6B7280;
-  box-sizing:border-box;
-  padding-top:env(safe-area-inset-top,0px);
-  padding-bottom:env(safe-area-inset-bottom,0px);
+  --bg:oklch(0.975 0.018 92); --fg:oklch(0.24 0.045 262); --card:oklch(0.995 0.008 95);
+  --muted:oklch(0.945 0.022 92); --muted-fg:oklch(0.49 0.03 262); --secondary:oklch(0.93 0.035 92);
+  --border:oklch(0.88 0.025 92); --on-color:oklch(0.98 0.012 95);
+  --coral:oklch(0.7 0.18 32); --coral-fg:oklch(0.99 0.01 95);
+  --sunflower:oklch(0.85 0.16 90); --sunflower-fg:oklch(0.26 0.05 90);
+  --lime:oklch(0.83 0.18 135); --lime-fg:oklch(0.26 0.06 150);
+  --cobalt:oklch(0.52 0.19 262); --cobalt-fg:oklch(0.98 0.012 95);
+  --green:oklch(0.6 0.15 150); --green-soft:oklch(0.93 0.07 150);
+  --amber:oklch(0.73 0.16 70); --amber-soft:oklch(0.945 0.07 85);
+  --red:oklch(0.57 0.21 27); --red-soft:oklch(0.94 0.05 30);
+  --grey:oklch(0.55 0.02 262); --grey-soft:oklch(0.92 0.01 262);
+  --accent:var(--cobalt); --ink:var(--fg); /* names used by the prototype's data */
+  --display:"Fraunces",Georgia,serif;
+  --sans:"Plus Jakarta Sans",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --shadow-card:0 14px 34px -18px color-mix(in oklab,var(--cobalt) 55%,transparent);
+  --r-xl:22px; --r-2xl:28px; --r-3xl:36px; --r-4xl:44px;
+  color-scheme:light;
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
-    --ink:#E4E7F5; --paper:#10142B; --card:#191E3A; --line:#2C3358; --muted:#9AA1BD;
-    --accent:#8C9BFF; --field:#131833; --green:#3FAE7C; --amber:#D99A2B; --red:#E4574C; --grey:#8A90A6;
+    --bg:oklch(0.2 0.03 262); --fg:oklch(0.97 0.012 92); --card:oklch(0.26 0.035 262);
+    --muted:oklch(0.3 0.035 262); --muted-fg:oklch(0.75 0.02 262); --secondary:oklch(0.3 0.035 262);
+    --border:oklch(1 0 0 / 14%); --on-color:oklch(0.18 0.03 262); --cobalt:oklch(0.72 0.15 262);
+    --cobalt-fg:oklch(0.18 0.03 262);
+    --green-soft:oklch(0.35 0.08 150); --amber-soft:oklch(0.36 0.08 80);
+    --red-soft:oklch(0.34 0.09 27); --grey-soft:oklch(0.32 0.02 262);
+    --accent:var(--cobalt); --ink:var(--fg);
+    color-scheme:dark;
   }
 }
 :root[data-theme="dark"]{
-  --ink:#E4E7F5; --paper:#10142B; --card:#191E3A; --line:#2C3358; --muted:#9AA1BD;
-  --accent:#8C9BFF; --field:#131833; --green:#3FAE7C; --amber:#D99A2B; --red:#E4574C; --grey:#8A90A6;
+  --bg:oklch(0.2 0.03 262); --fg:oklch(0.97 0.012 92); --card:oklch(0.26 0.035 262);
+  --muted:oklch(0.3 0.035 262); --muted-fg:oklch(0.75 0.02 262); --secondary:oklch(0.3 0.035 262);
+  --border:oklch(1 0 0 / 14%); --on-color:oklch(0.18 0.03 262); --cobalt:oklch(0.72 0.15 262);
+  --cobalt-fg:oklch(0.18 0.03 262);
+  --green-soft:oklch(0.35 0.08 150); --amber-soft:oklch(0.36 0.08 80);
+  --red-soft:oklch(0.34 0.09 27); --grey-soft:oklch(0.32 0.02 262);
+  --accent:var(--cobalt); --ink:var(--fg);
+  color-scheme:dark;
 }
-*,*::before,*::after{box-sizing:inherit}
-html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px)}
-body{margin:0;min-height:100%;background:var(--paper);color:var(--ink);
-  font-family:"Archivo",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:16px;line-height:1.45}
-main{max-width:520px;margin:0 auto;padding:16px 16px 110px}
-h1{font-size:1.7rem;font-weight:800;font-stretch:75%;letter-spacing:-.01em;margin:4px 0 2px;line-height:1.1}
-h2{font-size:1.1rem;font-weight:750;font-stretch:85%;margin:24px 0 8px}
-.hint{font-size:.88rem;color:var(--muted);margin:0 0 12px}
-.block{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px}
-section[hidden]{display:none}
 
-/* Scenario switch */
-.scen{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;margin:4px 0 14px}
-.scen button{font:inherit;font-size:.85rem;white-space:nowrap;border:1px solid var(--line);background:var(--card);
-  color:var(--ink);border-radius:999px;padding:7px 12px;cursor:pointer}
-.scen button[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;min-height:100vh;background:var(--bg);color:var(--fg);font-family:var(--sans);font-size:16px;
+  line-height:1.5;-webkit-font-smoothing:antialiased}
+h1,h2,h3{font-family:var(--display);font-weight:700;letter-spacing:-.02em;margin:0}
+h1{font-size:1.875rem;line-height:1.1}
+h2{font-size:1.25rem;line-height:1.2}
+h3{font-size:1.05rem;line-height:1.25}
+p{margin:0}
+a{color:inherit}
+button{font:inherit;color:inherit}
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,label.task:focus-within,.rmap .pin:focus-visible{
+  outline:3px solid var(--cobalt);outline-offset:2px}
+section[hidden],[hidden]{display:none!important}
 
-/* Scan screen */
-.viewfinder{position:relative;aspect-ratio:3/4;max-height:62vh;background:#2A2F45;border-radius:18px;overflow:hidden;
-  display:flex;align-items:center;justify-content:center}
-.corner{position:absolute;width:38px;height:38px;border:4px solid #fff;opacity:.9}
-.c1{top:18px;left:18px;border-right:0;border-bottom:0;border-radius:10px 0 0 0}
-.c2{top:18px;right:18px;border-left:0;border-bottom:0;border-radius:0 10px 0 0}
-.c3{bottom:18px;left:18px;border-right:0;border-top:0;border-radius:0 0 0 10px}
-.c4{bottom:18px;right:18px;border-left:0;border-top:0;border-radius:0 0 10px 0}
-.label{background:#F7F5EE;color:#222;width:62%;padding:18px 14px;border-radius:4px;text-align:center;
-  font-size:.82rem;line-height:1.5;box-shadow:0 6px 20px rgba(0,0,0,.35);transform:rotate(-2deg)}
-.label b{display:block;font-size:1.1rem;letter-spacing:.02em;margin-bottom:6px}
-.label .hl{background:transparent;transition:background-color .25s}
-.scanning .label .hl{background:#FFE58A}
-.beam{position:absolute;left:8%;right:8%;height:3px;background:#7FD1FF;box-shadow:0 0 14px #7FD1FF;top:15%;opacity:0}
+.wrap{max-width:480px;margin:0 auto;padding:max(20px,env(safe-area-inset-top,0px)) 16px 120px}
+.muted{color:var(--muted-fg)}
+.sub{font-size:.875rem;color:var(--muted-fg);margin-top:4px}
+.eyebrow{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted-fg)}
+.sec{margin-top:28px}
+.sec > .sub{margin-bottom:10px}
+.sec > h2 + .card,.sec > h2 + .stack{margin-top:10px}
+.card{background:var(--card);border:2px solid var(--border);border-radius:var(--r-3xl);padding:18px}
+.card.tight{border-radius:var(--r-2xl);padding:14px}
+.stack{display:grid;gap:10px}
+.mt{margin-top:14px}
+
+/* Header */
+header.top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px}
+.logo{display:flex;align-items:center;gap:8px;background:none;border:0;padding:0;cursor:pointer}
+.logo .mark{width:32px;height:32px;border-radius:12px;background:var(--coral);color:var(--coral-fg);display:grid;place-items:center;
+  font-weight:900;font-size:.9rem}
+.logo .word{font-weight:800;font-size:1.125rem;letter-spacing:-.02em}
+.kind{font-size:.68rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;border-radius:999px;padding:4px 10px}
+.kind.real{background:var(--lime);color:var(--lime-fg)}
+.kind.fake{background:var(--grey-soft);color:var(--fg)}
+
+/* Sample switcher */
+.scen{display:flex;gap:6px;overflow-x:auto;padding:2px 2px 6px;margin:0 -2px 16px;scrollbar-width:none}
+.scen::-webkit-scrollbar{display:none}
+.scen button{font-size:.8rem;font-weight:700;white-space:nowrap;border:2px solid var(--border);background:var(--card);
+  border-radius:999px;padding:7px 13px;cursor:pointer}
+.scen button[aria-pressed="true"]{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+
+/* Buttons */
+.btn{display:flex;align-items:center;justify-content:center;width:100%;border:0;cursor:pointer;border-radius:var(--r-2xl);
+  padding:15px 18px;font-weight:800;font-size:1rem;margin-top:12px;text-decoration:none;text-align:center}
+.btn.dark{background:var(--fg);color:var(--bg)}
+.btn.cobalt{background:var(--cobalt);color:var(--cobalt-fg);border-radius:999px}
+.btn.outline{background:transparent;color:var(--fg);border:2px solid var(--border);border-radius:999px}
+.btn.outline:hover{border-color:var(--fg)}
+.btn:disabled{opacity:.7;cursor:progress}
+.actions .btn + .btn{margin-top:8px}
+.back{background:none;border:0;padding:4px 0;font-size:.8rem;font-weight:700;color:var(--muted-fg);cursor:pointer}
+.textlink{display:block;margin:12px auto 0;background:none;border:0;padding:6px 4px;font-size:.875rem;font-weight:700;
+  color:var(--cobalt);text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+
+/* "Not built yet" note */
+.wip{display:flex;gap:10px;align-items:flex-start;width:100%;margin-top:14px;padding:12px 14px;border:2px dashed var(--border);
+  border-radius:var(--r-2xl);background:transparent;text-align:left;cursor:pointer;font-size:.84rem;color:var(--muted-fg)}
+.wip .chip{flex:none;background:var(--sunflower);color:var(--sunflower-fg);font-size:.66rem;font-weight:800;text-transform:uppercase;
+  letter-spacing:.06em;border-radius:999px;padding:3px 8px;margin-top:1px}
+.wip b{color:var(--fg)}
+.wip .go{font-weight:700;color:var(--fg);text-decoration:underline}
+
+/* Data badge */
+.databadge{border-radius:var(--r-2xl);padding:12px 14px;font-size:.84rem;margin-top:12px}
+.databadge.real{background:color-mix(in oklab,var(--lime) 22%,var(--card))}
+.databadge.fake{background:var(--grey-soft)}
+.databadge.draft{background:var(--amber-soft)}
+
+/* Scan */
+.steps{list-style:none;display:flex;gap:6px;margin:0 0 14px;padding:0}
+.steps li{flex:1;display:flex;align-items:center;gap:6px;font-size:.74rem;font-weight:700;color:var(--muted-fg);white-space:nowrap;
+  background:var(--card);border:2px solid var(--border);border-radius:999px;padding:5px 8px}
+.steps li span{width:18px;height:18px;flex:none;border-radius:50%;display:grid;place-items:center;font-size:.66rem;font-weight:800;background:var(--muted)}
+.steps li.on{color:var(--fg);border-color:var(--cobalt)}
+.steps li.on span{background:var(--cobalt);color:var(--cobalt-fg)}
+.hero{background:var(--coral);color:var(--coral-fg);border-radius:var(--r-4xl);padding:24px}
+.hero .eyebrow{color:inherit;opacity:.85}
+.hero h1{font-size:2.1rem;line-height:1.05;margin-top:6px}
+.hero p{font-size:.875rem;opacity:.92;margin-top:8px}
+.vf-card{margin-top:14px;overflow:hidden;border-radius:var(--r-3xl);border:2px solid var(--border);background:var(--card)}
+.viewfinder{position:relative;aspect-ratio:1/1;max-height:60vh;width:100%;background:oklch(0.3 0.04 262);
+  display:flex;align-items:center;justify-content:center;overflow:hidden}
+.corner{position:absolute;width:38px;height:38px;border:4px solid var(--sunflower);transition:border-color .3s}
+.c1{top:20px;left:20px;border-right:0;border-bottom:0;border-radius:14px 0 0 0}
+.c2{top:20px;right:20px;border-left:0;border-bottom:0;border-radius:0 14px 0 0}
+.c3{bottom:20px;left:20px;border-right:0;border-top:0;border-radius:0 0 0 14px}
+.c4{bottom:20px;right:20px;border-left:0;border-top:0;border-radius:0 0 14px 0}
+.vf-done .corner{border-color:var(--lime)}
+.label{background:#F7F5EE;color:#222;width:60%;padding:18px 14px;border-radius:6px;text-align:center;font-size:.82rem;
+  line-height:1.55;box-shadow:0 10px 26px rgba(0,0,0,.4);transform:rotate(-2deg);font-family:ui-monospace,Menlo,monospace}
+.label b{display:block;font-size:1.05rem;letter-spacing:.04em;margin-bottom:6px;font-family:var(--sans)}
+.label .hl{transition:background-color .25s}
+.scanning .label .hl{background:oklch(0.9 0.14 92)}
+.beam{position:absolute;left:8%;right:8%;height:4px;border-radius:4px;background:var(--lime);box-shadow:0 0 16px var(--lime);top:15%;opacity:0}
 .scanning .beam{opacity:1;animation:sweep 1.4s ease-in-out infinite alternate}
 @keyframes sweep{from{top:15%}to{top:85%}}
-.readout{margin-top:12px;font-size:.9rem}
-.readout div{display:flex;justify-content:space-between;border-top:1px solid var(--line);padding:7px 0}
+.vfcap{position:absolute;left:50%;bottom:22px;transform:translateX(-50%);background:rgba(0,0,0,.6);color:#fff;font-size:.78rem;font-weight:700;
+  padding:6px 14px;border-radius:999px;white-space:nowrap;transition:background-color .3s}
+.vf-done .vfcap{background:var(--lime);color:var(--lime-fg)}
+.tips{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.tips span{font-size:.76rem;font-weight:600;color:var(--muted-fg);background:var(--muted);border-radius:999px;padding:5px 11px}
+.progress{list-style:none;margin:12px 0 0;padding:14px 16px;background:var(--card);border:2px solid var(--border);border-radius:var(--r-2xl);font-size:.9rem}
+.progress li{display:flex;gap:10px;align-items:center;padding:4px 0;color:var(--muted-fg)}
+.progress li i{width:18px;height:18px;border-radius:50%;border:2px solid var(--border);flex:none;font-style:normal;display:grid;place-items:center;font-size:.62rem}
+.progress li.run{color:var(--fg);font-weight:700}
+.progress li.run i{border-color:var(--cobalt);border-top-color:transparent;animation:spin .8s linear infinite}
+.progress li.ok{color:var(--fg)}
+.progress li.ok i{background:var(--green);border-color:var(--green);color:var(--on-color)}
+.progress li.ok i::after{content:"✓";font-weight:800}
+@keyframes spin{to{transform:rotate(360deg)}}
+.readout{padding:6px 16px 10px;font-size:.9rem}
+.readout div{display:flex;justify-content:space-between;gap:12px;border-top:2px solid var(--border);padding:9px 0}
 .readout div:first-child{border-top:0}
-.readout span:first-child{color:var(--muted)}
-.btn{font:inherit;font-weight:700;border-radius:12px;padding:14px 16px;border:0;background:var(--accent);color:#fff;
-  cursor:pointer;width:100%;margin-top:14px;font-size:1.05rem}
-:root[data-theme="dark"] .btn{color:#10142B}
-@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .btn{color:#10142B}}
-.btn.ghost{background:transparent;color:var(--accent);border:1px solid var(--accent)}
-button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.readout span:first-child{color:var(--muted-fg)}
+.readout div > span:last-child{font-weight:700;text-align:right}
+.readout .ok{color:var(--green);font-weight:800;margin-left:6px}
+.rnform label{display:block}
+.rnform .row{display:flex;gap:8px;margin-top:8px}
+.rnform input{font:inherit;font-size:16px;color:var(--fg);background:var(--bg);border:2px solid var(--border);border-radius:var(--r-xl);
+  padding:10px 14px;flex:1;min-width:0}
+.rnform input:focus{border-color:var(--cobalt);outline:none}
+.rnform button{flex:none;border:0;border-radius:var(--r-xl);background:var(--cobalt);color:var(--cobalt-fg);font-weight:800;padding:0 18px;cursor:pointer}
 
-/* Verdict tag */
-.tag{--c:var(--grey);position:relative;color:#fff;background:var(--c);margin:10px 0 6px;
-  padding:18px 18px 18px 56px;clip-path:polygon(22px 0,100% 0,100% 100%,22px 100%,0 50%);border-radius:0 14px 14px 0}
-.tag::before{content:"";position:absolute;left:25px;top:50%;width:14px;height:14px;margin-top:-7px;border-radius:50%;
-  background:var(--paper)}
-.tag .v{font-size:2.2rem;font-weight:800;font-stretch:68%;line-height:1}
-.tag .s{font-size:.93rem;margin-top:6px;opacity:.95}
-.green{--c:var(--green)} .amber{--c:var(--amber)} .red{--c:var(--red)} .grey{--c:var(--grey)}
+/* Sample shelf */
+.shelf{display:grid;gap:10px}
+.shelf button{display:flex;gap:12px;align-items:center;text-align:left;width:100%;border:2px solid transparent;border-radius:var(--r-3xl);
+  padding:12px;cursor:pointer}
+.shelf button[aria-pressed="true"]{border-color:var(--fg)}
+.acc-lime{background:color-mix(in oklab,var(--lime) 22%,var(--bg))}
+.acc-coral{background:color-mix(in oklab,var(--coral) 16%,var(--bg))}
+.acc-sunflower{background:color-mix(in oklab,var(--sunflower) 26%,var(--bg))}
+.acc-cobalt{background:color-mix(in oklab,var(--cobalt) 15%,var(--bg))}
+.tee{width:64px;height:64px;flex:none;border-radius:20px;background:var(--card);display:grid;place-items:center;box-shadow:var(--shadow-card)}
+.tee svg{width:40px;height:40px}
+.shelf .nm{display:block;font-weight:800;line-height:1.2}
+.shelf .meta{display:block;font-size:.75rem;color:var(--muted-fg);margin-top:2px}
 
-/* Three scores */
-.scores{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
-.sc{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 8px;text-align:center}
-.ring{--p:0;--c:var(--grey);width:74px;height:74px;margin:0 auto 6px;border-radius:50%;
-  background:conic-gradient(var(--c) calc(var(--p)*1%),var(--field) 0);display:grid;place-items:center;position:relative}
-.ring::after{content:"";position:absolute;inset:8px;border-radius:50%;background:var(--card)}
-.ring b{position:relative;z-index:1;font-size:1.35rem;font-weight:800;font-stretch:75%;font-variant-numeric:tabular-nums}
-.sc .n{font-weight:700;font-size:.9rem}
-.sc .d{font-size:.76rem;color:var(--muted);line-height:1.3;margin-top:2px}
-.reasons{margin:14px 0 0;padding-left:18px;font-size:.93rem}
-.reasons li{margin:5px 0}
-.legend{display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:.84rem}
-.legend div{display:flex;gap:8px;align-items:flex-start}
-.dot{width:12px;height:12px;border-radius:50%;flex:none;margin-top:4px;background:var(--c)}
+/* Verdict */
+.vchip{display:inline-flex;align-items:center;border-radius:999px;font-weight:800;text-transform:uppercase;background:var(--c);color:var(--on-color)}
+.vchip.sm{font-size:.66rem;letter-spacing:.06em;padding:3px 10px;margin-top:6px}
+.vchip.lg{font-size:.8rem;letter-spacing:.12em;padding:6px 16px}
+.vchip.amber{color:var(--sunflower-fg)}
+.verdict{border-radius:var(--r-3xl);padding:20px;background:var(--soft);margin-top:14px}
+.verdict h2{font-size:1.875rem;margin-top:12px;line-height:1.15}
+.verdict p{font-size:.875rem;margin-top:4px;opacity:.85}
+.green{--c:var(--green);--soft:var(--green-soft)} .amber{--c:var(--amber);--soft:var(--amber-soft)}
+.red{--c:var(--red);--soft:var(--red-soft)} .grey{--c:var(--grey);--soft:var(--grey-soft)}
+.banner{margin-top:12px;border-radius:var(--r-3xl);padding:16px;border:2px solid var(--c);background:var(--soft);font-size:.875rem}
+.banner.grey{border-color:var(--border)}
+.banner .eyebrow{color:var(--fg);font-weight:800}
+.banner p{margin-top:4px}
 
-/* Chain ladder */
-.ladder{list-style:none;margin:0;padding:0;position:relative}
-.ladder::before{content:"";position:absolute;left:17px;top:12px;bottom:12px;width:2px;background:var(--line)}
-.rung{position:relative;padding:0 0 16px 48px}
-.rung:last-child{padding-bottom:0}
-.rung .mk{position:absolute;left:6px;top:2px;width:24px;height:24px;border-radius:50%;background:var(--c);
-  border:3px solid var(--paper)}
-.rung.est .mk{background:transparent;border:3px dashed var(--c)}
-.rung .t{font-weight:700}
-.rung .st{display:inline-block;font-size:.75rem;font-weight:700;padding:2px 8px;border-radius:999px;margin-left:6px;
-  border:1px solid var(--c);color:var(--c);vertical-align:1px}
-.rung p{margin:3px 0 0;font-size:.9rem;color:var(--muted)}
-.countries{display:grid;gap:6px}
-.crow{display:grid;grid-template-columns:16px 1fr auto;gap:10px;align-items:center;font-size:.92rem;
-  padding:8px 0;border-top:1px solid var(--line)}
-.crow:first-child{border-top:0}
-.crow span:last-child{color:var(--muted);font-variant-numeric:tabular-nums}
-.rmap{padding:6px;overflow:hidden}
-.rmap svg{display:block;width:100%;height:auto}
-.rmap .sea{fill:var(--card)}
-.rmap .land{fill:var(--field);stroke:var(--line);stroke-width:.6}
-.rmap .bord{fill:none;stroke:var(--line);stroke-width:.7}
-.rmap .xj{fill:var(--red);fill-opacity:.13;stroke:var(--red);stroke-width:1;stroke-dasharray:3 2}
-.rmap .arc{fill:none;stroke:var(--c);stroke-width:1.8;stroke-linecap:round;opacity:.85}
+/* Three scores: dial, dots, bar. Different shapes on purpose. */
+.scores{display:grid;gap:12px;margin-top:14px}
+.dial{position:relative;width:132px;margin:10px auto 0}
+.dial svg{width:100%;display:block}
+.dial .num{position:absolute;left:0;right:0;bottom:-2px;text-align:center;font-size:1.9rem;font-weight:800;line-height:1}
+.band{text-align:center;font-weight:800;font-size:.875rem;margin-top:6px;color:var(--c)}
+.score-note{font-size:.76rem;color:var(--muted-fg);margin-top:6px}
+.center{text-align:center}
+.big{font-size:1.9rem;font-weight:800;line-height:1;margin-top:8px}
+.big small{font-size:1rem;font-weight:700;color:var(--muted-fg)}
+.dots{display:flex;gap:4px;margin-top:12px}
+.dots span{height:20px;flex:1;border-radius:999px;background:var(--muted)}
+.dots span.on{background:var(--cobalt)}
+.bar{height:20px;border-radius:999px;background:var(--muted);overflow:hidden;margin-top:12px}
+.bar span{display:block;height:100%;border-radius:999px;background:var(--sunflower);transition:width .4s}
+
+.reasons{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.reasons li{position:relative;padding:12px 14px 12px 34px;border-radius:var(--r-xl);background:var(--muted);font-size:.9rem}
+.reasons li::before{content:"";position:absolute;left:14px;top:19px;width:8px;height:8px;border-radius:50%;background:var(--cobalt)}
+.bul{margin:0;padding-left:18px;font-size:.9rem}
+.bul li{margin:7px 0}
+.bul li:first-child{margin-top:0}
+.bul li:last-child{margin-bottom:0}
+.legend{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.legend div{border-radius:var(--r-xl);padding:12px;background:var(--soft);font-size:.82rem}
+.legend b{display:block;margin-bottom:2px}
+.footer{margin-top:28px;border-radius:var(--r-3xl);background:color-mix(in oklab,var(--muted) 75%,transparent);padding:16px;font-size:.75rem;color:var(--muted-fg)}
+.footer button{background:none;border:0;padding:0;margin-top:6px;font-weight:700;text-decoration:underline;cursor:pointer;color:var(--fg);font-size:.75rem}
+
+/* Method */
+.method h2{margin-bottom:6px}
+.method > p{font-size:.9rem;margin-bottom:10px}
+.mrows{display:grid;gap:6px;margin:10px 0}
+.mrows div{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;background:var(--muted);border-radius:16px;padding:9px 12px;font-size:.85rem}
+.mrows b{font-variant-numeric:tabular-nums;white-space:nowrap}
+.formula{background:color-mix(in oklab,var(--sunflower) 24%,var(--card));border-radius:16px;padding:10px 12px;font-size:.85rem;font-weight:600;margin:10px 0}
+.method .this{margin-top:12px;border-radius:16px;padding:12px 14px;background:color-mix(in oklab,var(--cobalt) 12%,var(--card));font-size:.88rem}
+.method .this b{display:block;font-size:.68rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--cobalt);margin-bottom:2px}
+
+/* Chain */
+.tiers{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.tier{border:2px solid var(--border);border-radius:var(--r-2xl);padding:14px;background:var(--card)}
+.tier.est{border-style:dashed;background:color-mix(in oklab,var(--muted) 45%,var(--card))}
+.tier .row{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.tier .t{font-weight:800;font-size:.95rem;line-height:1.3}
+.tier p{font-size:.84rem;color:var(--muted-fg);margin-top:6px}
+.tier .pills{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex:none}
+.pill{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:3px 10px;font-size:.66rem;font-weight:800;
+  text-transform:uppercase;letter-spacing:.05em;white-space:nowrap}
+.pill.soft{background:var(--soft);color:var(--fg)}
+.pill.risk{background:transparent;border:2px solid var(--c);color:var(--fg)}
+.pill .d{width:8px;height:8px;border-radius:50%;background:var(--c)}
+.st-known{--soft:var(--green-soft)} .st-partly-known,.st-estimated,.st-lead{--soft:var(--amber-soft)} .st-unknown,.st-mock-up{--soft:var(--grey-soft)}
+
+/* At a glance */
+.glance h3{font-family:var(--sans);font-size:.72rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--muted-fg);margin:16px 0 4px}
+.glance h3:first-child{margin-top:0}
+.gl{display:grid;grid-template-columns:26px 1fr auto;gap:10px;align-items:start;width:100%;text-align:left;background:none;border:0;
+  border-top:2px solid var(--border);padding:12px 2px;cursor:pointer}
+.glance h3 + .gl{border-top:0}
+.gl:hover b{text-decoration:underline}
+.gl .num,.mapnodes .num{width:24px;height:24px;border-radius:50%;background:var(--c);color:var(--on-color);font-size:.75rem;font-weight:800;display:grid;place-items:center}
+.gl b{display:block;font-size:.92rem}
+.gl .stp{display:block;font-size:.82rem}
+.gl .why{display:block;font-size:.8rem;color:var(--muted-fg);margin-top:2px}
+.gl .pill{border:2px solid var(--c);color:var(--fg);margin-top:2px}
+
+/* Map */
+.rmap{padding:8px;overflow:hidden}
+.rmap svg{display:block;width:100%;height:auto;color:var(--fg);border-radius:26px}
+.rmap .sea{fill:color-mix(in oklab,var(--cobalt) 7%,var(--card))}
+.rmap .land{fill:var(--muted);stroke:var(--border);stroke-width:.6}
+.rmap .bord{fill:none;stroke:color-mix(in oklab,var(--fg) 22%,transparent);stroke-width:.7}
+.rmap .xj{fill:var(--red);fill-opacity:.14;stroke:var(--red);stroke-width:1;stroke-dasharray:3 2}
+.rmap .arc{fill:none;stroke:var(--c);stroke-width:2;stroke-linecap:round;opacity:.9}
 .rmap .arc.hist{stroke-dasharray:5 4}
 .rmap .arc.via{stroke-dasharray:.5 4}
 .rmap .pin{cursor:pointer;outline:none}
 .rmap .pin circle{fill:var(--c);stroke:var(--card);stroke-width:2}
-.rmap .pin text{font-size:10px;font-weight:800;fill:var(--card);text-anchor:middle;dominant-baseline:central;pointer-events:none}
-.rmap .pin.sel circle,.rmap .pin:focus-visible circle{stroke:var(--ink);stroke-width:2.5}
-.rmap .lbl{font-size:10px;font-weight:700;letter-spacing:.1em;fill:var(--muted)}
+.rmap .pin text{font-family:var(--sans);font-size:10px;font-weight:800;fill:var(--on-color);text-anchor:middle;dominant-baseline:central;pointer-events:none}
+.rmap .pin.sel circle,.rmap .pin:focus-visible circle{stroke:var(--fg);stroke-width:2.5}
+.rmap .lbl{font-family:var(--sans);font-size:10px;font-weight:800;letter-spacing:.1em;fill:var(--muted-fg)}
 .rmap .lbl.xjl{fill:var(--red)}
-.rmap .inset{fill:var(--field);stroke:var(--ink);stroke-width:1}
-.rmap .lead{fill:none;stroke:var(--ink);stroke-width:1;stroke-dasharray:2 2}
-.rmap .cl{fill:none;stroke:var(--ink);stroke-width:1.5}
-.maplegend{display:grid;grid-template-columns:1fr 1fr;gap:6px 12px;font-size:.8rem;margin-top:10px;color:var(--muted)}
-.maplegend div{display:flex;gap:7px;align-items:center}
-.maplegend svg{flex:none}
+.rmap .inset{fill:var(--card);stroke:var(--fg);stroke-width:1.2}
+.rmap .lead{fill:none;stroke:var(--fg);stroke-width:1;stroke-dasharray:2 2}
+.rmap .cl{fill:none;stroke:var(--fg);stroke-width:1.5}
+.maplegend{display:grid;grid-template-columns:1fr 1fr;gap:8px 12px;font-size:.76rem;margin-top:12px;color:var(--muted-fg)}
+.maplegend div{display:flex;gap:8px;align-items:center}
+.maplegend .d{width:10px;height:10px;border-radius:50%;flex:none;background:var(--c)}
+.maplegend svg{flex:none;color:var(--fg)}
 .mapnodes{list-style:none;margin:0;padding:0}
-.mapnodes li{display:grid;grid-template-columns:24px 1fr;gap:10px;padding:10px 6px;border-top:1px solid var(--line);border-radius:8px}
+.mapnodes li{display:grid;grid-template-columns:26px 1fr;gap:10px;padding:12px 8px;border-top:2px solid var(--border);border-radius:18px;transition:background-color .2s}
 .mapnodes li:first-child{border-top:0}
-.mapnodes li.sel{background:var(--field)}
-.mapnodes .num{width:22px;height:22px;border-radius:50%;background:var(--c);color:var(--card);font-size:.75rem;font-weight:800;
-  display:grid;place-items:center;margin-top:1px}
-.mapnodes .nt{font-weight:750;font-size:.92rem}
-.mapnodes .nw{font-size:.78rem;color:var(--muted)}
-.mapnodes p{margin:4px 0 0;font-size:.86rem}
-.mapnodes .srcs{display:grid;grid-template-columns:auto 1fr;gap:2px 8px;margin-top:6px;font-size:.8rem}
-.mapnodes .srcs b{color:var(--muted);font-weight:700}
-.steps{list-style:none;display:flex;gap:6px;margin:2px 0 12px;padding:0;font-size:.8rem;color:var(--muted)}
-.steps li{display:flex;align-items:center;gap:6px;flex:1;padding:6px 8px;border-radius:999px;background:var(--card);border:1px solid var(--line);white-space:nowrap}
-.steps li span{width:18px;height:18px;border-radius:50%;display:grid;place-items:center;font-size:.7rem;font-weight:800;background:var(--field);color:var(--muted)}
-.steps li.on{color:var(--ink);border-color:var(--accent);font-weight:700}
-.steps li.on span{background:var(--accent);color:var(--card)}
-.vfcap{position:absolute;left:50%;bottom:44px;transform:translateX(-50%);background:rgba(0,0,0,.55);color:#fff;font-size:.8rem;
-  padding:6px 12px;border-radius:999px;white-space:nowrap;transition:background-color .3s}
-.vf-done .corner{border-color:#6EE7A8}
-.vf-done .vfcap{background:#1F7A50}
-.tips{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
-.tips span{font-size:.78rem;color:var(--muted);background:var(--card);border:1px solid var(--line);border-radius:999px;padding:4px 10px}
-.progress{list-style:none;margin:12px 0 0;padding:12px 14px;background:var(--card);border:1px solid var(--line);border-radius:12px;font-size:.9rem}
-.progress li{display:flex;gap:10px;align-items:center;padding:4px 0;color:var(--muted)}
-.progress li i{width:16px;height:16px;border-radius:50%;border:2px solid var(--line);flex:none;font-style:normal;display:grid;place-items:center;font-size:.6rem}
-.progress li.run{color:var(--ink);font-weight:650}
-.progress li.run i{border-color:var(--accent);border-top-color:transparent;animation:spin .8s linear infinite}
-.progress li.ok{color:var(--ink)}
-.progress li.ok i{background:var(--green);border-color:var(--green);color:var(--card)}
-.progress li.ok i::after{content:"✓";font-weight:800}
-@keyframes spin{to{transform:rotate(360deg)}}
-.readout .ok{color:var(--green);font-weight:800;margin-left:6px}
-.linkbtn{font:inherit;font-size:.9rem;background:none;border:0;color:var(--accent);font-weight:700;padding:10px 0 0;cursor:pointer;display:block;margin:0 auto}
-.rnform{margin-top:10px}
-.rnform label{display:block;font-size:.85rem;color:var(--muted);margin-bottom:4px}
-.rnform .row{display:flex;gap:8px}
-.rnform input{font:inherit;font-size:16px;color:var(--ink);background:var(--field);border:1px solid var(--line);border-radius:8px;padding:9px 10px;flex:1;min-width:0}
-.rnform .btn{width:auto;margin:0;padding:9px 16px;font-size:.95rem}
-.rnform .hint{margin:6px 0 0}
-.actions .btn+.btn{margin-top:8px}
-.glance h3{font-size:.8rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:12px 0 2px}
-.glance h3:first-child{margin-top:0}
-.gl{display:grid;grid-template-columns:24px 1fr auto;gap:10px;align-items:start;width:100%;text-align:left;font:inherit;color:inherit;
-  background:none;border:0;border-top:1px solid var(--line);padding:10px 2px;cursor:pointer}
-.glance h3+.gl{border-top:0}
-.gl .num{width:22px;height:22px;border-radius:50%;background:var(--c);color:var(--card);font-size:.75rem;font-weight:800;display:grid;place-items:center;margin-top:1px}
-.gl b{display:block;font-size:.92rem}
-.gl .stp{display:block;font-size:.84rem}
-.gl .why{display:block;font-size:.82rem;color:var(--muted);margin-top:2px}
-.gl .pill{margin-top:2px}
-.method h3{font-size:1rem;margin:0 0 4px}
-.method p{margin:0 0 8px;font-size:.92rem}
-.method table{width:100%;border-collapse:collapse;font-size:.86rem;margin:6px 0 8px}
-.method td{padding:7px 4px;border-top:1px solid var(--line);vertical-align:top}
-.method tr:first-child td{border-top:0}
-.method td:last-child{text-align:right;font-weight:750;font-variant-numeric:tabular-nums;white-space:nowrap}
-.method .formula{background:var(--field);border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-size:.86rem;margin:6px 0 8px}
-.method .this{border-left:3px solid var(--accent);padding:4px 0 4px 10px;font-size:.88rem;margin-top:8px}
-.method .this b{display:block;font-size:.76rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
-.item.top{background:var(--field);border:2px solid var(--red);border-radius:12px;padding:14px;margin-bottom:6px}
-.item.top+.item{border-top:0}
-.toplbl{display:inline-block;font-size:.72rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--red);margin-bottom:4px}
-.acts{margin:8px 0 0;padding-left:20px;font-size:.88rem}
-.acts li{margin:6px 0}
-.topbox{border:2px solid var(--red)}
-.flags h3{font-size:.95rem;margin:0 0 6px}
-.flags ul{margin:0 0 12px;padding-left:18px;font-size:.9rem}
-.flags li{margin:4px 0}
-.note{font-size:.82rem;color:var(--muted);margin-top:16px}
+.mapnodes li.sel{background:color-mix(in oklab,var(--cobalt) 12%,var(--card));border-top-color:transparent}
+.mapnodes li.sel + li{border-top-color:transparent}
+.mapnodes .nt{font-weight:800;font-size:.92rem}
+.mapnodes .nw{font-size:.78rem;color:var(--muted-fg);font-weight:400}
+.mapnodes p{margin-top:4px;font-size:.86rem}
+.mapnodes .srcs{display:grid;grid-template-columns:auto 1fr;gap:3px 10px;margin-top:8px;font-size:.78rem}
+.mapnodes .srcs b{color:var(--muted-fg);font-weight:800}
 
-.gap{display:flex;gap:8px;align-items:flex-start;margin-top:12px;padding:10px 12px;border:1px dashed var(--muted);
-  border-radius:10px;font-size:.86rem;color:var(--muted);background:transparent;width:100%;text-align:left;font-family:inherit;cursor:pointer}
-.gap b{color:var(--ink)}
-.status-row{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 12px;font-size:.82rem}
-.pill{display:inline-block;font-size:.74rem;font-weight:700;padding:2px 9px;border-radius:999px;border:1px solid var(--c);color:var(--c)}
-.p-work{--c:var(--green)} .p-part{--c:var(--amber)} .p-sim{--c:var(--accent)} .p-no{--c:var(--red)} .p-later{--c:var(--grey)}
-.owners{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;margin-bottom:10px}
-.owners button{font:inherit;font-size:.82rem;white-space:nowrap;border:1px solid var(--line);background:var(--card);color:var(--ink);
-  border-radius:999px;padding:6px 11px;cursor:pointer}
-.owners button[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
-.item{border-top:1px solid var(--line);padding:14px 0}
-.item:first-child{border-top:0;padding-top:2px}
-.item .top{display:flex;justify-content:space-between;gap:10px;align-items:baseline}
-.item .ti{font-weight:750}
-.item dl{margin:6px 0 0;font-size:.88rem;display:grid;grid-template-columns:78px 1fr;gap:4px 10px}
-.item dt{color:var(--muted)}
+.crow{display:grid;grid-template-columns:1fr auto;gap:4px 10px;align-items:center;font-size:.9rem;padding:9px 0;border-top:2px solid var(--border)}
+.crow:first-child{border-top:0;padding-top:0}
+.crow .cn{display:flex;align-items:center;gap:8px;font-weight:700}
+.crow .cn .d{width:10px;height:10px;border-radius:50%;background:var(--c)}
+.crow .ct{color:var(--muted-fg);font-size:.82rem;font-variant-numeric:tabular-nums}
+.crow .track{grid-column:1/-1;height:8px;border-radius:999px;background:var(--muted);overflow:hidden}
+.crow .track span{display:block;height:100%;border-radius:999px;background:var(--c)}
+
+.lrow{display:flex;flex-direction:column;align-items:flex-start;gap:8px;padding:12px 0;border-top:2px solid var(--border);font-size:.9rem}
+.lrow:first-child{border-top:0;padding-top:0}
+.lrow:last-child{padding-bottom:0}
+.lrow .nm{font-weight:700}
+.lrow .src{display:block;font-size:.75rem;color:var(--muted-fg);font-weight:400}
+.lrow .pill{white-space:normal;text-transform:none;letter-spacing:0;font-size:.8rem;border-radius:14px;padding:4px 12px}
+
+.ev{border:2px solid var(--border);border-radius:var(--r-2xl);padding:14px;background:var(--card)}
+.ev .tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
+.ev p{font-size:.9rem}
+.tag-find{background:var(--cobalt);color:var(--cobalt-fg)}
+.tag-ctx{background:var(--sunflower);color:var(--sunflower-fg)}
+.tag-lead{background:var(--grey-soft);color:var(--fg)}
+.ev-empty{font-size:.9rem;color:var(--muted-fg)}
+
+/* UFLPA */
+.stat3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:14px}
+.stat3 div{border-radius:var(--r-2xl);padding:14px 8px;text-align:center}
+.stat3 b{display:block;font-family:var(--display);font-size:1.6rem;line-height:1.1;font-variant-numeric:tabular-nums}
+.stat3 span{display:block;font-size:.72rem;line-height:1.3;margin-top:4px}
+.ent{list-style:none;margin:0;padding:0}
+.ent li{font-size:.9rem;font-weight:700;padding:10px 0;border-top:2px solid var(--border)}
+.ent li:first-child{border-top:0;padding-top:0}
+.ent li:last-child{padding-bottom:0}
+.ent small{display:block;color:var(--muted-fg);font-size:.76rem;font-weight:400;margin-top:2px}
+.links a{color:var(--cobalt);font-weight:700;text-decoration:none}
+.links a:hover{text-decoration:underline}
+.prose{font-size:.92rem}
+.prose p + p{margin-top:10px}
+
+/* To solve */
+.status-row{display:flex;gap:6px;flex-wrap:wrap;margin:12px 0}
+.s-work{--c:var(--green);--soft:var(--green-soft)} .s-part{--c:var(--amber);--soft:var(--amber-soft)}
+.s-sim{--c:var(--cobalt);--soft:color-mix(in oklab,var(--cobalt) 18%,var(--card))}
+.s-no{--c:var(--red);--soft:var(--red-soft)} .s-later{--c:var(--grey);--soft:var(--grey-soft)}
+.chips{display:flex;gap:6px;overflow-x:auto;padding:2px 2px 6px;margin:0 -2px 8px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chips button{font-size:.8rem;font-weight:700;white-space:nowrap;border:2px solid var(--border);background:var(--card);
+  border-radius:999px;padding:6px 12px;cursor:pointer}
+.chips button[aria-pressed="true"]{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.item .top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.item .ti{font-weight:800;line-height:1.3}
+.item dl{margin:10px 0 0;font-size:.86rem;display:grid;grid-template-columns:84px 1fr;gap:6px 10px}
+.item dt{color:var(--muted-fg);font-weight:700}
 .item dd{margin:0}
-.week{margin:0;padding-left:0;list-style:none;font-size:.9rem}
-.week li{padding:8px 0;border-top:1px solid var(--line)}
-.week li:first-child{border-top:0}
+.item.pri{border-color:var(--red);background:color-mix(in oklab,var(--red-soft) 55%,var(--card))}
+.toplbl{display:inline-block;background:var(--red);color:var(--on-color);font-size:.66rem;font-weight:800;letter-spacing:.08em;
+  text-transform:uppercase;border-radius:999px;padding:3px 10px;margin-bottom:8px}
+.acts-h{margin-top:12px;font-weight:800;font-size:.9rem}
+.acts{margin:6px 0 0;padding-left:20px;font-size:.86rem}
+.acts li{margin:7px 0}
+.week{list-style:none;margin:0;padding:0}
+.week li{padding:10px 0;border-top:2px solid var(--border);font-size:.9rem}
+.week li:first-child{border-top:0;padding-top:0}
+.week li:last-child{padding-bottom:0}
 .week b{display:block}
-.timer{display:flex;align-items:center;justify-content:space-between;gap:12px}
-.timer .clock{font-size:2.4rem;font-weight:800;font-stretch:70%;font-variant-numeric:tabular-nums;line-height:1}
-.timer .phase{font-size:.9rem;color:var(--muted)}
-.timer .btn{width:auto;margin:0;padding:10px 16px;font-size:.95rem}
-.phases{list-style:none;margin:12px 0 0;padding:0;font-size:.9rem}
-.phases li{display:grid;grid-template-columns:62px 1fr;gap:10px;padding:7px 0;border-top:1px solid var(--line)}
-.phases li:first-child{border-top:0}
-.phases li.now{font-weight:700}
-.phases li.now span:first-child{color:var(--accent)}
-.phases span:first-child{color:var(--muted);font-variant-numeric:tabular-nums}
-.gaps{margin:0;padding-left:20px;font-size:.92rem}
-.gaps li{margin:6px 0}
-.pc{border-top:1px solid var(--line);padding:14px 0}
-.pc:first-child{border-top:0;padding-top:2px}
-.pc .who{font-weight:750}
-.pc .where{font-size:.82rem;color:var(--muted)}
-.task{display:flex;gap:10px;align-items:flex-start;margin-top:8px;font-size:.9rem}
-.task input{width:20px;height:20px;flex:none;margin:1px 0 0;accent-color:var(--accent)}
-.task .lbl{flex:1}
-.task .when{font-size:.75rem;font-weight:700;color:var(--accent);display:block}
-.prompt{margin-top:8px;font-size:.84rem;background:var(--field);border:1px solid var(--line);border-radius:8px;padding:8px 10px}
-.prompt b{display:block;font-size:.76rem;color:var(--muted);font-weight:700;margin-bottom:2px}
-.form label.f{display:block;font-size:.85rem;color:var(--muted);margin:12px 0 4px}
+
+/* Submit */
+.levels{display:grid;gap:8px;margin-top:12px}
+.levels div{display:grid;grid-template-columns:76px 1fr;gap:10px;align-items:start;border-radius:var(--r-xl);padding:10px 12px;font-size:.86rem;background:var(--soft)}
+.levels b.n{font-family:var(--display);font-size:1.05rem;font-variant-numeric:tabular-nums}
+.form label.f{display:block;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted-fg);margin:14px 0 6px}
 .form label.f:first-child{margin-top:0}
-.form input[type=text],.form input[type=url],.form select,.form textarea{font:inherit;font-size:16px;color:var(--ink);
-  background:var(--field);border:1px solid var(--line);border-radius:8px;padding:9px 10px;width:100%}
-.form textarea{min-height:84px;resize:vertical}
+.form input[type=text],.form input[type=url],.form select,.form textarea{font:inherit;font-size:16px;color:var(--fg);background:var(--bg);
+  border:2px solid var(--border);border-radius:var(--r-xl);padding:11px 14px;width:100%}
+.form input:focus,.form select:focus,.form textarea:focus{border-color:var(--cobalt);outline:none}
+.form textarea{min-height:92px;resize:vertical}
 .form .chk{display:flex;gap:10px;align-items:flex-start;margin-top:12px;font-size:.92rem}
-.form .chk input{width:20px;height:20px;flex:none;margin:1px 0 0;accent-color:var(--accent)}
-.levels{width:100%;border-collapse:collapse;font-size:.88rem}
-.levels td{padding:8px 4px;border-top:1px solid var(--line);vertical-align:top}
-.levels tr:first-child td{border-top:0}
-.levels td:first-child{font-weight:800;font-variant-numeric:tabular-nums;width:74px}
+.form .chk input,.task input{width:20px;height:20px;flex:none;margin:1px 0 0;accent-color:var(--cobalt)}
 .pipe{list-style:none;margin:0;padding:0}
-.pipe li{display:grid;grid-template-columns:26px 1fr;gap:10px;padding:9px 0;border-top:1px solid var(--line);opacity:.35;transition:opacity .3s}
-.pipe li:first-child{border-top:0}
+.pipe li{display:grid;grid-template-columns:28px 1fr;gap:10px;padding:10px 0;border-top:2px solid var(--border);opacity:.4;transition:opacity .3s}
+.pipe li:first-child{border-top:0;padding-top:0}
 .pipe li.on{opacity:1}
-.pipe .ic{width:22px;height:22px;border-radius:50%;border:2px solid var(--line);display:grid;place-items:center;font-size:.75rem;font-weight:800}
-.pipe li.on .ic{background:var(--accent);border-color:var(--accent);color:var(--card)}
-.pipe .nm{font-weight:700;font-size:.93rem}
-.pipe .out{font-size:.86rem;color:var(--muted)}
-.outcome{margin-top:12px;padding:12px 14px;border-radius:10px;border:2px solid var(--c);display:none}
-.outcome .h{font-weight:800;color:var(--c)}
-.outcome p{margin:4px 0 0;font-size:.9rem}
-.subs li{font-size:.88rem;padding:8px 0;border-top:1px solid var(--line);list-style:none}
-.subs li:first-child{border-top:0}
-.subs{margin:0;padding:0}
-.back{font:inherit;background:none;border:0;color:var(--accent);font-weight:700;padding:4px 0;cursor:pointer;font-size:.95rem}
-.databadge{display:flex;gap:10px;align-items:flex-start;margin:8px 0 10px;padding:10px 12px;border-radius:10px;
-  border:1px solid var(--c);font-size:.86rem}
-.databadge b{color:var(--c)}
-.databadge.real{--c:var(--green)} .databadge.fake{--c:var(--grey)}
-.conf-ex{font-size:.9rem}
-.conf-ex li{margin:5px 0}
-.lists{width:100%;border-collapse:collapse;font-size:.88rem}
-.lists td{padding:9px 4px;border-top:1px solid var(--line);vertical-align:top}
-.lists tr:first-child td{border-top:0}
-.lists td:first-child{width:46%}
-.lists .src{display:block;font-size:.76rem;color:var(--muted)}
-.lists .res{font-weight:700;color:var(--c)}
-.stat3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-.stat3 div{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 8px;text-align:center}
-.stat3 b{display:block;font-size:1.6rem;font-weight:800;font-stretch:70%;line-height:1.1;font-variant-numeric:tabular-nums}
-.stat3 span{font-size:.76rem;color:var(--muted);line-height:1.25;display:block;margin-top:3px}
-.ent li{font-size:.9rem;padding:7px 0;border-top:1px solid var(--line);list-style:none}
-.ent li:first-child{border-top:0}
-.ent{margin:0;padding:0}
-.ent small{display:block;color:var(--muted);font-size:.78rem}
-.linkrow a{color:var(--accent);font-weight:700;text-decoration:none}
-.linkrow li{margin:7px 0;font-size:.9rem}
-nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:5;background:var(--card);border-top:1px solid var(--line);
+.pipe .ic{width:26px;height:26px;border-radius:50%;background:var(--muted);display:grid;place-items:center;font-size:.75rem;font-weight:800}
+.pipe li.on .ic{background:var(--cobalt);color:var(--cobalt-fg)}
+.pipe .nm{font-weight:700;font-size:.92rem}
+.pipe .out{font-size:.84rem;color:var(--muted-fg)}
+.outcome{margin-top:14px;padding:14px 16px;border-radius:var(--r-2xl);border:2px solid var(--c);background:var(--soft);display:none}
+.outcome .h{font-weight:800}
+.outcome p{margin-top:4px;font-size:.9rem}
+.subs{list-style:none;margin:0;padding:0}
+.subs li{font-size:.88rem;padding:10px 0;border-top:2px solid var(--border)}
+.subs li:first-child{border-top:0;padding-top:0}
+.subs li:last-child{padding-bottom:0}
+
+/* Next hour */
+.timer{background:var(--cobalt);color:var(--cobalt-fg);border-radius:var(--r-3xl);padding:20px;display:flex;align-items:center;
+  justify-content:space-between;gap:12px;margin-top:14px}
+.timer .clock{font-family:var(--display);font-size:2.6rem;line-height:1;font-variant-numeric:tabular-nums}
+.timer .phase{font-size:.84rem;opacity:.9;margin-top:4px}
+.timer button{flex:none;border:0;border-radius:999px;background:var(--cobalt-fg);color:var(--cobalt);font-weight:800;padding:11px 16px;cursor:pointer}
+.phases{list-style:none;margin:0;padding:0}
+.phases li{display:grid;grid-template-columns:70px 1fr;gap:10px;padding:9px 0;border-top:2px solid var(--border);font-size:.88rem}
+.phases li:first-child{border-top:0;padding-top:0}
+.phases li:last-child{padding-bottom:0}
+.phases span:first-child{color:var(--muted-fg);font-variant-numeric:tabular-nums}
+.phases li.now{font-weight:800}
+.phases li.now span:first-child{color:var(--cobalt)}
+.topbox{border-color:var(--red);background:color-mix(in oklab,var(--red-soft) 55%,var(--card))}
+.olist{margin:0;padding-left:20px;font-size:.9rem}
+.olist li{margin:7px 0}
+.olist li:first-child{margin-top:0}
+.olist li:last-child{margin-bottom:0}
+.pc .who{font-weight:800}
+.pc .where{font-size:.78rem;color:var(--muted-fg)}
+.task{display:flex;gap:10px;align-items:flex-start;margin-top:10px;font-size:.9rem;cursor:pointer}
+.task .when{display:block;font-size:.68rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--cobalt)}
+.prompt{margin-top:12px;font-size:.84rem;background:color-mix(in oklab,var(--sunflower) 22%,var(--card));border-radius:var(--r-xl);padding:10px 12px}
+.prompt b{display:block;font-size:.68rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;margin-bottom:2px}
+
+/* Bottom tabs */
+nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:5;background:var(--card);border-top:2px solid var(--border);
   padding-bottom:env(safe-area-inset-bottom,0px)}
-nav.tabs .inner{max-width:520px;margin:0 auto;display:grid;grid-template-columns:repeat(6,1fr)}
-nav.tabs button{font:inherit;font-size:.72rem;font-weight:650;background:transparent;border:0;color:var(--muted);
-  padding:14px 2px 16px;cursor:pointer;border-top:3px solid transparent}
-nav.tabs button[aria-selected="true"]{color:var(--ink);border-top-color:var(--accent)}
+nav.tabs .inner{max-width:480px;margin:0 auto;display:grid;grid-template-columns:repeat(6,1fr)}
+nav.tabs button{position:relative;font-size:.7rem;font-weight:700;background:transparent;border:0;color:var(--muted-fg);
+  padding:16px 2px 18px;cursor:pointer}
+nav.tabs button::before{content:"";position:absolute;top:0;left:22%;right:22%;height:4px;border-radius:0 0 6px 6px;background:transparent}
+nav.tabs button[aria-selected="true"]{color:var(--fg)}
+nav.tabs button[aria-selected="true"]::before{background:var(--coral)}
+
 @media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
 <body>
-<main>
+<div class="wrap">
+  <header class="top">
+    <button class="logo" id="home" aria-label="Vis-a-Vis, go to Scan"><span class="mark">V</span><span class="word">Vis-a-Vis</span></button>
+    <span class="kind" id="kind"></span>
+  </header>
+
   <div class="scen" role="group" aria-label="Sample scenario">
     <button data-s="test" aria-pressed="true">Real test trace</button>
     <button data-s="good">Example: well traced</button>
@@ -311,351 +456,437 @@ nav.tabs button[aria-selected="true"]{color:var(--ink);border-top-color:var(--ac
     <button data-s="unknown">Example: not enough data</button>
   </div>
 
+  <main>
   <!-- SCAN -->
   <section id="v-scan">
     <ol class="steps" aria-label="How it works">
       <li class="on"><span>1</span>Scan label</li><li><span>2</span>Get scores</li><li><span>3</span>See the chain</li>
     </ol>
-    <h1>Scan a clothing label</h1>
-    <p class="hint">Point the camera at the care label. The app reads the brand, RN number, country of origin and fiber, then traces who made it.</p>
+    <div class="hero">
+      <p class="eyebrow">Visibility for consumers</p>
+      <h1>Scan a clothing label</h1>
+      <p>Point the camera at the care label. The app reads the brand, RN number, country of origin and fiber, then traces who made it.</p>
+    </div>
     <div class="databadge" data-badge></div>
-    <div class="viewfinder" id="vf">
-      <span class="corner c1"></span><span class="corner c2"></span><span class="corner c3"></span><span class="corner c4"></span>
-      <div class="label" id="lbl"></div>
-      <div class="beam"></div>
-      <div class="vfcap" id="vfCap" aria-live="polite">Fit the care label inside the frame</div>
+    <div class="vf-card">
+      <div class="viewfinder" id="vf">
+        <span class="corner c1"></span><span class="corner c2"></span><span class="corner c3"></span><span class="corner c4"></span>
+        <div class="label" id="lbl"></div>
+        <div class="beam"></div>
+        <div class="vfcap" id="vfCap" aria-live="polite">Fit the care label inside the frame</div>
+      </div>
+      <div class="readout" id="readout" hidden></div>
     </div>
     <div class="tips" aria-label="Tips"><span>☀️ Good light</span><span>📏 Label flat</span><span>🔢 RN number in view</span></div>
-    <button class="btn" id="scanBtn">Scan label</button>
+    <button class="btn dark" id="scanBtn">Scan label</button>
     <ol class="progress" id="scanProg" hidden aria-live="polite"></ol>
-    <div class="block readout" id="readout" hidden></div>
-    <button class="linkbtn" id="rnToggle" aria-expanded="false">Can't scan? Type the RN number instead</button>
-    <form class="block rnform" id="rnForm" hidden>
-      <label for="rnIn">RN number</label>
-      <div class="row"><input id="rnIn" type="text" inputmode="numeric" autocomplete="off" placeholder="e.g. RN 123456"><button class="btn" type="submit">Look up</button></div>
-      <p class="hint">Found on clothing sold in the US, usually on the care label or the neck label.</p>
+    <button class="textlink" id="rnToggle" aria-expanded="false">Can't scan? Type the RN number instead</button>
+    <form class="card tight rnform mt" id="rnForm" hidden>
+      <label class="eyebrow" for="rnIn">RN number</label>
+      <div class="row"><input id="rnIn" type="text" inputmode="numeric" autocomplete="off" placeholder="e.g. RN 123456"><button type="submit">Look up</button></div>
+      <p class="sub" style="margin-top:8px">Found on clothing sold in the US, usually on the care label or the neck label.</p>
     </form>
-    <button class="gap" data-go="todo"><span>🚧</span><span><b>Simulated.</b> Reading real labels and matching RN numbers to companies aren't built yet. See To solve.</span></button>
+    <button class="wip" data-go="todo"><span class="chip">Simulated</span><span>Reading real labels and matching RN numbers to companies aren't built yet. <span class="go">See To solve</span></span></button>
+
+    <div class="sec">
+      <h2>Samples</h2>
+      <p class="sub">One real trace and three made-up examples that show each color. Pick one, then scan.</p>
+      <div class="shelf" id="shelf" role="group" aria-label="Sample scenario"></div>
+    </div>
   </section>
 
-  <!-- RESULT -->
+  <!-- SCORE -->
   <section id="v-result" hidden>
-    <h1 id="rTitle"></h1>
-    <p class="hint" id="rSub"></p>
+    <h1 id="rTitle" style="font-size:1.5rem"></h1>
+    <p class="sub" id="rSub"></p>
     <div class="databadge" data-badge></div>
-    <div class="tag" id="rTag"><div class="v" id="rVerdict"></div><div class="s" id="rVerdictSub"></div></div>
+    <div class="verdict" id="rTag">
+      <span class="vchip lg" id="rChip"></span>
+      <h2 id="rVerdict"></h2>
+      <p id="rVerdictSub"></p>
+    </div>
+    <div id="rBanners"></div>
     <div class="scores">
-      <div class="sc"><div class="ring" id="ringRisk"><b id="nRisk"></b></div><div class="n">Risk</div><div class="d">Forced labor risk, worst tier</div></div>
-      <div class="sc"><div class="ring" id="ringConf"><b id="nConf"></b></div><div class="n">Confidence</div><div class="d">How much is verified</div></div>
-      <div class="sc"><div class="ring" id="ringTrans"><b id="nTrans"></b></div><div class="n">Transparency</div><div class="d">How far it's traced</div></div>
+      <div class="card" id="scRisk"></div>
+      <div class="card" id="scConf"></div>
+      <div class="card" id="scTrans"></div>
     </div>
-    <ul class="reasons" id="rReasons"></ul>
+    <button class="textlink" data-go="method">How are these numbers calculated?</button>
+
+    <div class="sec">
+      <h2>Why this result</h2>
+      <ul class="reasons mt" id="rReasons"></ul>
+    </div>
     <div class="actions">
-      <button class="btn" id="toChain">See the supply chain</button>
-      <button class="btn ghost" data-go="method">How these numbers are calculated</button>
-      <button class="btn ghost" data-go="submit">Submit a source about this product</button>
+      <button class="btn cobalt" id="toChain">See the supply chain</button>
+      <button class="btn outline" data-go="method">How these numbers are calculated</button>
+      <button class="btn outline" data-go="submit">Submit a source about this product</button>
     </div>
-    <button class="gap" data-go="todo"><span>🚧</span><span><b>Preset scores.</b> Scoring rules, thresholds, wage data and the price check still need the team's decisions. See To solve.</span></button>
-    <h2>How confidence works</h2>
-    <div class="block"><ul class="gaps conf-ex" style="list-style:disc">
-      <li><b>Official government lists count most.</b> A match on the UFLPA Entity List, a CBP order, or North Korean labor enforcement sets the result to red.</li>
-      <li><b>Verified beats estimated.</b> Records traced in shipment data and checked by a person count most.</li>
-      <li><b>Two sources agreeing raises confidence.</b> When Sayari and Tradeverifyd both show the same supplier or flag, the result is stronger.</li>
-      <li><b>Disagreement goes to a person.</b> If the two sources conflict, the result is flagged for human review.</li>
-      <li><b>Not checked isn't clean.</b> A company that hasn't been screened shows as unknown, never as "no problems found."</li>
-    </ul></div>
+    <button class="wip" data-go="todo"><span class="chip">Preset</span><span><b>Preset scores.</b> Scoring rules, thresholds, wage data and the price check still need the team's decisions. <span class="go">See To solve</span></span></button>
 
-    <h2>What the colors mean</h2>
-    <div class="block legend">
-      <div class="green"><span class="dot"></span><span>Low risk, with enough data to say so</span></div>
-      <div class="amber"><span class="dot"></span><span>Elevated risk or open leads</span></div>
-      <div class="red"><span class="dot"></span><span>High risk or banned-list match</span></div>
-      <div class="grey"><span class="dot"></span><span>Not enough data to judge</span></div>
+    <div class="sec">
+      <h2>How confidence works</h2>
+      <div class="card"><ul class="bul">
+        <li><b>Official government lists count most.</b> A match on the UFLPA Entity List, a CBP order, or North Korean labor enforcement sets the result to red.</li>
+        <li><b>Verified beats estimated.</b> Records traced in shipment data and checked by a person count most.</li>
+        <li><b>Two sources agreeing raises confidence.</b> When Sayari and Tradeverifyd both show the same supplier or flag, the result is stronger.</li>
+        <li><b>Disagreement goes to a person.</b> If the two sources conflict, the result is flagged for human review.</li>
+        <li><b>Not checked isn't clean.</b> A company that hasn't been screened shows as unknown, never as "no problems found."</li>
+      </ul></div>
     </div>
-  </section>
 
-  <!-- CHAIN -->
-  <section id="v-chain" hidden>
-    <h1 id="cTitle"></h1>
-    <div class="databadge" data-badge></div>
-    <div id="glanceWrap" hidden>
-      <h2 style="margin-top:12px">At a glance: where each step happens</h2>
-      <p class="hint">Every flagged location in this product's chain, what's made there, and the risk. Tap one to find it on the map.</p>
-      <div class="block glance" id="glance"></div>
-    </div>
-    <h2>Tier by tier</h2>
-    <p class="hint">From the finished product back to raw cotton. Solid markers are traced in shipment records; dashed markers are estimates.</p>
-    <div class="block"><ol class="ladder" id="ladder"></ol></div>
-
-    <div id="mapWrap" hidden>
-      <h2>Where the forced labor risks are</h2>
-      <p class="hint" id="mapHint"></p>
-      <div class="block rmap">
-        <svg id="rmap" viewBox="0 0 480 430" role="group" aria-labelledby="rmapT"><title id="rmapT">Map of forced labor risks in this supply chain</title></svg>
+    <div class="sec">
+      <h2>What the colors mean</h2>
+      <div class="legend mt">
+        <div class="green"><b>Green</b>Low risk, with enough data to say so</div>
+        <div class="amber"><b>Amber</b>Elevated risk or open leads</div>
+        <div class="red"><b>Red</b>High risk or banned-list match</div>
+        <div class="grey"><b>Grey</b>Not enough data to judge</div>
       </div>
-      <div class="maplegend" aria-hidden="true">
-        <div class="red"><span class="dot"></span>On the UFLPA list or based in Xinjiang</div>
-        <div class="amber"><span class="dot"></span>Named in research, or buys from a flagged company</div>
-        <div><svg width="26" height="6"><line x1="1" y1="3" x2="25" y2="3" stroke="currentColor" stroke-width="2"/></svg>Trade in the last 2 years</div>
-        <div><svg width="26" height="6"><line x1="1" y1="3" x2="25" y2="3" stroke="currentColor" stroke-width="2" stroke-dasharray="5 4"/></svg>Older trade (2019)</div>
-        <div><svg width="26" height="6"><line x1="1" y1="3" x2="25" y2="3" stroke="currentColor" stroke-width="2" stroke-dasharray=".5 4" stroke-linecap="round"/></svg>Through another supplier</div>
-        <div><svg width="14" height="14"><circle cx="7" cy="7" r="5.5" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>Area shown in the inset</div>
-      </div>
-      <h2>What each point is</h2>
-      <p class="hint">Names are withheld until a person verifies each link. Tap a number on the map to jump to it.</p>
-      <div class="block"><ol class="mapnodes" id="mapNodes"></ol></div>
-      <p class="note" id="mapNote"></p>
     </div>
-
-    <h2>Where the known suppliers are</h2>
-    <div class="block countries" id="countries"></div>
-
-    <h2>Government enforcement lists</h2>
-    <p class="hint">Official US lists are the strongest evidence. A match on any of the first three blocks goods from entering the US.</p>
-    <div class="block"><table class="lists" id="lists"></table></div>
-
-    <h2>What we found</h2>
-    <div class="block flags" id="flags"></div>
-
-    <h2>Sources</h2>
-    <div class="block" style="font-size:.9rem" id="sources"></div>
-    <p class="note" id="chainNote"></p>
-    <button class="btn ghost" data-go="submit">Know something we don't? Submit a source</button>
-    <button class="gap" data-go="todo"><span>🚧</span><span><b>Stops early.</b> Tracing yarn and cotton, and verifying leads before showing them, are open problems. See To solve.</span></button>
-  </section>
-  <!-- TO SOLVE -->
-  <section id="v-todo" hidden>
-    <h1>What we still need to solve</h1>
-    <p class="hint">Every feature the app needs, where it stands, who owns it, and how AI and existing tools can speed it up. Tap a name to see just their work.</p>
-    <div class="status-row">
-      <span class="pill p-work">Working</span><span class="pill p-part">Partly working</span>
-      <span class="pill p-sim">Simulated</span><span class="pill p-no">Not solved</span><span class="pill p-later">Later</span>
-    </div>
-    <div class="owners" id="owners" role="group" aria-label="Filter by owner"></div>
-    <div class="block" id="items"></div>
-
-    <h2>This week: one task each</h2>
-    <div class="block"><ul class="week" id="week"></ul></div>
-    <p class="note">Owners are roles, not final assignments. Swap names in once the team agrees.</p>
-  </section>
-  <!-- UFLPA -->
-  <section id="v-uflpa" hidden>
-    <h1>The UFLPA Entity List</h1>
-    <p class="hint">The single most important list for cotton apparel. A match here turns a result red automatically.</p>
-
-    <div class="stat3">
-      <div><b>187</b><span>companies listed since Aug 3, 2026</span></div>
-      <div><b>43</b><span>added July 31, 2026, the largest expansion yet</span></div>
-      <div><b>24,300+</b><span>shipments denied entry, worth nearly $1 billion</span></div>
-    </div>
-
-    <h2>What the law does</h2>
-    <div class="block" style="font-size:.93rem">
-      <p style="margin:0 0 8px">The Uyghur Forced Labor Prevention Act was signed December 23, 2021. Since June 21, 2022, US customs presumes that goods made <b>wholly or in part</b> in China's Xinjiang region, or by any company on the Entity List, were made with forced labor and bars them from entering the US.</p>
-      <p style="margin:0 0 8px">Importers can only overcome this with "clear and convincing evidence." There's no minimum amount: any traceable input from a listed company can get a whole shipment detained.</p>
-      <p style="margin:0">For apparel this matters because Xinjiang grows most of China's cotton, so cotton can pass through several countries and still trace back to the region.</p>
-    </div>
-
-    <h2>Who ends up on the list</h2>
-    <div class="block"><ul class="gaps" style="list-style:disc">
-      <li><b>Makers in Xinjiang</b> that mine, produce or manufacture goods with forced labor.</li>
-      <li><b>Companies that recruit or move workers</b> out of Xinjiang with the regional government, including Uyghurs, Kazakhs and Kyrgyz people.</li>
-      <li><b>Exporters</b> of those goods into the US.</li>
-      <li><b>Companies sourcing from Xinjiang</b> through government "poverty alleviation" or "pairing assistance" labor programs.</li>
-    </ul>
-    <p class="hint" style="margin:10px 0 0">The July 2026 additions focused on aluminum, apparel, copper, cotton, and tomatoes.</p></div>
-
-    <h2>Examples relevant to cotton and apparel</h2>
-    <p class="hint">A partial list for illustration, from the official DHS page. Always check the full, current list.</p>
-    <div class="block"><ul class="ent">
-      <li>Xinjiang Production and Construction Corps (XPCC, "Bingtuan") and its subordinate and affiliated entities<small>Listed June 21, 2022 · a huge state-run group with many affiliates, which makes matching hard</small></li>
-      <li>Changji Esquel Textile Co. Ltd. (alias Changji Yida Textile)<small>Listed June 21, 2022</small></li>
-      <li>Xinjiang Junggar Cotton and Linen Co., Ltd.<small>Listed June 21, 2022</small></li>
-      <li>Hetian Taida Apparel Co., Ltd. (alias Hetian TEDA Garment)<small>Listed June 21, 2022</small></li>
-      <li>Aksu Huafu Textiles Co. (aliases include Aksu Huafu Dyed Melange Yarn)<small>Listed June 21, 2022</small></li>
-      <li>Nanjing Synergy Textiles Co., Ltd.<small>Listed June 21, 2022</small></li>
-      <li>Yili Zhuowan Garment Manufacturing Co., Ltd.<small>Listed June 21, 2022</small></li>
-      <li>Xinjiang Tianmian Foundation Textile Co., Ltd.<small>Listed September 27, 2023</small></li>
-      <li>Xinjiang Tianshan Wool Textile Co. Ltd.<small>Listed September 27, 2023</small></li>
-      <li>Anhui Xinya New Materials Co., Ltd. (formerly Chaohu Youngor Color Spinning Technology)<small>Listed December 11, 2023</small></li>
-      <li>Henan Yumian Logistics Co., Ltd. (formerly 841 Cotton Transfer) and Heze Cotton and Linen Co., Ltd.<small>Added in a 2024 update</small></li>
-    </ul></div>
-
-    <h2>How the app will use it</h2>
-    <div class="block"><ul class="gaps" style="list-style:disc">
-      <li><b>Check every tier,</b> not just the factory. A listed spinner or cotton trader three tiers up still counts.</li>
-      <li><b>Match aliases and former names.</b> Many entries list several names, and some cover all "subsidiaries" or "affiliated entities."</li>
-      <li><b>Flag Xinjiang origin even without a listed company,</b> since the presumption covers the whole region.</li>
-      <li><b>Refresh automatically</b> whenever the list changes, and show the date it was last checked.</li>
-      <li><b>A confirmed match sets the result to red.</b> A likely-but-unconfirmed match goes to human review first.</li>
-    </ul></div>
-
-    <h2>Our real test trace</h2>
-    <div class="block" style="font-size:.92rem">The factory and its 42 direct suppliers have no UFLPA flags of their own. But tracing further up in Sayari found a raw cotton trader on the UFLPA Entity List at Tier 4, selling to a Vietnamese yarn spinner in the chain. Tradeverifyd confirms the trader is listed (since August 3, 2026). The trade link hasn't been verified yet, so the status is "possible match, needs review," not red. See the map on the Chain screen.</div>
-
-    <h2>Where to get the data</h2>
-    <div class="block"><ul class="gaps linkrow" style="list-style:disc">
-      <li><a href="https://www.dhs.gov/uflpa-entity-list" target="_blank" rel="noopener">Official DHS UFLPA Entity List</a></li>
-      <li><a href="https://www.opensanctions.org/datasets/us_dhs_uflpa/" target="_blank" rel="noopener">OpenSanctions dataset</a> · machine-readable copy the builder can load into the app</li>
-      <li><a href="https://www.cbp.gov/trade/forced-labor/enforcement" target="_blank" rel="noopener">CBP forced labor enforcement</a> · WROs, Findings and UFLPA statistics</li>
-    </ul>
-    <p class="hint" style="margin:10px 0 0">Figures as of September 25, 2026. Check DHS for changes.</p></div>
+    <div class="footer">Internal demo. Not a public accusation. A risk indicator, not proof.<br><button data-go="submit">Request a correction or add evidence</button></div>
   </section>
 
   <!-- METHOD -->
   <section id="v-method" hidden>
     <button class="back" id="methBack">← Back</button>
     <h1>How the numbers are calculated</h1>
-    <p class="hint">Every result has three numbers. Each answers a different question, so a product can be high risk and low confidence at the same time.</p>
-    <div class="databadge fake" style="--c:var(--amber)"><span>⚠️</span><span><b>Draft method.</b> The numbers in this prototype are set by hand. This is the method the team is proposing; the weights and cutoffs still need sign-off (see To solve).</span></div>
+    <p class="sub">Every result has three numbers. Each answers a different question, so a product can be high risk and low confidence at the same time.</p>
+    <div class="databadge draft"><b>Draft method.</b> The numbers in this prototype are set by hand. This is the method the team is proposing; the weights and cutoffs still need sign-off (see To solve).</div>
 
-    <div class="block method">
-      <h3>Risk · 0 to 100</h3>
+    <div class="card method mt">
+      <p class="eyebrow">0 to 100</p>
+      <h2>Risk</h2>
       <p><b>How likely is forced labor somewhere in this product?</b> We score every tier and keep the <b>worst</b> one, because one bad link is enough. Averaging would let a clean factory hide a Xinjiang cotton source.</p>
-      <table>
-        <tr><td>Verified match on an official US list (UFLPA, CBP order, North Korean labor) or verified Xinjiang origin</td><td>95–100</td></tr>
-        <tr><td>Unverified lead to a listed company or to Xinjiang</td><td>60–75</td></tr>
-        <tr><td>Named in NGO or university forced labor research</td><td>45–60</td></tr>
-        <tr><td>Country and product on the US Department of Labor goods list</td><td>30–45</td></tr>
-        <tr><td>Traced, with no specific signals</td><td>0–25</td></tr>
-      </table>
+      <div class="mrows">
+        <div><span>Verified match on an official US list (UFLPA, CBP order, North Korean labor) or verified Xinjiang origin</span><b>95–100</b></div>
+        <div><span>Unverified lead to a listed company or to Xinjiang</span><b>60–75</b></div>
+        <div><span>Named in NGO or university forced labor research</span><b>45–60</b></div>
+        <div><span>Country and product on the US Department of Labor goods list</span><b>30–45</b></div>
+        <div><span>Traced, with no specific signals</span><b>0–25</b></div>
+      </div>
       <div class="formula">Risk = highest tier score + up to 10 if the price is below the estimated legal cost (price check, planned)</div>
       <p>Color: 65 and up is red, 35–64 amber, below 35 green. A verified official-list match is red no matter what else is true.</p>
       <div class="this" id="mRisk"></div>
     </div>
 
-    <h2>Confidence · 0 to 100%</h2>
-    <div class="block method">
+    <div class="card method mt">
+      <p class="eyebrow">0 to 100%</p>
+      <h2>Confidence</h2>
       <p><b>How much of what we're saying is checked?</b> Each finding behind the risk score gets a weight for how strong its source is. Confidence is the average weight.</p>
-      <table>
-        <tr><td>Official government list</td><td>1.0</td></tr>
-        <tr><td>Verified by a person on our team</td><td>0.9</td></tr>
-        <tr><td>NGO or university research</td><td>0.8</td></tr>
-        <tr><td>Shipment records (Sayari, Tradeverifyd)</td><td>0.6</td></tr>
-        <tr><td>Country or industry context</td><td>0.4</td></tr>
-        <tr><td>User submission, not yet checked</td><td>0.3</td></tr>
-      </table>
+      <div class="mrows">
+        <div><span>Official government list</span><b>1.0</b></div>
+        <div><span>Verified by a person on our team</span><b>0.9</b></div>
+        <div><span>NGO or university research</span><b>0.8</b></div>
+        <div><span>Shipment records (Sayari, Tradeverifyd)</span><b>0.6</b></div>
+        <div><span>Country or industry context</span><b>0.4</b></div>
+        <div><span>User submission, not yet checked</span><b>0.3</b></div>
+      </div>
       <div class="formula">Confidence = average source weight × 100, +10 when Sayari and Tradeverifyd agree, −10 when they disagree</div>
       <p>Below 40%, the result turns <b>grey</b> ("not enough data") whatever the risk number says. Not checked is never shown as clean.</p>
       <div class="this" id="mConf"></div>
     </div>
 
-    <h2>Transparency · 0 to 100</h2>
-    <div class="block method">
+    <div class="card method mt">
+      <p class="eyebrow">0 to 100</p>
+      <h2>Transparency</h2>
       <p><b>How far back is the chain traced?</b> Five steps (finished product, then Tiers 1–4) are worth 20 points each.</p>
-      <table>
-        <tr><td>Known: traced in shipment records or disclosed</td><td>20</td></tr>
-        <tr><td>Partly known</td><td>10</td></tr>
-        <tr><td>Estimated, or a lead only</td><td>5</td></tr>
-        <tr><td>Unknown</td><td>0</td></tr>
-      </table>
+      <div class="mrows">
+        <div><span>Known: traced in shipment records or disclosed</span><b>20</b></div>
+        <div><span>Partly known</span><b>10</b></div>
+        <div><span>Estimated, or a lead only</span><b>5</b></div>
+        <div><span>Unknown</span><b>0</b></div>
+      </div>
       <div class="formula">Transparency = sum of the five steps</div>
       <div class="this" id="mTrans"></div>
     </div>
-    <button class="btn ghost" data-go="todo">See what still needs deciding</button>
+    <button class="btn outline" data-go="todo">See what still needs deciding</button>
+  </section>
+
+  <!-- CHAIN -->
+  <section id="v-chain" hidden>
+    <h1 id="cTitle" style="font-size:1.5rem"></h1>
+    <div class="databadge" data-badge></div>
+
+    <div class="sec" id="glanceWrap" hidden>
+      <h2>At a glance: where each step happens</h2>
+      <p class="sub">Every flagged location in this product's chain, what's made there, and the risk. Tap one to find it on the map.</p>
+      <div class="card glance" id="glance"></div>
+    </div>
+
+    <div class="sec">
+      <h2>Tier by tier</h2>
+      <p class="sub">From the finished product back to raw cotton. Solid cards are traced in shipment records; dashed cards are estimates.</p>
+      <ol class="tiers" id="ladder"></ol>
+    </div>
+
+    <div id="mapWrap" hidden>
+      <div class="sec">
+        <h2>Where the forced labor risks are</h2>
+        <p class="sub" id="mapHint"></p>
+        <div class="card rmap">
+          <svg id="rmap" viewBox="0 0 480 430" role="group" aria-labelledby="rmapT"><title id="rmapT">Map of forced labor risks in this supply chain</title></svg>
+        </div>
+        <div class="maplegend" aria-hidden="true">
+          <div class="red"><span class="d"></span>On the UFLPA list or based in Xinjiang</div>
+          <div class="amber"><span class="d"></span>Named in research, or buys from a flagged company</div>
+          <div><svg width="26" height="6"><line x1="1" y1="3" x2="25" y2="3" stroke="currentColor" stroke-width="2"/></svg>Trade in the last 2 years</div>
+          <div><svg width="26" height="6"><line x1="1" y1="3" x2="25" y2="3" stroke="currentColor" stroke-width="2" stroke-dasharray="5 4"/></svg>Older trade (2019)</div>
+          <div><svg width="26" height="6"><line x1="1" y1="3" x2="25" y2="3" stroke="currentColor" stroke-width="2" stroke-dasharray=".5 4" stroke-linecap="round"/></svg>Through another supplier</div>
+          <div><svg width="14" height="14"><circle cx="7" cy="7" r="5.5" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>Area shown in the inset</div>
+        </div>
+      </div>
+      <div class="sec">
+        <h2>What each point is</h2>
+        <p class="sub">Names are withheld until a person verifies each link. Tap a number on the map to jump to it.</p>
+        <div class="card"><ol class="mapnodes" id="mapNodes"></ol></div>
+        <p class="sub" id="mapNote" style="margin-top:10px"></p>
+      </div>
+    </div>
+
+    <div class="sec">
+      <h2>Where the known suppliers are</h2>
+      <div class="card" id="countries"></div>
+    </div>
+
+    <div class="sec">
+      <h2>Government enforcement lists</h2>
+      <p class="sub">Official US lists are the strongest evidence. A match on any of the first three blocks goods from entering the US.</p>
+      <div class="card" id="lists"></div>
+    </div>
+
+    <div class="sec">
+      <h2>What we found</h2>
+      <p class="eyebrow" style="margin:10px 0">About specific suppliers</p>
+      <div class="stack" id="evidence"></div>
+      <p class="eyebrow" style="margin:18px 0 10px">Industry and country context</p>
+      <div class="stack" id="context"></div>
+    </div>
+
+    <div class="sec">
+      <h2>Sources</h2>
+      <div class="card" style="font-size:.88rem" id="sources"></div>
+      <p class="sub" id="chainNote" style="margin-top:10px"></p>
+    </div>
+    <button class="btn outline" data-go="submit">Know something we don't? Submit a source</button>
+    <button class="wip" data-go="todo"><span class="chip">Stops early</span><span><b>Stops early.</b> Tracing yarn and cotton, and verifying leads before showing them, are open problems. <span class="go">See To solve</span></span></button>
+    <div class="footer">Internal demo. Not a public accusation. A risk indicator, not proof.<br><button data-go="submit">Request a correction or add evidence</button></div>
+  </section>
+
+  <!-- TO SOLVE -->
+  <section id="v-todo" hidden>
+    <h1>What we still need to solve</h1>
+    <p class="sub">Every feature the app needs, where it stands, who owns it, and how AI and existing tools can speed it up. Tap a name to see just their work.</p>
+    <div class="status-row">
+      <span class="pill soft s-work"><span class="d"></span>Working</span>
+      <span class="pill soft s-part"><span class="d"></span>Partly working</span>
+      <span class="pill soft s-sim"><span class="d"></span>Simulated</span>
+      <span class="pill soft s-no"><span class="d"></span>Not solved</span>
+      <span class="pill soft s-later"><span class="d"></span>Later</span>
+    </div>
+    <div class="chips" id="owners" role="group" aria-label="Filter by owner"></div>
+    <div class="stack" id="items"></div>
+
+    <div class="sec">
+      <h2>This week: one task each</h2>
+      <div class="card"><ul class="week" id="week"></ul></div>
+      <p class="sub" style="margin-top:10px">Owners are roles, not final assignments. Swap names in once the team agrees.</p>
+    </div>
+  </section>
+
+  <!-- UFLPA -->
+  <section id="v-uflpa" hidden>
+    <h1>The UFLPA Entity List</h1>
+    <p class="sub">The single most important list for cotton apparel. A match here turns a result red automatically.</p>
+
+    <div class="stat3">
+      <div class="acc-coral"><b>187</b><span>companies listed since Aug 3, 2026</span></div>
+      <div class="acc-sunflower"><b>43</b><span>added July 31, 2026, the largest expansion yet</span></div>
+      <div class="acc-lime"><b>24,300+</b><span>shipments denied entry, worth nearly $1 billion</span></div>
+    </div>
+
+    <div class="sec">
+      <h2>What the law does</h2>
+      <div class="card prose">
+        <p>The Uyghur Forced Labor Prevention Act was signed December 23, 2021. Since June 21, 2022, US customs presumes that goods made <b>wholly or in part</b> in China's Xinjiang region, or by any company on the Entity List, were made with forced labor and bars them from entering the US.</p>
+        <p>Importers can only overcome this with "clear and convincing evidence." There's no minimum amount: any traceable input from a listed company can get a whole shipment detained.</p>
+        <p>For apparel this matters because Xinjiang grows most of China's cotton, so cotton can pass through several countries and still trace back to the region.</p>
+      </div>
+    </div>
+
+    <div class="sec">
+      <h2>Who ends up on the list</h2>
+      <div class="card"><ul class="bul">
+        <li><b>Makers in Xinjiang</b> that mine, produce or manufacture goods with forced labor.</li>
+        <li><b>Companies that recruit or move workers</b> out of Xinjiang with the regional government, including Uyghurs, Kazakhs and Kyrgyz people.</li>
+        <li><b>Exporters</b> of those goods into the US.</li>
+        <li><b>Companies sourcing from Xinjiang</b> through government "poverty alleviation" or "pairing assistance" labor programs.</li>
+      </ul>
+      <p class="sub" style="margin-top:12px">The July 2026 additions focused on aluminum, apparel, copper, cotton, and tomatoes.</p></div>
+    </div>
+
+    <div class="sec">
+      <h2>Examples relevant to cotton and apparel</h2>
+      <p class="sub">A partial list for illustration, from the official DHS page. Always check the full, current list.</p>
+      <div class="card"><ul class="ent">
+        <li>Xinjiang Production and Construction Corps (XPCC, "Bingtuan") and its subordinate and affiliated entities<small>Listed June 21, 2022 · a huge state-run group with many affiliates, which makes matching hard</small></li>
+        <li>Changji Esquel Textile Co. Ltd. (alias Changji Yida Textile)<small>Listed June 21, 2022</small></li>
+        <li>Xinjiang Junggar Cotton and Linen Co., Ltd.<small>Listed June 21, 2022</small></li>
+        <li>Hetian Taida Apparel Co., Ltd. (alias Hetian TEDA Garment)<small>Listed June 21, 2022</small></li>
+        <li>Aksu Huafu Textiles Co. (aliases include Aksu Huafu Dyed Melange Yarn)<small>Listed June 21, 2022</small></li>
+        <li>Nanjing Synergy Textiles Co., Ltd.<small>Listed June 21, 2022</small></li>
+        <li>Yili Zhuowan Garment Manufacturing Co., Ltd.<small>Listed June 21, 2022</small></li>
+        <li>Xinjiang Tianmian Foundation Textile Co., Ltd.<small>Listed September 27, 2023</small></li>
+        <li>Xinjiang Tianshan Wool Textile Co. Ltd.<small>Listed September 27, 2023</small></li>
+        <li>Anhui Xinya New Materials Co., Ltd. (formerly Chaohu Youngor Color Spinning Technology)<small>Listed December 11, 2023</small></li>
+        <li>Henan Yumian Logistics Co., Ltd. (formerly 841 Cotton Transfer) and Heze Cotton and Linen Co., Ltd.<small>Added in a 2024 update</small></li>
+      </ul></div>
+    </div>
+
+    <div class="sec">
+      <h2>How the app will use it</h2>
+      <div class="card"><ul class="bul">
+        <li><b>Check every tier,</b> not just the factory. A listed spinner or cotton trader three tiers up still counts.</li>
+        <li><b>Match aliases and former names.</b> Many entries list several names, and some cover all "subsidiaries" or "affiliated entities."</li>
+        <li><b>Flag Xinjiang origin even without a listed company,</b> since the presumption covers the whole region.</li>
+        <li><b>Refresh automatically</b> whenever the list changes, and show the date it was last checked.</li>
+        <li><b>A confirmed match sets the result to red.</b> A likely-but-unconfirmed match goes to human review first.</li>
+      </ul></div>
+    </div>
+
+    <div class="sec">
+      <h2>Our real test trace</h2>
+      <div class="card prose">The factory and its 42 direct suppliers have no UFLPA flags of their own. But tracing further up in Sayari found a raw cotton trader on the UFLPA Entity List at Tier 4, selling to a Vietnamese yarn spinner in the chain. Tradeverifyd confirms the trader is listed (since August 3, 2026). The trade link hasn't been verified yet, so the status is "possible match, needs review," not red. See the map on the Chain screen.</div>
+      <button class="btn outline" id="toMap">See the map</button>
+    </div>
+
+    <div class="sec">
+      <h2>Where to get the data</h2>
+      <div class="card"><ul class="bul links">
+        <li><a href="https://www.dhs.gov/uflpa-entity-list" target="_blank" rel="noopener">Official DHS UFLPA Entity List</a></li>
+        <li><a href="https://www.opensanctions.org/datasets/us_dhs_uflpa/" target="_blank" rel="noopener">OpenSanctions dataset</a> · machine-readable copy the builder can load into the app</li>
+        <li><a href="https://www.cbp.gov/trade/forced-labor/enforcement" target="_blank" rel="noopener">CBP forced labor enforcement</a> · WROs, Findings and UFLPA statistics</li>
+      </ul>
+      <p class="sub" style="margin-top:12px">Figures as of September 25, 2026. Check DHS for changes.</p></div>
+    </div>
   </section>
 
   <!-- SUBMIT -->
   <section id="v-submit" hidden>
     <button class="back" id="subBack">← Back</button>
     <h1>Submit a source</h1>
-    <p class="hint">Anyone can add evidence: a report, an article, a court record, a worker's account. Submissions start with low confidence and only count toward a score once they're checked.</p>
+    <p class="sub">Anyone can add evidence: a report, an article, a court record, a worker's account. Submissions start with low confidence and only count toward a score once they're checked.</p>
 
-    <h2>Why submissions count for less at first</h2>
-    <div class="block">
-      <p style="margin:0 0 10px;font-size:.92rem">Anyone can submit anything, including companies trying to boost their own score or competitors trying to hurt a rival. So every submission moves up a confidence ladder as it's checked:</p>
-      <table class="levels">
-        <tr><td>0.3</td><td><b>Submitted, not checked.</b> Visible to our team only. Doesn't change public scores.</td></tr>
-        <tr><td>0.5–0.7</td><td><b>Checked by the AI agent and backed by other data.</b> Can count as industry or country context.</td></tr>
-        <tr><td>0.85–1.0</td><td><b>Verified by a person.</b> Only now can a claim about a specific supplier affect a score.</td></tr>
-      </table>
+    <div class="sec">
+      <h2>Why submissions count for less at first</h2>
+      <div class="card">
+        <p style="font-size:.9rem">Anyone can submit anything, including companies trying to boost their own score or competitors trying to hurt a rival. So every submission moves up a confidence ladder as it's checked:</p>
+        <div class="levels">
+          <div class="grey"><b class="n">0.3</b><span><b>Submitted, not checked.</b> Visible to our team only. Doesn't change public scores.</span></div>
+          <div class="amber"><b class="n">0.5–0.7</b><span><b>Checked by the AI agent and backed by other data.</b> Can count as industry or country context.</span></div>
+          <div class="green"><b class="n">0.85–1.0</b><span><b>Verified by a person.</b> Only now can a claim about a specific supplier affect a score.</span></div>
+        </div>
+      </div>
     </div>
 
-    <h2>Your source</h2>
-    <div class="block form">
-      <label class="f" for="sCo">Product or company</label>
-      <input type="text" id="sCo">
-      <label class="f" for="sType">Type of source</label>
-      <select id="sType">
-        <option value="0.9">Court or government record</option>
-        <option value="0.8" selected>NGO or research report</option>
-        <option value="0.7">News article</option>
-        <option value="0.6">Company disclosure</option>
-        <option value="0.6w">Worker or witness account</option>
-        <option value="0.4">Other (blog, social media, photo)</option>
-      </select>
-      <label class="f" for="sLink">Link (optional but strongly helps)</label>
-      <input type="url" id="sLink" placeholder="https://">
-      <label class="f" for="sClaim">What does it show?</label>
-      <textarea id="sClaim" placeholder="e.g. The mill supplying this factory buys cotton from a region linked to forced labor."></textarea>
-      <label class="f" for="sDir">This source…</label>
-      <select id="sDir"><option value="neg">Raises a concern</option><option value="pos">Shows an improvement or good practice</option></select>
-      <label class="chk"><input type="checkbox" id="sNames"> It names a specific supplier or factory</label>
-      <label class="chk"><input type="checkbox" id="sAnon" checked> Keep my identity private</label>
-      <button class="btn" id="sGo">Submit for checking</button>
+    <div class="sec">
+      <h2>Your source</h2>
+      <div class="card form">
+        <label class="f" for="sCo">Product or company</label>
+        <input type="text" id="sCo" maxlength="120">
+        <label class="f" for="sType">Type of source</label>
+        <select id="sType">
+          <option value="0.9">Court or government record</option>
+          <option value="0.8" selected>NGO or research report</option>
+          <option value="0.7">News article</option>
+          <option value="0.6">Company disclosure</option>
+          <option value="0.6w">Worker or witness account</option>
+          <option value="0.4">Other (blog, social media, photo)</option>
+        </select>
+        <label class="f" for="sLink">Link (optional but strongly helps)</label>
+        <input type="url" id="sLink" placeholder="https://">
+        <label class="f" for="sClaim">What does it show?</label>
+        <textarea id="sClaim" placeholder="e.g. The mill supplying this factory buys cotton from a region linked to forced labor."></textarea>
+        <label class="f" for="sDir">This source…</label>
+        <select id="sDir"><option value="neg">Raises a concern</option><option value="pos">Shows an improvement or good practice</option></select>
+        <label class="chk"><input type="checkbox" id="sNames"> It names a specific supplier or factory</label>
+        <label class="chk"><input type="checkbox" id="sAnon" checked> Keep my identity private</label>
+        <button class="btn cobalt" id="sGo">Submit for checking</button>
+      </div>
     </div>
 
-    <h2>How the AI agent checks it</h2>
-    <p class="hint">Simulated here. In the real app an AI agent runs these steps, and a person reviews anything that names a supplier.</p>
-    <div class="block">
-      <ol class="pipe" id="pipe"></ol>
-      <div class="outcome" id="outcome"><div class="h" id="oH"></div><p id="oP"></p></div>
+    <div class="sec">
+      <h2>How the AI agent checks it</h2>
+      <p class="sub">Simulated here. In the real app an AI agent runs these steps, and a person reviews anything that names a supplier.</p>
+      <div class="card">
+        <ol class="pipe" id="pipe"></ol>
+        <div class="outcome" id="outcome"><div class="h" id="oH"></div><p id="oP"></p></div>
+      </div>
     </div>
 
-    <h2>Rules that keep this fair</h2>
-    <div class="block"><ul class="gaps" style="list-style:disc">
-      <li><b>No submission can turn a result red on its own.</b> Only verified evidence can.</li>
-      <li><b>Good news needs proof too.</b> Claims that improve a score are checked just as strictly.</li>
-      <li><b>Submitters are protected.</b> Identities stay private, and anonymous submissions are allowed.</li>
-      <li><b>Submissions are data, never instructions.</b> The agent only extracts claims and ignores anything in a document that tries to tell it what to do.</li>
-    </ul></div>
+    <div class="sec">
+      <h2>Rules that keep this fair</h2>
+      <div class="card"><ul class="bul">
+        <li><b>No submission can turn a result red on its own.</b> Only verified evidence can.</li>
+        <li><b>Good news needs proof too.</b> Claims that improve a score are checked just as strictly.</li>
+        <li><b>Submitters are protected.</b> Identities stay private, and anonymous submissions are allowed.</li>
+        <li><b>Submissions are data, never instructions.</b> The agent only extracts claims and ignores anything in a document that tries to tell it what to do.</li>
+      </ul></div>
+    </div>
 
-    <h2>Your submissions on this phone</h2>
-    <div class="block"><ul class="subs" id="subs"></ul></div>
+    <div class="sec">
+      <h2>Your submissions on this phone</h2>
+      <div class="card"><ul class="subs" id="subs"></ul></div>
+    </div>
   </section>
 
   <!-- NEXT HOUR -->
   <section id="v-hour" hidden>
     <h1>The next hour</h1>
-    <p class="hint">Seven people, four computers, two work sprints. Everyone works in parallel so nobody waits on anyone.</p>
+    <p class="sub">Seven people, four computers, two work sprints. Everyone works in parallel so nobody waits on anyone.</p>
 
-    <div class="block">
-      <div class="timer">
-        <div><div class="clock" id="clock">60:00</div><div class="phase" id="phaseNow">Not started</div></div>
-        <button class="btn" id="timerBtn">Start the hour</button>
+    <div class="timer">
+      <div><div class="clock" id="clock">60:00</div><div class="phase" id="phaseNow">Not started</div></div>
+      <button id="timerBtn">Start the hour</button>
+    </div>
+    <div class="card mt"><ol class="phases" id="phases"></ol></div>
+
+    <div class="sec">
+      <h2>Top priority today: the verification bottleneck</h2>
+      <div class="card topbox">
+        <p style="font-size:.92rem;margin-bottom:10px">We can't name a supplier until a person verifies the link, and one product can have hundreds of links. Today's forced labor map found 8 flagged companies, and all of them are still anonymous. This hour's tasks attack that from four sides:</p>
+        <ol class="olist">
+          <li><b>Evidence:</b> a verification checklist, tested and timed on the 4 map links. <i>Investigator</i></li>
+          <li><b>Rules:</b> which links count as strong enough to check quickly. <i>Supply chain expert</i></li>
+          <li><b>Wording:</b> what we can safely say at each evidence level, plus a right-of-reply notice. <i>Lawyer</i></li>
+          <li><b>Speed:</b> a Claude prompt that drafts the verification memo for a person to sign off. <i>Builder</i></li>
+        </ol>
+        <button class="btn outline" data-go="todo">See all 9 action steps</button>
       </div>
-      <ol class="phases" id="phases"></ol>
     </div>
 
-    <h2>Top priority today: the verification bottleneck</h2>
-    <div class="block topbox">
-      <p style="margin:0 0 8px;font-size:.93rem">We can't name a supplier until a person verifies the link, and one product can have hundreds of links. Today's forced labor map found 8 flagged companies, and all of them are still anonymous. This hour's tasks attack that from four sides:</p>
-      <ol class="gaps">
-        <li><b>Evidence:</b> a verification checklist, tested and timed on the 4 map links. <i>Investigator</i></li>
-        <li><b>Rules:</b> which links count as strong enough to check quickly. <i>Supply chain expert</i></li>
-        <li><b>Wording:</b> what we can safely say at each evidence level, plus a right-of-reply notice. <i>Lawyer</i></li>
-        <li><b>Speed:</b> a Claude prompt that drafts the verification memo for a person to sign off. <i>Builder</i></li>
-      </ol>
-      <button class="btn ghost" data-go="todo" style="margin-top:10px">See all 9 action steps</button>
+    <div class="sec">
+      <h2>Where the app most needs work</h2>
+      <div class="card">
+        <ol class="olist">
+          <li><b>Verification and naming.</b> Nothing supplier-specific, including names, can be shown until a person checks it. This is the bottleneck.</li>
+          <li><b>Label to company.</b> We can't yet turn an RN number or brand into the right company record.</li>
+          <li><b>Going upstream.</b> Tracing now reaches cotton for one factory, but only for two suppliers, and it isn't automated.</li>
+          <li><b>Rules everyone agrees on.</b> Thresholds, wording and data licensing are still drafts.</li>
+          <li><b>Real numbers.</b> Wage benchmarks and cost floors are placeholders in the scores.</li>
+        </ol>
+      </div>
     </div>
 
-    <h2>Where the app most needs work</h2>
-    <div class="block">
-      <ol class="gaps">
-        <li><b>Verification and naming.</b> Nothing supplier-specific, including names, can be shown until a person checks it. This is the bottleneck.</li>
-        <li><b>Label to company.</b> We can't yet turn an RN number or brand into the right company record.</li>
-        <li><b>Going upstream.</b> Tracing now reaches cotton for one factory, but only for two suppliers, and it isn't automated.</li>
-        <li><b>Rules everyone agrees on.</b> Thresholds, wording and data licensing are still drafts.</li>
-        <li><b>Real numbers.</b> Wage benchmarks and cost floors are placeholders in the scores.</li>
-      </ol>
+    <div class="sec">
+      <h2>Who does what</h2>
+      <p class="sub">Check tasks off as you go. Checkmarks are saved on this phone only.</p>
+      <div class="stack" id="plan"></div>
+      <button class="btn outline" id="clearChecks">Clear checkmarks</button>
     </div>
-
-    <h2>Who does what</h2>
-    <p class="hint">Check tasks off as you go. Checkmarks are saved on this phone only.</p>
-    <div class="block" id="plan"></div>
-    <button class="btn ghost" id="clearChecks">Clear checkmarks</button>
   </section>
-</main>
+  </main>
+</div>
 
 <nav class="tabs" role="tablist" aria-label="Screens">
   <div class="inner">
@@ -671,6 +902,7 @@ nav.tabs button[aria-selected="true"]{color:var(--ink);border-top-color:var(--ac
 <script>
 (function(){
   const $ = id => document.getElementById(id);
+  /* ---- Data from the prototype, unchanged ---- */
   const S = {
     test: {
       real:true, lists:["review","pending","pending","clear"],
@@ -886,31 +1118,6 @@ nav.tabs button[aria-selected="true"]{color:var(--ink);border-top-color:var(--ac
      tools:"Isotope and DNA origin-testing providers.",
      next:"Park for now; revisit once the paper trail works."}
   ];
-  const ST = {work:["Working","p-work"],part:["Partly working","p-part"],sim:["Simulated","p-sim"],no:["Not solved","p-no"],later:["Later","p-later"]};
-  const ROLES = ["Everyone","Coordinator","Builder","Investigator","Supply chain expert","Lawyer","Human rights researcher","Designer"];
-  let owner = "Everyone";
-  function renderTodo(){
-    $("owners").innerHTML = ROLES.map(r => "<button aria-pressed='"+(r===owner)+"' data-o='"+r+"'>"+r+"</button>").join("");
-    $("owners").querySelectorAll("button").forEach(b => b.addEventListener("click", () => { owner = b.dataset.o; renderTodo(); }));
-    const list = TODO.filter(t => owner === "Everyone" || t.own.includes(owner));
-    $("items").innerHTML = list.map(t =>
-      "<div class='item"+(t.top?" top":"")+"'>"+(t.top?"<span class='toplbl'>Top priority today</span>":"")+
-      "<div class='top'><span class='ti'>"+t.ti+"</span><span class='pill "+ST[t.st][1]+"'>"+ST[t.st][0]+"</span></div>"+
-      "<dl><dt>Owner</dt><dd>"+t.own.join(", ")+"</dd><dt>Problem</dt><dd>"+t.prob+"</dd><dt>AI & tools</dt><dd>"+t.tools+"</dd><dt>Next step</dt><dd>"+t.next+"</dd></dl>"+
-      (t.steps ? "<div style='margin-top:10px;font-weight:750;font-size:.9rem'>Action steps to brainstorm</div><ol class='acts'>"+t.steps.map(x => "<li>"+x+"</li>").join("")+"</ol>" : "")+
-      "</div>").join("");
-    const WEEK = [
-      ["Coordinator","Run a 15-minute weekly check-in, keep this list current, and start the funder list."],
-      ["Builder","Prototype the Claude prompt that turns a link's Sayari records into a one-page verification memo."],
-      ["Investigator","Write the verification checklist, run it on the 4 links in the forced labor map, and time each one."],
-      ["Supply chain expert","Push 3 suppliers one tier further upstream and estimate one cost floor."],
-      ["Lawyer","Draft the wording ladder (what we can say at each evidence level) and the right-of-reply notice."],
-      ["Human rights researcher","Build the wage benchmark table for the top 10 garment countries."],
-      ["Designer","Test this prototype with 5 people and bring back what confused them."]
-    ].filter(w => owner === "Everyone" || w[0] === owner);
-    $("week").innerHTML = WEEK.map(w => "<li><b>"+w[0]+"</b>"+w[1]+"</li>").join("");
-  }
-
   const PHASES = [
     [0,5,"Kickoff: everyone photographs 3 clothing labels and drops them in a shared folder"],
     [5,35,"Sprint 1"],
@@ -942,15 +1149,56 @@ nav.tabs button[aria-selected="true"]{color:var(--ink);border-top-color:var(--ac
             ["Sprint 2","Sketch fixes for the top 2 confusion points and share them at wrap-up."]],
      prompt:"\"Write 6 short questions to test whether shoppers understand the four colors and three scores.\""}
   ];
+  const LISTS = [
+    ["UFLPA Entity List","DHS Forced Labor Enforcement Task Force · 187 entities since Aug 3, 2026"],
+    ["Withhold Release Orders & Findings","CBP forced labor enforcement dashboard"],
+    ["North Korean labor (CAATSA)","CBP enforcement of goods made with North Korean labor"],
+    ["Sanctions (incl. North Korea)","Treasury OFAC and other sanctions lists"]
+  ];
+  const RES = {review:["Possible match at Tier 4. Both sources list the company; the trade link needs review","amber"], clear:["No match","green"], match:["Match","red"], pending:["Not checked yet","grey"], partial:["No match in Sayari; official list not checked directly","amber"]};
+  const SCAN_STEPS = ["Reading the label","Matching the company","Tracing the supply chain","Scoring"];
+  const WEEK_ALL = [
+      ["Coordinator","Run a 15-minute weekly check-in, keep this list current, and start the funder list."],
+      ["Builder","Prototype the Claude prompt that turns a link's Sayari records into a one-page verification memo."],
+      ["Investigator","Write the verification checklist, run it on the 4 links in the forced labor map, and time each one."],
+      ["Supply chain expert","Push 3 suppliers one tier further upstream and estimate one cost floor."],
+      ["Lawyer","Draft the wording ladder (what we can say at each evidence level) and the right-of-reply notice."],
+      ["Human rights researcher","Build the wage benchmark table for the top 10 garment countries."],
+      ["Designer","Test this prototype with 5 people and bring back what confused them."]
+    ];
+
+  /* ---- Look of each sample in the Vis-a-Vis design ---- */
+  const LOOK = {test:{accent:"lime", short:"Real test trace"}, good:{accent:"cobalt", short:"Example: well traced"},
+                match:{accent:"coral", short:"Example: direct match"}, unknown:{accent:"sunflower", short:"Example: not enough data"}};
+
+  /* ---- To solve ---- */
+  const ST = {work:["Working","s-work"],part:["Partly working","s-part"],sim:["Simulated","s-sim"],no:["Not solved","s-no"],later:["Later","s-later"]};
+  const ROLES = ["Everyone","Coordinator","Builder","Investigator","Supply chain expert","Lawyer","Human rights researcher","Designer"];
+  let owner = "Everyone";
+  function renderTodo(){
+    $("owners").innerHTML = ROLES.map(r => "<button aria-pressed='"+(r===owner)+"' data-o='"+r+"'>"+r+"</button>").join("");
+    $("owners").querySelectorAll("button").forEach(b => b.addEventListener("click", () => { owner = b.dataset.o; renderTodo(); }));
+    const list = TODO.filter(t => owner === "Everyone" || t.own.includes(owner));
+    $("items").innerHTML = list.map(t =>
+      "<div class='card tight item"+(t.top?" pri":"")+"'>"+(t.top?"<span class='toplbl'>Top priority today</span>":"")+
+      "<div class='top'><span class='ti'>"+t.ti+"</span><span class='pill soft "+ST[t.st][1]+"'><span class='d'></span>"+ST[t.st][0]+"</span></div>"+
+      "<dl><dt>Owner</dt><dd>"+t.own.join(", ")+"</dd><dt>Problem</dt><dd>"+t.prob+"</dd><dt>AI &amp; tools</dt><dd>"+t.tools+"</dd><dt>Next step</dt><dd>"+t.next+"</dd></dl>"+
+      (t.steps ? "<div class='acts-h'>Action steps to brainstorm</div><ol class='acts'>"+t.steps.map(x => "<li>"+x+"</li>").join("")+"</ol>" : "")+
+      "</div>").join("");
+    const WEEK = WEEK_ALL.filter(w => owner === "Everyone" || w[0] === owner);
+    $("week").innerHTML = WEEK.map(w => "<li><b>"+w[0]+"</b>"+w[1]+"</li>").join("");
+  }
+
+  /* ---- Next hour ---- */
   const CK = "sc-hour-checks";
   function getChecks(){ try{ return JSON.parse(localStorage.getItem(CK)||"{}"); }catch(e){ return {}; } }
   function setChecks(o){ try{ localStorage.setItem(CK, JSON.stringify(o)); }catch(e){} }
   function renderPlan(){
     const ch = getChecks();
     $("plan").innerHTML = PLAN.map((p,i) =>
-      "<div class='pc'><div class='who'>"+p.who+"</div><div class='where'>"+p.where+"</div>"+
+      "<div class='card tight pc'><div class='who'>"+p.who+"</div><div class='where'>"+p.where+"</div>"+
       p.tasks.map((t,j) => { const id="t"+i+"-"+j;
-        return "<label class='task'><input type='checkbox' data-id='"+id+"'"+(ch[id]?" checked":"")+"><span class='lbl'><span class='when'>"+t[0]+"</span>"+t[1]+"</span></label>"; }).join("")+
+        return "<label class='task'><input type='checkbox' data-id='"+id+"'"+(ch[id]?" checked":"")+"><span><span class='when'>"+t[0]+"</span>"+t[1]+"</span></label>"; }).join("")+
       "<div class='prompt'><b>Prompt to try with Claude or Grok</b>"+p.prompt+"</div></div>").join("");
     $("plan").querySelectorAll("input").forEach(c => c.addEventListener("change", () => {
       const o = getChecks(); o[c.dataset.id] = c.checked; setChecks(o);
@@ -978,24 +1226,28 @@ nav.tabs button[aria-selected="true"]{color:var(--ink);border-top-color:var(--ac
     $("clearChecks").addEventListener("click", () => { setChecks({}); renderPlan(); });
   }
 
+  /* ---- Submit a source ---- */
   const STAGES = ["Received","Pull out the claims","Match the company","Look for supporting evidence","Rate the source","Decide where it goes"];
   const SK = "sc-submissions";
+  function esc(t){ const d=document.createElement("div"); d.textContent=t; return d.innerHTML; }
   function getSubs(){ try{ return JSON.parse(localStorage.getItem(SK)||"[]"); }catch(e){ return []; } }
   function renderSubs(){
     const l = getSubs();
-    $("subs").innerHTML = l.length ? l.slice().reverse().map(x => "<li><b>"+x.route+"</b> · confidence "+x.conf+"<br><span style='color:var(--muted)'>"+x.co+": "+x.claim+"</span></li>").join("")
-      : "<li style='color:var(--muted)'>Nothing submitted yet.</li>";
+    $("subs").innerHTML = l.length ? l.slice().reverse().map(x => "<li><b>"+esc(x.route)+"</b> · confidence "+esc(x.conf)+"<br><span class='muted'>"+esc(x.co)+": "+esc(x.claim)+"</span></li>").join("")
+      : "<li class='muted'>Nothing submitted yet.</li>";
   }
   function renderPipe(n, outs){
     $("pipe").innerHTML = STAGES.map((st,i) => "<li class='"+(i<n?"on":"")+"'><span class='ic'>"+(i<n?"✓":i+1)+"</span><span><span class='nm'>"+st+"</span><div class='out'>"+(i<n&&outs?outs[i]:"")+"</div></span></li>").join("");
   }
-  function esc(t){ const d=document.createElement("div"); d.textContent=t; return d.innerHTML; }
+  function showOutcome(color, head, body){
+    const o = $("outcome"); o.className = "outcome " + color; o.style.display = "block";
+    $("oH").textContent = head; $("oP").textContent = body;
+  }
   function runAgent(){
     const co = $("sCo").value.trim(), typeV = $("sType").value, cred = parseFloat(typeV), worker = typeV.endsWith("w");
     const typeName = $("sType").selectedOptions[0].text, link = $("sLink").value.trim(), claim = $("sClaim").value.trim();
     const pos = $("sDir").value === "pos", names = $("sNames").checked, anon = $("sAnon").checked;
-    if (!claim){ $("outcome").style.display="block"; $("outcome").style.setProperty("--c","var(--amber)");
-      $("oH").textContent="Add what the source shows"; $("oP").textContent="Describe the claim in a sentence so the agent knows what to check."; return; }
+    if (!claim){ showOutcome("amber", "Add what the source shows", "Describe the claim in a sentence so the agent knows what to check."); return; }
     const corroborated = cred >= 0.7 && !!link;
     const outs = [
       typeName + (anon ? ". Your identity is kept private." : ".") + (worker ? " Worker accounts get extra privacy protection." : ""),
@@ -1022,8 +1274,7 @@ nav.tabs button[aria-selected="true"]{color:var(--ink);border-top-color:var(--ac
     const iv = setInterval(() => {
       n++; renderPipe(n, outs);
       if (n >= STAGES.length){ clearInterval(iv); $("sGo").disabled = false;
-        $("outcome").style.display="block"; $("outcome").style.setProperty("--c","var(--"+color+")");
-        $("oH").textContent = route + " · confidence " + conf; $("oP").textContent = expl;
+        showOutcome(color, route + " · confidence " + conf, expl);
         const l = getSubs(); l.push({co: co || "Industry context", claim: claim.slice(0,80), route, conf});
         try{ localStorage.setItem(SK, JSON.stringify(l.slice(-20))); }catch(e){}
         renderSubs(); }
@@ -1037,19 +1288,7 @@ nav.tabs button[aria-selected="true"]{color:var(--ink);border-top-color:var(--ac
     $("methBack").addEventListener("click", () => show(lastView));
   }
 
-  const LISTS = [
-    ["UFLPA Entity List","DHS Forced Labor Enforcement Task Force · 187 entities since Aug 3, 2026"],
-    ["Withhold Release Orders & Findings","CBP forced labor enforcement dashboard"],
-    ["North Korean labor (CAATSA)","CBP enforcement of goods made with North Korean labor"],
-    ["Sanctions (incl. North Korea)","Treasury OFAC and other sanctions lists"]
-  ];
-  const RES = {review:["Possible match at Tier 4. Both sources list the company; the trade link needs review","amber"], clear:["No match","green"], match:["Match","red"], pending:["Not checked yet","grey"], partial:["No match in Sayari; official list not checked directly","amber"]};
-  let cur = "test";
-  const colorFor = d => d.conf < 40 ? "grey" : d.risk >= 65 ? "red" : d.risk >= 35 ? "amber" : "green";
-  const goodColor = v => v >= 65 ? "green" : v >= 40 ? "amber" : "grey";
-
-  function setRing(el, val, c){ el.style.setProperty("--p", val); el.style.setProperty("--c", "var(--"+c+")"); }
-
+  /* ---- Map, at-a-glance list and method page (prototype code, unchanged) ---- */
   const MAPBASE = {
     land:"M122.0,0L122.0,0.6L116.9,6.7L98.6,2.3L91.9,26.3L87.2,29.2L68.9,34.4L77.2,56.7L70.9,60.0L71.6,67.1L65.9,65.3L61.3,60.8L47.6,59.5L32.3,59.1L29.0,60.5L15.8,55.2L10.6,57.8L9.1,65.3L0,62.6L0,0ZM0,82.4L5.1,85.5L0,89.3L0,82.4ZM277.6,386.0L275.5,374.6L281.4,366.7L293.3,364.9L302.0,366.3L309.6,370.0L313.8,363.4L321.9,366.9L324.1,373.3L322.9,384.6L307.4,391.9L311.5,397.6L301.8,398.3L293.8,402.0L286.1,400.7L282.3,395.8ZM248.0,430L244.5,426.1L240.0,421.7L238.5,427.2L236.7,422.0L237.7,416.2L240.4,407.2L244.9,397.6L250.0,388.8L246.4,380.2L246.5,375.8L245.5,370.5L239.3,362.9L237.1,358.1L240.3,356.4L243.7,348.0L239.9,341.7L234.0,334.6L229.6,326.1L233.5,324.3L237.7,313.8L244.2,313.3L249.6,309.1L254.9,306.8L258.8,309.8L259.4,315.7L265.6,316.2L263.4,326.5L263.6,335.2L273.3,329.4L276.1,331.1L281.5,330.8L283.3,327.4L290.3,328.1L297.3,336.0L297.9,345.5L305.4,353.9L305.0,362.0L302.0,366.3L302.0,366.3L293.3,364.9L281.4,366.7L275.5,374.6L277.6,386.0L269.4,381.7L261.5,381.9L262.8,374.4L254.7,374.5L254.0,384.9L249.0,398.7L246.0,407.0L246.6,413.7L252.6,414.0L256.4,422.5L257.9,430L248.0,430ZM321.9,366.9L313.8,363.4L309.6,370.0L302.0,366.3L305.0,362.0L305.4,353.9L297.9,345.5L297.3,336.0L290.3,328.1L283.3,327.4L281.5,330.8L276.1,331.1L273.3,329.4L263.6,335.2L263.4,326.5L265.6,316.2L259.4,315.7L258.8,309.8L254.9,306.8L256.8,303.2L264.7,296.7L265.5,299.1L270.4,299.3L269.0,288.0L273.8,286.5L279.2,294.4L283.4,303.4L294.7,303.5L298.3,312.0L292.4,314.6L289.7,318.1L300.8,324.0L308.5,335.4L314.3,343.9L321.3,350.6L323.6,357.4ZM254.9,306.8L249.6,309.1L244.2,313.3L237.7,313.8L233.5,324.3L229.6,326.1L234.0,334.6L239.9,341.7L243.7,348.0L240.3,356.4L237.1,358.1L239.3,362.9L245.5,370.5L246.5,375.8L246.4,380.2L250.0,388.8L244.9,397.6L240.4,407.2L239.5,400.3L242.4,393.1L239.3,387.5L240.0,377.2L236.3,372.3L233.3,360.9L231.6,348.8L227.6,340.8L221.5,345.6L211.1,352.5L205.9,351.6L200.2,349.4L203.4,337.5L201.4,328.4L194.2,317.1L195.3,313.6L189.9,312.3L183.4,304.3L182.8,296.4L186.0,297.9L186.2,290.7L190.7,288.4L189.7,284.1L191.8,280.7L192.2,270.3L199.4,272.6L203.5,264.3L204.0,259.3L209.1,250.7L208.8,244.8L220.7,237.7L227.3,239.6L226.6,233.2L229.8,231.2L229.1,227.3L234.5,226.5L237.6,232.7L241.6,235.1L241.9,243.1L241.5,251.6L232.8,260.1L231.7,272.1L241.4,270.5L243.6,279.7L249.5,281.7L246.8,290.0L253.6,293.7L257.6,295.5L264.4,292.6L264.7,296.7L256.8,303.2ZM293.8,402.0L301.8,398.3L311.5,397.6L307.4,391.9L322.9,384.6L324.1,373.3L321.9,366.9L323.6,357.4L321.3,350.6L314.3,343.9L308.5,335.4L300.8,324.0L289.7,318.1L292.4,314.6L298.3,312.0L294.7,303.5L283.4,303.4L279.2,294.4L273.8,286.5L278.8,284.1L286.1,284.1L295.1,283.0L303.0,277.6L307.4,281.4L315.9,283.2L314.4,289.0L318.8,293.0L328.1,295.6L315.8,304.1L308.1,313.3L306.1,320.1L313.1,330.4L321.7,343.0L330.1,349.0L335.7,356.7L339.9,374.3L338.7,390.9L331.0,397.1L320.4,403.2L312.9,411.0L301.4,419.7L298.0,413.7L300.6,407.4ZM480,98.5L477.7,96.8L480,94.5L480,98.5ZM430.9,0L436.3,6.1L435.3,10.9L428.0,9.4L414.6,11.2L408.1,15.0L401.3,23.8L387.3,28.9L378.1,35.8L368.5,33.2L363.4,32.0L358.5,40.4L361.5,45.3L363.0,49.6L356.5,53.8L349.9,60.6L339.1,65.0L325.3,65.5L310.4,69.8L299.6,76.5L295.5,72.6L284.4,72.7L270.7,65.1L261.6,63.2L249.3,65.0L230.3,62.1L220.1,62.4L214.7,54.9L210.5,43.2L204.8,41.7L193.6,33.6L181.2,31.8L170.2,29.6L166.9,23.9L170.5,8.3L165.6,0L430.9,0ZM0,223.4L3.0,219.9L8.8,209.2L17.7,198.4L17.6,190.7L25.4,184.4L18.0,179.0L14.8,171.6L11.5,161.8L16.1,157.0L30.1,159.7L40.4,158.1L49.3,148.6L59.2,161.8L58.2,170.8L61.9,176.5L61.6,182.1L55.0,180.6L57.6,192.6L66.6,199.5L79.5,206.9L73.6,211.8L70.0,221.7L79.0,225.7L87.7,230.8L99.7,236.6L112.4,238.0L117.7,243.3L124.8,244.2L135.9,246.6L143.6,246.5L144.7,242.4L143.5,235.8L144.2,231.3L149.8,229.1L150.6,237.3L150.8,239.4L159.1,243.3L165.0,241.7L172.7,242.4L180.3,242.1L180.9,235.7L177.2,232.4L184.6,231.1L193.0,223.3L203.7,216.6L211.4,219.2L218.0,214.7L222.3,221.3L219.2,225.7L229.1,227.3L229.1,227.3L229.8,231.2L226.6,233.2L227.3,239.6L220.7,237.7L208.8,244.8L209.1,250.7L204.0,259.3L203.5,264.3L199.4,272.6L192.2,270.3L191.8,280.7L189.7,284.1L190.7,288.4L186.2,290.7L181.3,274.9L178.8,274.9L177.2,281.3L172.2,276.1L175.1,270.4L179.2,269.8L183.4,261.2L178.1,259.5L169.6,259.6L160.8,258.2L160.0,251.1L155.6,250.6L148.2,246.1L145.0,253.1L151.6,258.5L145.9,262.3L143.8,266.0L149.5,268.7L147.9,274.8L151.1,282.4L152.6,290.6L151.3,294.2L145.0,294.1L133.6,296.2L134.1,303.6L129.2,309.4L115.9,316.0L105.6,327.5L98.6,333.6L89.5,340.0L89.4,344.4L84.9,346.8L76.5,350.2L72.2,350.7L69.4,358.0L71.4,370.4L71.9,378.3L67.9,387.3L67.9,403.3L63.1,403.7L58.9,410.9L61.7,413.9L53.3,416.6L50.2,422.9L46.5,425.6L37.8,416.9L33.5,403.8L30.0,394.3L26.7,389.9L21.8,380.8L19.5,368.9L17.9,363.0L9.5,349.8L5.7,331.1L3.0,318.7L3.0,306.8L1.2,297.6L0,298.1L0,223.4ZM186.2,290.7L186.0,297.9L182.8,296.4L183.4,304.3L180.7,299.2L180.2,294.1L178.4,289.3L174.6,283.5L166.1,283.1L166.9,287.2L164.0,292.8L160.1,290.8L158.7,292.6L156.1,291.5L152.6,290.6L151.1,282.4L147.9,274.8L149.5,268.7L143.8,266.0L145.9,262.3L151.6,258.5L145.0,253.1L148.2,246.1L155.6,250.6L160.0,251.1L160.8,258.2L169.6,259.6L178.1,259.5L183.4,261.2L179.2,269.8L175.1,270.4L172.2,276.1L177.2,281.3L178.8,274.9L181.3,274.9ZM177.2,232.4L180.9,235.7L180.3,242.1L172.7,242.4L165.0,241.7L159.1,243.3L150.8,239.4L150.6,237.3L156.7,229.6L161.7,226.9L168.2,229.3L173.1,229.6ZM144.2,231.3L143.5,235.8L144.7,242.4L143.6,246.5L135.9,246.6L124.8,244.2L117.7,243.3L112.4,238.0L99.7,236.6L87.7,230.8L79.0,225.7L70.0,221.7L73.6,211.8L79.5,206.9L83.3,204.4L90.7,207.7L100.0,214.6L105.2,216.1L108.3,221.2L115.5,223.3L123.0,227.9L133.4,230.3ZM0,135.5L3.9,134.6L14.5,133.2L19.2,131.1L24.5,129.8L31.4,135.2L34.1,144.0L49.3,148.6L49.3,148.6L40.4,158.1L30.1,159.7L16.1,157.0L11.5,161.8L14.8,171.6L18.0,179.0L25.4,184.4L17.6,190.7L17.7,198.4L8.8,209.2L3.0,219.9L0,223.4L0,135.5ZM0,131.2L1.3,130.8L7.0,125.6L13.4,126.5L22.9,126.5L24.5,129.8L19.2,131.1L14.5,133.2L3.9,134.6L0,135.5L0,131.2ZM0,103.9L10.9,102.8L13.2,113.8L16.2,112.6L21.8,115.3L21.5,119.8L22.9,126.5L13.4,126.5L7.0,125.6L1.3,130.8L0,131.2L0,103.9ZM0,62.6L9.1,65.3L10.6,57.8L15.8,55.2L29.0,60.5L32.3,59.1L47.6,59.5L61.3,60.8L65.9,65.3L71.6,67.1L70.3,70.0L55.8,76.7L52.5,81.6L40.7,83.0L37.2,90.8L27.4,89.2L21.0,91.5L12.2,97.2L13.5,100.0L10.9,102.8L0,103.9L0,89.3L0,89.3L5.1,85.5L0,82.4L0,62.6ZM67.2,430L66.4,423.4L70.6,408.3L77.0,413.4L81.3,420.0L85.7,429.7L85.7,429.7L85.7,430L67.2,430ZM341.2,328.5L333.7,325.5L333.4,317.1L337.9,312.7L348.0,309.9L353.3,310.2L355.4,313.9L351.3,318.2L349.2,323.9ZM165.6,0L170.5,8.3L166.9,23.9L170.2,29.6L181.2,31.8L193.6,33.6L204.8,41.7L210.5,43.2L214.7,54.9L220.1,62.4L230.3,62.1L249.3,65.0L261.6,63.2L270.7,65.1L284.4,72.7L295.5,72.6L299.6,76.5L310.4,69.8L325.3,65.5L339.1,65.0L349.9,60.6L356.5,53.8L363.0,49.6L361.5,45.3L358.5,40.4L363.4,32.0L368.5,33.2L378.1,35.8L387.3,28.9L401.3,23.8L408.1,15.0L414.6,11.2L428.0,9.4L435.3,10.9L436.3,6.1L430.9,0L480,0L480,94.5L477.7,96.8L464.8,100.3L458.1,105.9L448.1,109.1L453.0,103.6L451.1,99.0L458.4,90.9L453.5,84.5L445.5,88.8L435.0,97.2L429.3,104.9L420.3,105.5L415.6,111.0L420.5,119.0L428.0,120.9L428.3,126.2L435.6,129.5L446.0,121.2L454.2,125.8L460.1,126.1L461.6,132.2L448.6,135.4L444.2,141.6L435.3,147.3L430.5,155.2L440.5,161.4L444.1,172.3L449.7,182.4L456.0,190.7L455.8,198.7L450.0,201.7L452.2,207.4L457.7,210.7L456.3,219.3L453.9,227.7L448.8,228.6L442.0,239.9L434.5,253.4L426.0,265.6L413.3,274.9L400.4,283.3L390.0,284.5L384.4,288.9L381.2,285.7L376.0,290.6L363.1,295.6L353.3,297.1L350.2,307.6L345.1,308.1L342.6,301.0L344.8,297.2L332.4,294.0L328.1,295.6L318.8,293.0L314.4,289.0L315.9,283.2L307.4,281.4L303.0,277.6L295.1,283.0L286.1,284.1L278.8,284.1L273.8,286.5L269.0,288.0L270.4,299.3L265.5,299.1L264.7,296.7L264.4,292.6L257.6,295.5L253.6,293.7L246.8,290.0L249.5,281.7L243.6,279.7L241.4,270.5L231.7,272.1L232.8,260.1L241.5,251.6L241.9,243.1L241.6,235.1L237.6,232.7L234.5,226.5L229.1,227.3L219.2,225.7L222.3,221.3L218.0,214.7L211.4,219.2L203.7,216.6L193.0,223.3L184.6,231.1L177.2,232.4L173.1,229.6L168.2,229.3L161.7,226.9L156.7,229.6L150.6,237.3L149.8,229.1L144.2,231.3L133.4,230.3L123.0,227.9L115.5,223.3L108.3,221.2L105.2,216.1L100.0,214.6L90.7,207.7L83.3,204.4L79.5,206.9L66.6,199.5L57.6,192.6L55.0,180.6L61.6,182.1L61.9,176.5L58.2,170.8L59.2,161.8L49.3,148.6L34.1,144.0L31.4,135.2L24.5,129.8L22.9,126.5L21.5,119.8L21.8,115.3L16.2,112.6L13.2,113.8L10.9,102.8L13.5,100.0L12.2,97.2L21.0,91.5L27.4,89.2L37.2,90.8L40.7,83.0L52.5,81.6L55.8,76.7L70.3,70.0L71.6,67.1L71.6,67.1L70.9,60.0L77.2,56.7L68.9,34.4L87.2,29.2L91.9,26.3L98.6,2.3L116.9,6.7L122.0,0.6L122.0,0L165.6,0ZM454.8,267.1L449.2,283.3L445.3,291.5L440.4,283.0L439.3,275.6L444.8,265.6L452.2,257.9L456.4,261.0ZM446.1,381.1L441.3,373.9L449.2,374.3L452.5,377.7L450.0,385.9ZM462.2,406.8L464.6,404.2L465.6,398.3L470.6,397.8L469.2,404.1L476.0,395.0L475.1,404.0L471.8,407.1L468.9,413.0L466.0,415.8L460.3,409.3ZM475.8,430L471.7,426.8L469.3,430L457.4,430L457.4,430L459.7,425.0L465.5,422.3L470.5,418.8L473.8,423.1L480,420.8L480,430ZM424.6,413.0L412.3,421.9L416.8,415.3L423.5,409.6L429.0,403.1L433.9,393.7L435.5,401.4L429.4,406.6ZM459.9,328.3L458.4,332.3L461.6,339.2L459.1,347.2L453.7,350.4L452.3,358.1L454.3,365.7L459.2,366.8L463.3,365.7L474.8,370.9L473.9,376.1L477.0,378.4L476.0,382.7L468.8,378.1L465.4,373.1L463.0,376.6L457.2,370.9L448.8,372.3L444.2,370.2L444.6,366.3L447.5,363.8L444.8,361.7L443.6,365.1L439.0,359.6L437.7,355.4L437.3,346.2L441.0,349.4L442.0,334.3L445.0,325.5L450.6,325.6L456.3,328.3L459.1,325.8ZM457.2,393.3L455.8,388.8L461.3,391.7L467.2,391.7L467.0,395.7L462.7,399.6L456.9,402.5L456.5,398.1ZM480,398.3L479.5,398.2L478.1,392.6L480,392.8L480,398.3ZM480,385.4L477.8,382.5L480,382.6L480,385.4Z",
     borders:"M122.0,0L122.0,0.6L116.9,6.7L98.6,2.3L91.9,26.3L87.2,29.2L68.9,34.4L77.2,56.7L70.9,60.0L71.6,67.1L65.9,65.3L61.3,60.8L47.6,59.5L32.3,59.1L29.0,60.5L15.8,55.2L10.6,57.8L9.1,65.3L0,62.6M0,82.4L5.1,85.5L0,89.3M277.6,386.0L275.5,374.6L281.4,366.7L293.3,364.9L302.0,366.3L309.6,370.0L313.8,363.4L321.9,366.9L324.1,373.3L322.9,384.6L307.4,391.9L311.5,397.6L301.8,398.3L293.8,402.0M240.4,407.2L244.9,397.6L250.0,388.8L246.4,380.2L246.5,375.8L245.5,370.5L239.3,362.9L237.1,358.1L240.3,356.4L243.7,348.0L239.9,341.7L234.0,334.6L229.6,326.1L233.5,324.3L237.7,313.8L244.2,313.3L249.6,309.1L254.9,306.8L258.8,309.8L259.4,315.7L265.6,316.2L263.4,326.5L263.6,335.2L273.3,329.4L276.1,331.1L281.5,330.8L283.3,327.4L290.3,328.1L297.3,336.0L297.9,345.5L305.4,353.9L305.0,362.0L302.0,366.3M254.9,306.8L256.8,303.2L264.7,296.7L265.5,299.1L270.4,299.3L269.0,288.0L273.8,286.5L279.2,294.4L283.4,303.4L294.7,303.5L298.3,312.0L292.4,314.6L289.7,318.1L300.8,324.0L308.5,335.4L314.3,343.9L321.3,350.6L323.6,357.4L321.9,366.9M183.4,304.3L182.8,296.4L186.0,297.9L186.2,290.7L190.7,288.4L189.7,284.1L191.8,280.7L192.2,270.3L199.4,272.6L203.5,264.3L204.0,259.3L209.1,250.7L208.8,244.8L220.7,237.7L227.3,239.6L226.6,233.2L229.8,231.2L229.1,227.3L234.5,226.5L237.6,232.7L241.6,235.1L241.9,243.1L241.5,251.6L232.8,260.1L231.7,272.1L241.4,270.5L243.6,279.7L249.5,281.7L246.8,290.0L253.6,293.7L257.6,295.5L264.4,292.6L264.7,296.7M273.8,286.5L278.8,284.1L286.1,284.1L295.1,283.0L303.0,277.6L307.4,281.4L315.9,283.2L314.4,289.0L318.8,293.0L328.1,295.6M477.7,96.8L480,94.5M430.9,0L436.3,6.1L435.3,10.9L428.0,9.4L414.6,11.2L408.1,15.0L401.3,23.8L387.3,28.9L378.1,35.8L368.5,33.2L363.4,32.0L358.5,40.4L361.5,45.3L363.0,49.6L356.5,53.8L349.9,60.6L339.1,65.0L325.3,65.5L310.4,69.8L299.6,76.5L295.5,72.6L284.4,72.7L270.7,65.1L261.6,63.2L249.3,65.0L230.3,62.1L220.1,62.4L214.7,54.9L210.5,43.2L204.8,41.7L193.6,33.6L181.2,31.8L170.2,29.6L166.9,23.9L170.5,8.3L165.6,0M186.2,290.7L181.3,274.9L178.8,274.9L177.2,281.3L172.2,276.1L175.1,270.4L179.2,269.8L183.4,261.2L178.1,259.5L169.6,259.6L160.8,258.2L160.0,251.1L155.6,250.6L148.2,246.1L145.0,253.1L151.6,258.5L145.9,262.3L143.8,266.0L149.5,268.7L147.9,274.8L151.1,282.4L152.6,290.6M0,223.4L3.0,219.9L8.8,209.2L17.7,198.4L17.6,190.7L25.4,184.4L18.0,179.0L14.8,171.6L11.5,161.8L16.1,157.0L30.1,159.7L40.4,158.1L49.3,148.6L59.2,161.8L58.2,170.8L61.9,176.5L61.6,182.1L55.0,180.6L57.6,192.6L66.6,199.5L79.5,206.9L73.6,211.8L70.0,221.7L79.0,225.7L87.7,230.8L99.7,236.6L112.4,238.0L117.7,243.3L124.8,244.2L135.9,246.6L143.6,246.5L144.7,242.4L143.5,235.8L144.2,231.3L149.8,229.1L150.6,237.3L150.8,239.4L159.1,243.3L165.0,241.7L172.7,242.4L180.3,242.1L180.9,235.7L177.2,232.4L184.6,231.1L193.0,223.3L203.7,216.6L211.4,219.2L218.0,214.7L222.3,221.3L219.2,225.7L229.1,227.3M150.6,237.3L156.7,229.6L161.7,226.9L168.2,229.3L173.1,229.6L177.2,232.4M79.5,206.9L83.3,204.4L90.7,207.7L100.0,214.6L105.2,216.1L108.3,221.2L115.5,223.3L123.0,227.9L133.4,230.3L144.2,231.3M0,135.5L3.9,134.6L14.5,133.2L19.2,131.1L24.5,129.8L31.4,135.2L34.1,144.0L49.3,148.6M0,131.2L1.3,130.8L7.0,125.6L13.4,126.5L22.9,126.5L24.5,129.8M0,103.9L10.9,102.8L13.2,113.8L16.2,112.6L21.8,115.3L21.5,119.8L22.9,126.5M71.6,67.1L70.3,70.0L55.8,76.7L52.5,81.6L40.7,83.0L37.2,90.8L27.4,89.2L21.0,91.5L12.2,97.2L13.5,100.0L10.9,102.8",
@@ -1134,63 +1373,120 @@ nav.tabs button[aria-selected="true"]{color:var(--ink);border-top-color:var(--ac
     });
   }
 
+  /* ---- Screens in the Vis-a-Vis design ---- */
+  let cur = "test";
+  const colorFor = d => d.conf < 40 ? "grey" : d.risk >= 65 ? "red" : d.risk >= 35 ? "amber" : "green";
+  const bandFor = r => r >= 65 ? ["High","red"] : r >= 35 ? ["Elevated","amber"] : ["Low","green"];
+  const VLABEL = {green:"Green", amber:"Amber", red:"Red", grey:"Grey"};
+  const RISKWORD = {green:"Low risk", amber:"Elevated risk", red:"High risk", grey:"Risk unknown"};
+  const NO_FINDINGS = /^(none\.?|no supplier-specific risk findings\.?)$/i;
+  const LEAD = /\blead\b|unverified|review/i;
+  const teeSVG = c => "<svg viewBox='0 0 40 40' aria-hidden='true'><path d='M14 6l-9 5 3 7 4-2v18h16V16l4 2 3-7-9-5c-1 3-3.5 4.5-6 4.5S15 9 14 6z' fill='var(--"+c+")' stroke='var(--fg)' stroke-width='1.6' stroke-linejoin='round'/></svg>";
+
+  function riskCard(d){
+    const [band, bc] = bandFor(d.risk), c = d.conf < 40 ? "grey" : bc, arc = Math.PI * 42;
+    return "<p class='eyebrow'>Risk</p><div class='dial "+c+"'><svg viewBox='0 0 110 60' role='img' aria-label='Risk "+d.risk+" out of 100'>"+
+      "<path d='M 13 55 A 42 42 0 0 1 97 55' fill='none' stroke-width='11' stroke-linecap='round' stroke='var(--muted)'/>"+
+      "<path d='M 13 55 A 42 42 0 0 1 97 55' fill='none' stroke-width='11' stroke-linecap='round' stroke='var(--c)' stroke-dasharray='"+(d.risk/100*arc).toFixed(1)+" "+arc.toFixed(1)+"'/>"+
+      "</svg><span class='num'>"+d.risk+"</span></div>"+
+      "<p class='band "+c+"'>"+(d.conf < 40 ? "Not reliable yet" : band+" risk")+"</p>"+
+      "<p class='score-note center'>Forced labor risk, worst tier. We keep the worst step in the chain, not the average.</p>";
+  }
+  function confCard(v){
+    const filled = Math.round(v/10);
+    return "<p class='eyebrow'>Confidence</p><p class='big'>"+v+"<small>%</small></p>"+
+      "<div class='dots' role='img' aria-label='"+filled+" of 10'>"+Array.from({length:10},(_,i)=>"<span class='"+(i<filled?"on":"")+"'></span>").join("")+"</div>"+
+      "<p class='score-note'>How much is verified. "+(v < 40 ? "Below 40%, so the result is grey." : v < 70 ? "Decent, but there are holes." : "Most of this has been checked.")+"</p>";
+  }
+  function transCard(v){
+    return "<p class='eyebrow'>Transparency</p><p class='big'>"+v+"</p>"+
+      "<div class='bar' role='img' aria-label='"+v+" of 100'><span style='width:"+v+"%'></span></div>"+
+      "<p class='score-note'>How far it's traced, from the finished product back to raw cotton.</p>";
+  }
+  function renderShelf(){
+    $("shelf").innerHTML = Object.keys(S).map(k => { const d = S[k], L = LOOK[k], col = colorFor(d);
+      return "<button data-s='"+k+"' aria-pressed='"+(k===cur)+"' class='acc-"+L.accent+"'><span class='tee'>"+teeSVG(L.accent)+"</span>"+
+        "<span style='min-width:0'><span class='nm'>"+L.short+"</span><span class='meta'>"+d.product.replace(/^Real test trace: /,"")+" · "+d.made+"</span>"+
+        "<span class='vchip sm "+col+"'>"+d.verdict+"</span></span></button>"; }).join("");
+    $("shelf").querySelectorAll("button").forEach(b => b.addEventListener("click", () => pick(b.dataset.s)));
+  }
+
   function render(){
     const d = S[cur];
+    $("kind").className = "kind " + (d.real ? "real" : "fake");
+    $("kind").textContent = d.real ? "Real data" : "Example";
     $("lbl").innerHTML = "<b>"+d.brand.toUpperCase()+"</b><span class='hl'>"+d.rn+"</span><br><span class='hl'>Made in "+d.made+"</span><br><span class='hl'>"+d.fiber+"</span><br>Machine wash cold";
     $("readout").innerHTML =
       [["Brand",d.brand],["RN number",d.rn],["Made in",d.made],["Fiber",d.fiber]].map(r =>
         "<div><span>"+r[0]+"</span><span>"+r[1]+"<span class='ok' aria-label='read'>✓</span></span></div>").join("");
     $("readout").hidden = true; $("scanProg").hidden = true; $("vf").classList.remove("vf-done");
     $("vfCap").textContent = "Fit the care label inside the frame"; $("scanBtn").textContent = "Scan label";
-
     document.querySelectorAll("[data-badge]").forEach(b => { b.className = "databadge " + (d.real ? "real" : "fake"); b.innerHTML = d.badge; });
+    renderShelf();
+
     const col = colorFor(d);
     $("rTitle").textContent = d.product;
     $("rSub").textContent = d.brand + " · " + d.rn + " · Made in " + d.made;
-    $("rTag").className = "tag " + col;
+    $("rTag").className = "verdict " + col;
+    $("rChip").textContent = VLABEL[col];
+    $("rChip").className = "vchip lg " + col;
     $("rVerdict").textContent = d.verdict;
     $("rVerdictSub").textContent = d.verdictSub;
-    $("nRisk").textContent = d.risk; $("nConf").textContent = d.conf + "%"; $("nTrans").textContent = d.trans;
-    setRing($("ringRisk"), d.risk, d.conf < 40 ? "grey" : col);
-    setRing($("ringConf"), d.conf, goodColor(d.conf));
-    setRing($("ringTrans"), d.trans, goodColor(d.trans));
+    let banners = "";
+    if (d.lists.includes("match")) banners += "<div class='banner red'><p class='eyebrow'>Official banned-list match</p><p>"+RES.match[0]+" on the "+LISTS[d.lists.indexOf("match")][0]+". A verified official-list match is red no matter what else is true.</p></div>";
+    if (d.lists.includes("review")) banners += "<div class='banner amber'><p class='eyebrow'>Possible banned-list match</p><p>"+RES.review[0]+".</p></div>";
+    if (d.conf < 40) banners += "<div class='banner grey'><p class='eyebrow'>Grey, on purpose</p><p>Confidence is "+d.conf+"%. Below 40%, the result turns grey (\"not enough data\") whatever the risk number says. Not checked is never shown as clean.</p></div>";
+    $("rBanners").innerHTML = banners;
+    $("scRisk").innerHTML = riskCard(d);
+    $("scConf").innerHTML = confCard(d.conf);
+    $("scTrans").innerHTML = transCard(d.trans);
     $("rReasons").innerHTML = d.reasons.map(r => "<li>"+r+"</li>").join("");
 
     $("cTitle").textContent = d.product;
     $("ladder").innerHTML = d.tiers.map(t =>
-      "<li class='rung "+t.c+(t.est?" est":"")+"'><span class='mk'></span><span class='t'>"+t.t+"</span><span class='st'>"+t.s+"</span><p>"+t.p+"</p></li>").join("");
+      "<li class='tier"+(t.est?" est":"")+"'><div class='row'><span class='t'>"+t.t+"</span><span class='pills'>"+
+      "<span class='pill soft st-"+t.s.toLowerCase().replace(/\s+/g,"-")+"'>"+t.s+"</span>"+
+      "<span class='pill risk "+t.c+"'><span class='d'></span>"+RISKWORD[t.c]+"</span></span></div><p>"+t.p+"</p></li>").join("");
+    const max = Math.max(1, ...d.countries.map(c => c[1]));
     $("countries").innerHTML = d.countries.length
-      ? d.countries.map(c => "<div class='crow "+c[2]+"'><span class='dot'></span><span>"+c[0]+"</span><span>"+c[1]+" suppliers</span></div>").join("") +
-        (d.countriesNote ? "<p class='hint' style='margin:6px 0 0'>"+d.countriesNote+"</p>" : "")
-      : "<p class='hint' style='margin:0'>"+d.countriesNote+"</p>";
-    $("flags").innerHTML =
-      "<h3>About specific suppliers</h3><ul>"+d.evidence.map(e=>"<li>"+e+"</li>").join("")+"</ul>"+
-      "<h3>Industry and country context</h3><ul>"+d.context.map(e=>"<li>"+e+"</li>").join("")+"</ul>";
+      ? d.countries.map(c => "<div class='crow "+c[2]+"'><span class='cn'><span class='d'></span>"+c[0]+"</span><span class='ct'>"+c[1]+" suppliers</span>"+
+          "<span class='track'><span style='width:"+Math.round(c[1]/max*100)+"%'></span></span></div>").join("") +
+        (d.countriesNote ? "<p class='sub' style='margin-top:10px'>"+d.countriesNote+"</p>" : "")
+      : "<p class='muted' style='font-size:.9rem'>"+d.countriesNote+"</p>";
     $("lists").innerHTML = LISTS.map((l,i) => { const r = RES[d.lists[i]];
-      return "<tr><td>"+l[0]+"<span class='src'>"+l[1]+"</span></td><td><span class='res' style='--c:var(--"+r[1]+")'>"+r[0]+"</span></td></tr>"; }).join("");
+      return "<div class='lrow'><span class='nm'>"+l[0]+"<span class='src'>"+l[1]+"</span></span><span class='pill risk "+r[1]+"'><span class='d'></span>"+r[0]+"</span></div>"; }).join("");
+    $("evidence").innerHTML = (d.evidence.length === 1 && NO_FINDINGS.test(d.evidence[0]))
+      ? "<p class='ev-empty'>"+d.evidence[0]+"</p>"
+      : d.evidence.map(e => "<article class='ev'><div class='tags'><span class='pill tag-find'>About a specific supplier</span>"+
+          (LEAD.test(e) ? "<span class='pill tag-lead'>Unverified lead</span>" : "")+"</div><p>"+e+"</p></article>").join("");
+    $("context").innerHTML = d.context.map(e => "<article class='ev'><div class='tags'><span class='pill tag-ctx'>Context</span></div><p>"+e+"</p></article>").join("");
     $("sources").textContent = d.sources;
     $("chainNote").textContent = d.note;
     renderMap(d.map);
     renderGlance(d.map);
     renderMethod(d);
+    $("toMap").hidden = !d.map;
   }
 
+  function pick(k){
+    cur = k;
+    document.querySelectorAll(".scen button").forEach(x => x.setAttribute("aria-pressed", x.dataset.s === k ? "true" : "false"));
+    render();
+  }
+
+  const MAIN = ["scan","result","chain","uflpa","todo","hour"];
   function show(v){
-    if (v === "submit" || v === "method"){ const vis = ["scan","result","chain","uflpa","todo","hour"].find(x => !$("v-"+x).hidden); if (vis) lastView = vis; }
+    if (v === "submit" || v === "method"){ const vis = MAIN.find(x => !$("v-"+x).hidden); if (vis) lastView = vis; }
     if (v === "submit") $("sCo").value = S[cur].brand + " · " + S[cur].product;
-    ["scan","result","chain","uflpa","todo","hour","submit","method"].forEach(x => { $("v-"+x).hidden = x !== v; });
+    MAIN.concat(["submit","method"]).forEach(x => { $("v-"+x).hidden = x !== v; });
     document.querySelectorAll("nav.tabs button").forEach(b => b.setAttribute("aria-selected", b.dataset.v === v ? "true" : "false"));
     window.scrollTo(0,0);
   }
 
-  document.querySelectorAll(".scen button").forEach(b => b.addEventListener("click", () => {
-    cur = b.dataset.s;
-    document.querySelectorAll(".scen button").forEach(x => x.setAttribute("aria-pressed", x===b ? "true" : "false"));
-    render();
-  }));
+  document.querySelectorAll(".scen button").forEach(b => b.addEventListener("click", () => pick(b.dataset.s)));
   document.querySelectorAll("nav.tabs button").forEach(b => b.addEventListener("click", () => show(b.dataset.v)));
+  $("home").addEventListener("click", () => show("scan"));
 
-  const SCAN_STEPS = ["Reading the label","Matching the company","Tracing the supply chain","Scoring"];
   function runScan(){
     const vf = $("vf"), btn = $("scanBtn"), prog = $("scanProg");
     btn.disabled = true; btn.textContent = "Scanning…";
@@ -1215,6 +1511,7 @@ nav.tabs button[aria-selected="true"]{color:var(--ink);border-top-color:var(--ac
   });
   $("rnForm").addEventListener("submit", e => { e.preventDefault(); $("rnForm").hidden = true; $("rnToggle").setAttribute("aria-expanded","false"); runScan(); });
   $("toChain").addEventListener("click", () => show("chain"));
+  $("toMap").addEventListener("click", () => { show("chain"); $("mapWrap").scrollIntoView({block:"start"}); });
   document.querySelectorAll("[data-go]").forEach(b => b.addEventListener("click", () => show(b.dataset.go)));
   renderTodo();
   initHour();
