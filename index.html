@@ -111,6 +111,38 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
   padding:8px 0;border-top:1px solid var(--line)}
 .crow:first-child{border-top:0}
 .crow span:last-child{color:var(--muted);font-variant-numeric:tabular-nums}
+.rmap{padding:6px;overflow:hidden}
+.rmap svg{display:block;width:100%;height:auto}
+.rmap .sea{fill:var(--card)}
+.rmap .land{fill:var(--field);stroke:var(--line);stroke-width:.6}
+.rmap .bord{fill:none;stroke:var(--line);stroke-width:.7}
+.rmap .xj{fill:var(--red);fill-opacity:.13;stroke:var(--red);stroke-width:1;stroke-dasharray:3 2}
+.rmap .arc{fill:none;stroke:var(--c);stroke-width:1.8;stroke-linecap:round;opacity:.85}
+.rmap .arc.hist{stroke-dasharray:5 4}
+.rmap .arc.via{stroke-dasharray:.5 4}
+.rmap .pin{cursor:pointer;outline:none}
+.rmap .pin circle{fill:var(--c);stroke:var(--card);stroke-width:2}
+.rmap .pin text{font-size:10px;font-weight:800;fill:var(--card);text-anchor:middle;dominant-baseline:central;pointer-events:none}
+.rmap .pin.sel circle,.rmap .pin:focus-visible circle{stroke:var(--ink);stroke-width:2.5}
+.rmap .lbl{font-size:10px;font-weight:700;letter-spacing:.1em;fill:var(--muted)}
+.rmap .lbl.xjl{fill:var(--red)}
+.rmap .inset{fill:var(--field);stroke:var(--ink);stroke-width:1}
+.rmap .lead{fill:none;stroke:var(--ink);stroke-width:1;stroke-dasharray:2 2}
+.rmap .cl{fill:none;stroke:var(--ink);stroke-width:1.5}
+.maplegend{display:grid;grid-template-columns:1fr 1fr;gap:6px 12px;font-size:.8rem;margin-top:10px;color:var(--muted)}
+.maplegend div{display:flex;gap:7px;align-items:center}
+.maplegend svg{flex:none}
+.mapnodes{list-style:none;margin:0;padding:0}
+.mapnodes li{display:grid;grid-template-columns:24px 1fr;gap:10px;padding:10px 6px;border-top:1px solid var(--line);border-radius:8px}
+.mapnodes li:first-child{border-top:0}
+.mapnodes li.sel{background:var(--field)}
+.mapnodes .num{width:22px;height:22px;border-radius:50%;background:var(--c);color:var(--card);font-size:.75rem;font-weight:800;
+  display:grid;place-items:center;margin-top:1px}
+.mapnodes .nt{font-weight:750;font-size:.92rem}
+.mapnodes .nw{font-size:.78rem;color:var(--muted)}
+.mapnodes p{margin:4px 0 0;font-size:.86rem}
+.mapnodes .srcs{display:grid;grid-template-columns:auto 1fr;gap:2px 8px;margin-top:6px;font-size:.8rem}
+.mapnodes .srcs b{color:var(--muted);font-weight:700}
 .flags h3{font-size:.95rem;margin:0 0 6px}
 .flags ul{margin:0 0 12px;padding-left:18px;font-size:.9rem}
 .flags li{margin:4px 0}
@@ -280,6 +312,26 @@ nav.tabs button[aria-selected="true"]{color:var(--ink);border-top-color:var(--ac
     <p class="hint">From the finished product back to raw cotton. Solid markers are traced in shipment records; dashed markers are estimates.</p>
     <div class="block"><ol class="ladder" id="ladder"></ol></div>
 
+    <div id="mapWrap" hidden>
+      <h2>Where the forced labor risks are</h2>
+      <p class="hint" id="mapHint"></p>
+      <div class="block rmap">
+        <svg id="rmap" viewBox="0 0 480 430" role="group" aria-labelledby="rmapT"><title id="rmapT">Map of forced labor risks in this supply chain</title></svg>
+      </div>
+      <div class="maplegend" aria-hidden="true">
+        <div class="red"><span class="dot"></span>On the UFLPA list or based in Xinjiang</div>
+        <div class="amber"><span class="dot"></span>Named in research, or buys from a flagged company</div>
+        <div><svg width="26" height="6"><line x1="1" y1="3" x2="25" y2="3" stroke="currentColor" stroke-width="2"/></svg>Trade in the last 2 years</div>
+        <div><svg width="26" height="6"><line x1="1" y1="3" x2="25" y2="3" stroke="currentColor" stroke-width="2" stroke-dasharray="5 4"/></svg>Older trade (2019)</div>
+        <div><svg width="26" height="6"><line x1="1" y1="3" x2="25" y2="3" stroke="currentColor" stroke-width="2" stroke-dasharray=".5 4" stroke-linecap="round"/></svg>Through another supplier</div>
+        <div><svg width="14" height="14"><circle cx="7" cy="7" r="5.5" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>Area shown in the inset</div>
+      </div>
+      <h2>What each point is</h2>
+      <p class="hint">Names are withheld until a person verifies each link. Tap a number on the map to jump to it.</p>
+      <div class="block"><ol class="mapnodes" id="mapNodes"></ol></div>
+      <p class="note" id="mapNote"></p>
+    </div>
+
     <h2>Where the known suppliers are</h2>
     <div class="block countries" id="countries"></div>
 
@@ -364,7 +416,7 @@ nav.tabs button[aria-selected="true"]{color:var(--ink);border-top-color:var(--ac
     </ul></div>
 
     <h2>Our real test trace</h2>
-    <div class="block" style="font-size:.92rem">No UFLPA flags appeared in Sayari's data for the Vietnam factory or its 42 suppliers. They haven't yet been checked against the official list directly, and the cotton tiers haven't been traced, so the UFLPA status stays "not checked" for now.</div>
+    <div class="block" style="font-size:.92rem">The factory and its 42 direct suppliers have no UFLPA flags of their own. But tracing further up in Sayari found a raw cotton trader on the UFLPA Entity List at Tier 4, selling to a Vietnamese yarn spinner in the chain. Tradeverifyd confirms the trader is listed (since August 3, 2026). The trade link hasn't been verified yet, so the status is "possible match, needs review," not red. See the map on the Chain screen.</div>
 
     <h2>Where to get the data</h2>
     <div class="block"><ul class="gaps linkrow" style="list-style:disc">
@@ -481,7 +533,7 @@ nav.tabs button[aria-selected="true"]{color:var(--ink);border-top-color:var(--ac
   const $ = id => document.getElementById(id);
   const S = {
     test: {
-      real:true, lists:["partial","pending","pending","clear"],
+      real:true, lists:["review","pending","pending","clear"],
       badge:"<b>Real data.</b> The supply chain below comes from a live Sayari trace of a real garment factory, Worldon (Vietnam) Co., found in US customs records for cotton t-shirt shipments. Pulled September 25, 2026. The label on the scan screen is a mock-up.",
       product:"Real test trace: Vietnam garment factory", brand:"Mock-up label", rn:"RN 000000", made:"Viet Nam", fiber:"100% cotton",
       risk:58, conf:45, trans:30,
@@ -491,26 +543,61 @@ nav.tabs button[aria-selected="true"]{color:var(--ink);border-top-color:var(--ac
         "Sayari found 42 real fabric and trim suppliers one tier up, mostly linked to China and Hong Kong.",
         "2 suppliers carry supplier-specific forced labor flags that still need verification.",
         "Tradeverifyd has no record for this factory yet and it hasn't been screened there, so the second source can't confirm anything.",
-        "Yarn and raw cotton sources haven't been traced yet.",
+        "Yarn and raw cotton are only partly traced. A raw cotton trader on the UFLPA Entity List shows up at Tier 4 and needs a person to verify the link. See the map on the Chain screen.",
         "This result reflects unverified leads and industry context. It is not a finding about the factory."
       ],
       tiers:[
         {t:"Finished product", s:"Mock-up", c:"grey", est:true, p:"The label is a stand-in; we started from the factory, not a brand."},
         {t:"Tier 1 · Garment factory", s:"Known", c:"green", p:"Worldon (Vietnam) Co., a real exporter of cotton t-shirts to the US. No sanctions matches in Sayari. Not yet screened in Tradeverifyd."},
         {t:"Tier 2 · Fabric and trims", s:"Known", c:"amber", p:"42 real suppliers from Sayari trade data. 2 supplier-specific leads under verification."},
-        {t:"Tier 3 · Yarn spinning", s:"Unknown", c:"grey", est:true, p:"Not traced yet. Next step: repeat the trace for each Tier 2 supplier."},
-        {t:"Tier 4 · Raw cotton", s:"Estimated", c:"amber", est:true, p:"Fabric suppliers are largely China-linked, so cotton origin carries elevated risk until verified. Tradeverifyd's country trade data here is incomplete (one 2023 record, China to Vietnam, about $5.9M)."}
+        {t:"Tier 3 · Yarn spinning", s:"Partly known", c:"amber", est:true, p:"Partly traced in Sayari for two Tier 2 suppliers. Found a Vietnamese spinner that buys from a UFLPA-listed cotton trader, a Xinjiang yarn exporter (2019), and a mill group named in forced labor research. See the map below."},
+        {t:"Tier 4 · Raw cotton", s:"Lead", c:"amber", est:true, p:"A raw cotton trader on the UFLPA Entity List appears in Sayari trade records, and Tradeverifyd confirms the listing. The link to this factory isn't verified yet. Its July 2026 shipments to Vietnam were declared as US and Brazilian cotton, a claim that needs checking. Tradeverifyd's country trade data here is incomplete (one 2023 record, China to Vietnam, about $5.9M)."}
       ],
       countries:[["China",28,"amber"],["Hong Kong",16,"amber"],["Vietnam",7,"green"],["Bangladesh",6,"amber"],["Europe (various)",20,"green"]],
       countriesNote:"Real counts from the Sayari trace. Suppliers can appear in more than one country.",
       evidence:["Supplier lead 1: ownership link to an entity in the Xinjiang region flagged for forced labor. Unverified, name withheld.",
-                "Supplier lead 2: named as an intermediary in university forced labor research. Unverified, name withheld."],
+                "Supplier lead 2: named as an intermediary in university forced labor research. Unverified, name withheld.",
+                "Tier 4 lead: a raw cotton trader on the UFLPA Entity List sells to a Vietnamese yarn spinner that supplies lead 2. Both sources confirm the listing; the trade link is unverified. Name withheld.",
+                "Tier 3 lead: a Xinjiang-based company shipped cotton yarn to lead 2 in March 2019. Both sources place it in Xinjiang. The shipment is older than the UFLPA and outside Sayari's two-year window.",
+                "Two textile mills named in Sheffield Hallam University forced labor research sit at Tiers 3 and 4. Both sources agree on one; only Sayari flags the other, so it goes to human review."],
       context:["30 of 42 suppliers export goods on the US Department of Labor forced or child labor goods list for their country. This describes the industry and country, not the companies.",
                "No suppliers matched sanctions lists in Sayari.",
                "Tradeverifyd: factory not yet screened. Not checked is not the same as clean.",
-               "No UFLPA Entity List flags appeared in Sayari's data, but the factory and suppliers haven't been checked against the official DHS list, CBP orders, or North Korean labor enforcement directly."],
-      sources:"Sayari: US customs records for HS 6109 since June 2025, upstream trace one tier deep, risk flags. Tradeverifyd: cached entity check (no record) and UN Comtrade country trade flows. US Department of Labor goods list. Official list checks against DHS and CBP sources still to do. All pulled September 25, 2026.",
-      note:"Real data from a live test trace. Supplier names are withheld until verified. The factory is named only because it's where our test started."
+               "Sayari and Tradeverifyd both show a company on the UFLPA Entity List at Tier 4 (see the map). It hasn't been checked against the official DHS list directly, and nothing has been checked against CBP orders or North Korean labor enforcement yet."],
+      sources:"Sayari: US customs records for HS 6109 since June 2025, upstream trace one tier deep, risk flags. Tradeverifyd: cached entity check (no record) and UN Comtrade country trade flows. US Department of Labor goods list. Forced labor map: Sayari upstream trace to Tier 4 with forced labor risk filters, plus shipment records; Tradeverifyd entity annotations (UFLPA, Sheffield Hallam University research). Official list checks against DHS and CBP sources still to do. All pulled September 25, 2026.",
+      note:"Real data from a live test trace. Supplier names are withheld until verified. The factory is named only because it's where our test started.",
+      map:{
+        hint:"Each point is a company in Sayari's trade records with a forced labor flag, placed at its registered address. Lines show the direction goods move, toward the factory in Vietnam.",
+        note:"Sayari's supplier-network flags only count trade from the last two years. Sayari: upstream trace with forced labor risk filters, entity records and shipment records. Tradeverifyd: entity annotations. Pulled September 25, 2026. Map data: Natural Earth; Xinjiang boundary: AntV china-geojson.",
+        cluster:[313,397],
+        nodes:[
+          {n:1, c:"accent", x:313, y:397, ix:442.6, iy:372.1, t:"The garment factory", tier:"Tier 1", place:"Cu Chi, Ho Chi Minh City, Vietnam",
+           p:"No forced labor flags of its own. Sayari flags its supplier network at Tiers 2 and 3 for links to UFLPA-listed, Xinjiang-based and research-named companies.",
+           sy:"No direct flags. Supplier-network flags for UFLPA, Xinjiang, ASPI and Sheffield Hallam University research.", tv:"Only trade-record stubs, no annotations. Not screened."},
+          {n:2, c:"amber", x:313, y:397, ix:377.1, iy:360.2, t:"Fabric supplier A", tier:"Tier 2", place:"Phuoc Dong industrial park, Tay Ninh, Vietnam",
+           p:"Supplies the factory. Buys from 3, 5 and, through another supplier, 8. Named as an intermediary in university forced labor research.",
+           sy:"Named intermediary in Sheffield Hallam University forced labor research.", tv:"Record found, no annotations. Sources disagree, so this needs review."},
+          {n:3, c:"amber", x:313, y:397, ix:384.1, iy:345.9, t:"Yarn spinner B", tier:"Tier 3", place:"Phuoc Dong industrial park, Tay Ninh, Vietnam",
+           p:"Supplies fabric supplier A. Sayari shows it trading directly with the UFLPA-listed cotton trader (4).",
+           sy:"Direct trade with a UFLPA-listed company.", tv:"Record found, no annotations."},
+          {n:4, c:"red", x:380.6, y:156.8, t:"Raw cotton trader", tier:"Tier 4", place:"Zhengzhou, Henan, China",
+           p:"On the UFLPA Entity List. Sells raw cotton to yarn spinner B. Its July 2026 shipments to Vietnam were declared as US and Brazilian cotton, a claim that needs checking. A listed company is presumed to use forced labor whatever it declares.",
+           sy:"UFLPA Entity List. Recent law enforcement news.", tv:"UFLPA Entity List, valid from August 3, 2026. Both sources agree."},
+          {n:5, c:"red", x:126, y:74.9, arc:"hist", t:"Xinjiang yarn exporter", tier:"Tier 3", place:"Korla, Xinjiang, China",
+           p:"Shipped 100% cotton yarn to fabric supplier A in March 2019. The UFLPA presumes all goods made in Xinjiang use forced labor. This shipment is older than the law and isn't in Sayari's two-year window.",
+           sy:"Located in Xinjiang (by address and by name).", tv:"On Sheffield Hallam University's list of companies operating in Xinjiang. Both sources agree."},
+          {n:6, c:"amber", x:455.5, y:210, t:"Fabric supplier C", tier:"Tier 2", place:"Beilun, Ningbo, Zhejiang, China",
+           p:"Supplies the factory directly. Buys from mill group 7.",
+           sy:"No direct flags. Supplier-network flags for UFLPA, Xinjiang, ASPI and Sheffield Hallam University research.", tv:"Not checked yet."},
+          {n:7, c:"amber", x:420.4, y:133.7, to:6, t:"Textile mill group D", tier:"Tier 3", place:"Zibo, Shandong, China",
+           p:"Supplies fabric supplier C. Named in Sheffield Hallam University's \u201cLaundering Cotton\u201d research. Sayari's record merges the Chinese parent with its Vietnam subsidiary, so it's shown at the parent's address.",
+           sy:"Named in Sheffield Hallam University forced labor research. Direct trade with a UFLPA-listed company.", tv:"Annotation citing Sheffield Hallam University's \u201cLaundering Cotton\u201d. Both sources agree."},
+          {n:8, c:"amber", x:411.2, y:203.4, arc:"via", t:"Cotton yarn mill E", tier:"Tier 4", place:"Anqing, Anhui, China",
+           p:"Supplies another Vietnamese supplier that sells to fabric supplier A.",
+           sy:"Named in Sheffield Hallam University forced labor research.", tv:"Record found, no annotations. Sources disagree, so this needs review."}
+        ],
+        inset:[[3,2],[2,1]]
+      }
     },
     good: {
       real:false, badge:"<b>Example, not real.</b> Made-up data to show how this color looks. No real company is described.", lists:["clear","clear","clear","clear"],
@@ -796,12 +883,72 @@ nav.tabs button[aria-selected="true"]{color:var(--ink);border-top-color:var(--ac
     ["North Korean labor (CAATSA)","CBP enforcement of goods made with North Korean labor"],
     ["Sanctions (incl. North Korea)","Treasury OFAC and other sanctions lists"]
   ];
-  const RES = {clear:["No match","green"], match:["Match","red"], pending:["Not checked yet","grey"], partial:["No match in Sayari; official list not checked directly","amber"]};
+  const RES = {review:["Possible match at Tier 4. Both sources list the company; the trade link needs review","amber"], clear:["No match","green"], match:["Match","red"], pending:["Not checked yet","grey"], partial:["No match in Sayari; official list not checked directly","amber"]};
   let cur = "test";
   const colorFor = d => d.conf < 40 ? "grey" : d.risk >= 65 ? "red" : d.risk >= 35 ? "amber" : "green";
   const goodColor = v => v >= 65 ? "green" : v >= 40 ? "amber" : "grey";
 
   function setRing(el, val, c){ el.style.setProperty("--p", val); el.style.setProperty("--c", "var(--"+c+")"); }
+
+  const MAPBASE = {
+    land:"M122.0,0L122.0,0.6L116.9,6.7L98.6,2.3L91.9,26.3L87.2,29.2L68.9,34.4L77.2,56.7L70.9,60.0L71.6,67.1L65.9,65.3L61.3,60.8L47.6,59.5L32.3,59.1L29.0,60.5L15.8,55.2L10.6,57.8L9.1,65.3L0,62.6L0,0ZM0,82.4L5.1,85.5L0,89.3L0,82.4ZM277.6,386.0L275.5,374.6L281.4,366.7L293.3,364.9L302.0,366.3L309.6,370.0L313.8,363.4L321.9,366.9L324.1,373.3L322.9,384.6L307.4,391.9L311.5,397.6L301.8,398.3L293.8,402.0L286.1,400.7L282.3,395.8ZM248.0,430L244.5,426.1L240.0,421.7L238.5,427.2L236.7,422.0L237.7,416.2L240.4,407.2L244.9,397.6L250.0,388.8L246.4,380.2L246.5,375.8L245.5,370.5L239.3,362.9L237.1,358.1L240.3,356.4L243.7,348.0L239.9,341.7L234.0,334.6L229.6,326.1L233.5,324.3L237.7,313.8L244.2,313.3L249.6,309.1L254.9,306.8L258.8,309.8L259.4,315.7L265.6,316.2L263.4,326.5L263.6,335.2L273.3,329.4L276.1,331.1L281.5,330.8L283.3,327.4L290.3,328.1L297.3,336.0L297.9,345.5L305.4,353.9L305.0,362.0L302.0,366.3L302.0,366.3L293.3,364.9L281.4,366.7L275.5,374.6L277.6,386.0L269.4,381.7L261.5,381.9L262.8,374.4L254.7,374.5L254.0,384.9L249.0,398.7L246.0,407.0L246.6,413.7L252.6,414.0L256.4,422.5L257.9,430L248.0,430ZM321.9,366.9L313.8,363.4L309.6,370.0L302.0,366.3L305.0,362.0L305.4,353.9L297.9,345.5L297.3,336.0L290.3,328.1L283.3,327.4L281.5,330.8L276.1,331.1L273.3,329.4L263.6,335.2L263.4,326.5L265.6,316.2L259.4,315.7L258.8,309.8L254.9,306.8L256.8,303.2L264.7,296.7L265.5,299.1L270.4,299.3L269.0,288.0L273.8,286.5L279.2,294.4L283.4,303.4L294.7,303.5L298.3,312.0L292.4,314.6L289.7,318.1L300.8,324.0L308.5,335.4L314.3,343.9L321.3,350.6L323.6,357.4ZM254.9,306.8L249.6,309.1L244.2,313.3L237.7,313.8L233.5,324.3L229.6,326.1L234.0,334.6L239.9,341.7L243.7,348.0L240.3,356.4L237.1,358.1L239.3,362.9L245.5,370.5L246.5,375.8L246.4,380.2L250.0,388.8L244.9,397.6L240.4,407.2L239.5,400.3L242.4,393.1L239.3,387.5L240.0,377.2L236.3,372.3L233.3,360.9L231.6,348.8L227.6,340.8L221.5,345.6L211.1,352.5L205.9,351.6L200.2,349.4L203.4,337.5L201.4,328.4L194.2,317.1L195.3,313.6L189.9,312.3L183.4,304.3L182.8,296.4L186.0,297.9L186.2,290.7L190.7,288.4L189.7,284.1L191.8,280.7L192.2,270.3L199.4,272.6L203.5,264.3L204.0,259.3L209.1,250.7L208.8,244.8L220.7,237.7L227.3,239.6L226.6,233.2L229.8,231.2L229.1,227.3L234.5,226.5L237.6,232.7L241.6,235.1L241.9,243.1L241.5,251.6L232.8,260.1L231.7,272.1L241.4,270.5L243.6,279.7L249.5,281.7L246.8,290.0L253.6,293.7L257.6,295.5L264.4,292.6L264.7,296.7L256.8,303.2ZM293.8,402.0L301.8,398.3L311.5,397.6L307.4,391.9L322.9,384.6L324.1,373.3L321.9,366.9L323.6,357.4L321.3,350.6L314.3,343.9L308.5,335.4L300.8,324.0L289.7,318.1L292.4,314.6L298.3,312.0L294.7,303.5L283.4,303.4L279.2,294.4L273.8,286.5L278.8,284.1L286.1,284.1L295.1,283.0L303.0,277.6L307.4,281.4L315.9,283.2L314.4,289.0L318.8,293.0L328.1,295.6L315.8,304.1L308.1,313.3L306.1,320.1L313.1,330.4L321.7,343.0L330.1,349.0L335.7,356.7L339.9,374.3L338.7,390.9L331.0,397.1L320.4,403.2L312.9,411.0L301.4,419.7L298.0,413.7L300.6,407.4ZM480,98.5L477.7,96.8L480,94.5L480,98.5ZM430.9,0L436.3,6.1L435.3,10.9L428.0,9.4L414.6,11.2L408.1,15.0L401.3,23.8L387.3,28.9L378.1,35.8L368.5,33.2L363.4,32.0L358.5,40.4L361.5,45.3L363.0,49.6L356.5,53.8L349.9,60.6L339.1,65.0L325.3,65.5L310.4,69.8L299.6,76.5L295.5,72.6L284.4,72.7L270.7,65.1L261.6,63.2L249.3,65.0L230.3,62.1L220.1,62.4L214.7,54.9L210.5,43.2L204.8,41.7L193.6,33.6L181.2,31.8L170.2,29.6L166.9,23.9L170.5,8.3L165.6,0L430.9,0ZM0,223.4L3.0,219.9L8.8,209.2L17.7,198.4L17.6,190.7L25.4,184.4L18.0,179.0L14.8,171.6L11.5,161.8L16.1,157.0L30.1,159.7L40.4,158.1L49.3,148.6L59.2,161.8L58.2,170.8L61.9,176.5L61.6,182.1L55.0,180.6L57.6,192.6L66.6,199.5L79.5,206.9L73.6,211.8L70.0,221.7L79.0,225.7L87.7,230.8L99.7,236.6L112.4,238.0L117.7,243.3L124.8,244.2L135.9,246.6L143.6,246.5L144.7,242.4L143.5,235.8L144.2,231.3L149.8,229.1L150.6,237.3L150.8,239.4L159.1,243.3L165.0,241.7L172.7,242.4L180.3,242.1L180.9,235.7L177.2,232.4L184.6,231.1L193.0,223.3L203.7,216.6L211.4,219.2L218.0,214.7L222.3,221.3L219.2,225.7L229.1,227.3L229.1,227.3L229.8,231.2L226.6,233.2L227.3,239.6L220.7,237.7L208.8,244.8L209.1,250.7L204.0,259.3L203.5,264.3L199.4,272.6L192.2,270.3L191.8,280.7L189.7,284.1L190.7,288.4L186.2,290.7L181.3,274.9L178.8,274.9L177.2,281.3L172.2,276.1L175.1,270.4L179.2,269.8L183.4,261.2L178.1,259.5L169.6,259.6L160.8,258.2L160.0,251.1L155.6,250.6L148.2,246.1L145.0,253.1L151.6,258.5L145.9,262.3L143.8,266.0L149.5,268.7L147.9,274.8L151.1,282.4L152.6,290.6L151.3,294.2L145.0,294.1L133.6,296.2L134.1,303.6L129.2,309.4L115.9,316.0L105.6,327.5L98.6,333.6L89.5,340.0L89.4,344.4L84.9,346.8L76.5,350.2L72.2,350.7L69.4,358.0L71.4,370.4L71.9,378.3L67.9,387.3L67.9,403.3L63.1,403.7L58.9,410.9L61.7,413.9L53.3,416.6L50.2,422.9L46.5,425.6L37.8,416.9L33.5,403.8L30.0,394.3L26.7,389.9L21.8,380.8L19.5,368.9L17.9,363.0L9.5,349.8L5.7,331.1L3.0,318.7L3.0,306.8L1.2,297.6L0,298.1L0,223.4ZM186.2,290.7L186.0,297.9L182.8,296.4L183.4,304.3L180.7,299.2L180.2,294.1L178.4,289.3L174.6,283.5L166.1,283.1L166.9,287.2L164.0,292.8L160.1,290.8L158.7,292.6L156.1,291.5L152.6,290.6L151.1,282.4L147.9,274.8L149.5,268.7L143.8,266.0L145.9,262.3L151.6,258.5L145.0,253.1L148.2,246.1L155.6,250.6L160.0,251.1L160.8,258.2L169.6,259.6L178.1,259.5L183.4,261.2L179.2,269.8L175.1,270.4L172.2,276.1L177.2,281.3L178.8,274.9L181.3,274.9ZM177.2,232.4L180.9,235.7L180.3,242.1L172.7,242.4L165.0,241.7L159.1,243.3L150.8,239.4L150.6,237.3L156.7,229.6L161.7,226.9L168.2,229.3L173.1,229.6ZM144.2,231.3L143.5,235.8L144.7,242.4L143.6,246.5L135.9,246.6L124.8,244.2L117.7,243.3L112.4,238.0L99.7,236.6L87.7,230.8L79.0,225.7L70.0,221.7L73.6,211.8L79.5,206.9L83.3,204.4L90.7,207.7L100.0,214.6L105.2,216.1L108.3,221.2L115.5,223.3L123.0,227.9L133.4,230.3ZM0,135.5L3.9,134.6L14.5,133.2L19.2,131.1L24.5,129.8L31.4,135.2L34.1,144.0L49.3,148.6L49.3,148.6L40.4,158.1L30.1,159.7L16.1,157.0L11.5,161.8L14.8,171.6L18.0,179.0L25.4,184.4L17.6,190.7L17.7,198.4L8.8,209.2L3.0,219.9L0,223.4L0,135.5ZM0,131.2L1.3,130.8L7.0,125.6L13.4,126.5L22.9,126.5L24.5,129.8L19.2,131.1L14.5,133.2L3.9,134.6L0,135.5L0,131.2ZM0,103.9L10.9,102.8L13.2,113.8L16.2,112.6L21.8,115.3L21.5,119.8L22.9,126.5L13.4,126.5L7.0,125.6L1.3,130.8L0,131.2L0,103.9ZM0,62.6L9.1,65.3L10.6,57.8L15.8,55.2L29.0,60.5L32.3,59.1L47.6,59.5L61.3,60.8L65.9,65.3L71.6,67.1L70.3,70.0L55.8,76.7L52.5,81.6L40.7,83.0L37.2,90.8L27.4,89.2L21.0,91.5L12.2,97.2L13.5,100.0L10.9,102.8L0,103.9L0,89.3L0,89.3L5.1,85.5L0,82.4L0,62.6ZM67.2,430L66.4,423.4L70.6,408.3L77.0,413.4L81.3,420.0L85.7,429.7L85.7,429.7L85.7,430L67.2,430ZM341.2,328.5L333.7,325.5L333.4,317.1L337.9,312.7L348.0,309.9L353.3,310.2L355.4,313.9L351.3,318.2L349.2,323.9ZM165.6,0L170.5,8.3L166.9,23.9L170.2,29.6L181.2,31.8L193.6,33.6L204.8,41.7L210.5,43.2L214.7,54.9L220.1,62.4L230.3,62.1L249.3,65.0L261.6,63.2L270.7,65.1L284.4,72.7L295.5,72.6L299.6,76.5L310.4,69.8L325.3,65.5L339.1,65.0L349.9,60.6L356.5,53.8L363.0,49.6L361.5,45.3L358.5,40.4L363.4,32.0L368.5,33.2L378.1,35.8L387.3,28.9L401.3,23.8L408.1,15.0L414.6,11.2L428.0,9.4L435.3,10.9L436.3,6.1L430.9,0L480,0L480,94.5L477.7,96.8L464.8,100.3L458.1,105.9L448.1,109.1L453.0,103.6L451.1,99.0L458.4,90.9L453.5,84.5L445.5,88.8L435.0,97.2L429.3,104.9L420.3,105.5L415.6,111.0L420.5,119.0L428.0,120.9L428.3,126.2L435.6,129.5L446.0,121.2L454.2,125.8L460.1,126.1L461.6,132.2L448.6,135.4L444.2,141.6L435.3,147.3L430.5,155.2L440.5,161.4L444.1,172.3L449.7,182.4L456.0,190.7L455.8,198.7L450.0,201.7L452.2,207.4L457.7,210.7L456.3,219.3L453.9,227.7L448.8,228.6L442.0,239.9L434.5,253.4L426.0,265.6L413.3,274.9L400.4,283.3L390.0,284.5L384.4,288.9L381.2,285.7L376.0,290.6L363.1,295.6L353.3,297.1L350.2,307.6L345.1,308.1L342.6,301.0L344.8,297.2L332.4,294.0L328.1,295.6L318.8,293.0L314.4,289.0L315.9,283.2L307.4,281.4L303.0,277.6L295.1,283.0L286.1,284.1L278.8,284.1L273.8,286.5L269.0,288.0L270.4,299.3L265.5,299.1L264.7,296.7L264.4,292.6L257.6,295.5L253.6,293.7L246.8,290.0L249.5,281.7L243.6,279.7L241.4,270.5L231.7,272.1L232.8,260.1L241.5,251.6L241.9,243.1L241.6,235.1L237.6,232.7L234.5,226.5L229.1,227.3L219.2,225.7L222.3,221.3L218.0,214.7L211.4,219.2L203.7,216.6L193.0,223.3L184.6,231.1L177.2,232.4L173.1,229.6L168.2,229.3L161.7,226.9L156.7,229.6L150.6,237.3L149.8,229.1L144.2,231.3L133.4,230.3L123.0,227.9L115.5,223.3L108.3,221.2L105.2,216.1L100.0,214.6L90.7,207.7L83.3,204.4L79.5,206.9L66.6,199.5L57.6,192.6L55.0,180.6L61.6,182.1L61.9,176.5L58.2,170.8L59.2,161.8L49.3,148.6L34.1,144.0L31.4,135.2L24.5,129.8L22.9,126.5L21.5,119.8L21.8,115.3L16.2,112.6L13.2,113.8L10.9,102.8L13.5,100.0L12.2,97.2L21.0,91.5L27.4,89.2L37.2,90.8L40.7,83.0L52.5,81.6L55.8,76.7L70.3,70.0L71.6,67.1L71.6,67.1L70.9,60.0L77.2,56.7L68.9,34.4L87.2,29.2L91.9,26.3L98.6,2.3L116.9,6.7L122.0,0.6L122.0,0L165.6,0ZM454.8,267.1L449.2,283.3L445.3,291.5L440.4,283.0L439.3,275.6L444.8,265.6L452.2,257.9L456.4,261.0ZM446.1,381.1L441.3,373.9L449.2,374.3L452.5,377.7L450.0,385.9ZM462.2,406.8L464.6,404.2L465.6,398.3L470.6,397.8L469.2,404.1L476.0,395.0L475.1,404.0L471.8,407.1L468.9,413.0L466.0,415.8L460.3,409.3ZM475.8,430L471.7,426.8L469.3,430L457.4,430L457.4,430L459.7,425.0L465.5,422.3L470.5,418.8L473.8,423.1L480,420.8L480,430ZM424.6,413.0L412.3,421.9L416.8,415.3L423.5,409.6L429.0,403.1L433.9,393.7L435.5,401.4L429.4,406.6ZM459.9,328.3L458.4,332.3L461.6,339.2L459.1,347.2L453.7,350.4L452.3,358.1L454.3,365.7L459.2,366.8L463.3,365.7L474.8,370.9L473.9,376.1L477.0,378.4L476.0,382.7L468.8,378.1L465.4,373.1L463.0,376.6L457.2,370.9L448.8,372.3L444.2,370.2L444.6,366.3L447.5,363.8L444.8,361.7L443.6,365.1L439.0,359.6L437.7,355.4L437.3,346.2L441.0,349.4L442.0,334.3L445.0,325.5L450.6,325.6L456.3,328.3L459.1,325.8ZM457.2,393.3L455.8,388.8L461.3,391.7L467.2,391.7L467.0,395.7L462.7,399.6L456.9,402.5L456.5,398.1ZM480,398.3L479.5,398.2L478.1,392.6L480,392.8L480,398.3ZM480,385.4L477.8,382.5L480,382.6L480,385.4Z",
+    borders:"M122.0,0L122.0,0.6L116.9,6.7L98.6,2.3L91.9,26.3L87.2,29.2L68.9,34.4L77.2,56.7L70.9,60.0L71.6,67.1L65.9,65.3L61.3,60.8L47.6,59.5L32.3,59.1L29.0,60.5L15.8,55.2L10.6,57.8L9.1,65.3L0,62.6M0,82.4L5.1,85.5L0,89.3M277.6,386.0L275.5,374.6L281.4,366.7L293.3,364.9L302.0,366.3L309.6,370.0L313.8,363.4L321.9,366.9L324.1,373.3L322.9,384.6L307.4,391.9L311.5,397.6L301.8,398.3L293.8,402.0M240.4,407.2L244.9,397.6L250.0,388.8L246.4,380.2L246.5,375.8L245.5,370.5L239.3,362.9L237.1,358.1L240.3,356.4L243.7,348.0L239.9,341.7L234.0,334.6L229.6,326.1L233.5,324.3L237.7,313.8L244.2,313.3L249.6,309.1L254.9,306.8L258.8,309.8L259.4,315.7L265.6,316.2L263.4,326.5L263.6,335.2L273.3,329.4L276.1,331.1L281.5,330.8L283.3,327.4L290.3,328.1L297.3,336.0L297.9,345.5L305.4,353.9L305.0,362.0L302.0,366.3M254.9,306.8L256.8,303.2L264.7,296.7L265.5,299.1L270.4,299.3L269.0,288.0L273.8,286.5L279.2,294.4L283.4,303.4L294.7,303.5L298.3,312.0L292.4,314.6L289.7,318.1L300.8,324.0L308.5,335.4L314.3,343.9L321.3,350.6L323.6,357.4L321.9,366.9M183.4,304.3L182.8,296.4L186.0,297.9L186.2,290.7L190.7,288.4L189.7,284.1L191.8,280.7L192.2,270.3L199.4,272.6L203.5,264.3L204.0,259.3L209.1,250.7L208.8,244.8L220.7,237.7L227.3,239.6L226.6,233.2L229.8,231.2L229.1,227.3L234.5,226.5L237.6,232.7L241.6,235.1L241.9,243.1L241.5,251.6L232.8,260.1L231.7,272.1L241.4,270.5L243.6,279.7L249.5,281.7L246.8,290.0L253.6,293.7L257.6,295.5L264.4,292.6L264.7,296.7M273.8,286.5L278.8,284.1L286.1,284.1L295.1,283.0L303.0,277.6L307.4,281.4L315.9,283.2L314.4,289.0L318.8,293.0L328.1,295.6M477.7,96.8L480,94.5M430.9,0L436.3,6.1L435.3,10.9L428.0,9.4L414.6,11.2L408.1,15.0L401.3,23.8L387.3,28.9L378.1,35.8L368.5,33.2L363.4,32.0L358.5,40.4L361.5,45.3L363.0,49.6L356.5,53.8L349.9,60.6L339.1,65.0L325.3,65.5L310.4,69.8L299.6,76.5L295.5,72.6L284.4,72.7L270.7,65.1L261.6,63.2L249.3,65.0L230.3,62.1L220.1,62.4L214.7,54.9L210.5,43.2L204.8,41.7L193.6,33.6L181.2,31.8L170.2,29.6L166.9,23.9L170.5,8.3L165.6,0M186.2,290.7L181.3,274.9L178.8,274.9L177.2,281.3L172.2,276.1L175.1,270.4L179.2,269.8L183.4,261.2L178.1,259.5L169.6,259.6L160.8,258.2L160.0,251.1L155.6,250.6L148.2,246.1L145.0,253.1L151.6,258.5L145.9,262.3L143.8,266.0L149.5,268.7L147.9,274.8L151.1,282.4L152.6,290.6M0,223.4L3.0,219.9L8.8,209.2L17.7,198.4L17.6,190.7L25.4,184.4L18.0,179.0L14.8,171.6L11.5,161.8L16.1,157.0L30.1,159.7L40.4,158.1L49.3,148.6L59.2,161.8L58.2,170.8L61.9,176.5L61.6,182.1L55.0,180.6L57.6,192.6L66.6,199.5L79.5,206.9L73.6,211.8L70.0,221.7L79.0,225.7L87.7,230.8L99.7,236.6L112.4,238.0L117.7,243.3L124.8,244.2L135.9,246.6L143.6,246.5L144.7,242.4L143.5,235.8L144.2,231.3L149.8,229.1L150.6,237.3L150.8,239.4L159.1,243.3L165.0,241.7L172.7,242.4L180.3,242.1L180.9,235.7L177.2,232.4L184.6,231.1L193.0,223.3L203.7,216.6L211.4,219.2L218.0,214.7L222.3,221.3L219.2,225.7L229.1,227.3M150.6,237.3L156.7,229.6L161.7,226.9L168.2,229.3L173.1,229.6L177.2,232.4M79.5,206.9L83.3,204.4L90.7,207.7L100.0,214.6L105.2,216.1L108.3,221.2L115.5,223.3L123.0,227.9L133.4,230.3L144.2,231.3M0,135.5L3.9,134.6L14.5,133.2L19.2,131.1L24.5,129.8L31.4,135.2L34.1,144.0L49.3,148.6M0,131.2L1.3,130.8L7.0,125.6L13.4,126.5L22.9,126.5L24.5,129.8M0,103.9L10.9,102.8L13.2,113.8L16.2,112.6L21.8,115.3L21.5,119.8L22.9,126.5M71.6,67.1L70.3,70.0L55.8,76.7L52.5,81.6L40.7,83.0L37.2,90.8L27.4,89.2L21.0,91.5L12.2,97.2L13.5,100.0L10.9,102.8",
+    xinjiang:"M165.5,0L165.6,0.0L165.8,2.6L168.1,6.5L169.1,7.0L170.1,8.4L170.0,9.3L170.9,10.9L170.9,10.9L170.7,12.2L171.2,12.6L170.1,15.6L169.8,16.1L170.3,17.9L170.7,18.6L170.8,19.9L168.1,23.4L167.5,26.9L168.3,27.5L168.9,29.5L169.4,29.8L169.6,30.9L170.5,30.5L172.0,30.7L173.0,31.6L174.1,31.8L174.9,31.5L175.6,32.3L176.9,32.5L180.1,32.3L181.8,33.1L184.3,33.4L186.9,32.8L187.9,32.8L188.7,33.2L189.9,33.3L192.3,33.5L194.0,34.0L195.8,35.0L197.8,37.6L200.2,37.8L201.5,39.7L202.4,39.8L203.8,40.6L204.9,41.8L208.0,43.0L211.2,42.6L210.6,44.4L210.7,46.2L212.4,46.5L213.1,47.9L214.0,51.0L215.3,53.8L215.5,55.4L216.0,56.3L219.6,59.8L220.0,60.7L220.3,62.5L217.7,64.2L217.3,65.3L217.0,69.8L217.2,71.6L215.6,73.3L214.8,73.6L212.2,73.3L208.2,74.1L203.8,76.6L198.5,82.6L196.2,86.0L195.4,87.7L194.5,88.8L191.8,90.3L189.5,90.0L188.7,90.2L188.5,90.9L188.4,94.5L187.1,97.1L187.1,98.2L188.7,102.5L188.6,106.1L183.0,107.3L182.3,108.1L181.1,108.6L178.9,109.4L176.5,110.0L175.3,110.1L173.5,110.9L170.9,111.5L169.8,111.5L167.5,111.8L167.4,112.4L165.9,113.5L164.4,114.2L162.9,114.6L163.3,115.9L165.6,119.8L165.7,120.5L165.3,121.5L165.5,122.3L166.8,122.8L169.2,124.3L170.3,125.3L171.4,125.7L172.1,127.6L172.9,129.1L173.7,130.0L173.4,131.2L172.5,131.3L171.2,132.0L169.7,132.0L169.0,132.4L168.1,133.4L167.9,134.8L168.1,135.5L168.9,136.4L170.8,137.1L171.3,139.2L172.0,141.2L171.8,142.0L169.6,142.8L167.3,141.6L164.2,141.5L163.0,141.4L161.6,139.9L161.2,141.6L160.3,142.1L158.5,141.9L154.3,139.8L151.9,139.5L150.7,138.6L149.6,138.6L147.9,138.1L147.3,137.7L145.6,137.7L143.0,137.9L142.4,138.5L139.1,139.0L137.0,138.6L135.6,139.4L133.8,139.7L131.9,139.9L131.2,140.2L128.8,140.3L128.3,140.9L126.6,141.5L125.4,144.2L124.5,145.3L123.9,145.5L122.0,145.6L120.5,146.7L120.2,146.1L119.0,145.6L117.8,145.9L116.7,145.7L114.7,146.4L113.3,147.4L111.3,147.8L108.1,149.8L107.4,149.9L106.0,149.5L104.9,149.9L102.1,150.1L101.1,149.7L99.2,149.4L97.8,149.5L96.6,148.6L96.7,147.4L96.3,146.5L94.9,146.4L94.2,146.8L91.6,146.4L90.6,147.0L90.3,148.0L88.5,149.1L87.7,150.6L85.0,151.4L83.5,151.3L82.7,150.7L81.7,150.4L80.4,150.6L79.0,149.8L78.8,150.7L78.3,150.9L77.1,150.2L76.3,150.3L75.3,149.8L73.7,149.6L72.2,148.4L71.6,148.4L71.6,149.2L70.8,151.3L69.3,153.2L69.7,154.0L69.2,154.5L68.1,155.1L68.8,157.7L67.3,160.6L66.6,160.8L64.7,160.1L63.1,160.6L61.9,160.5L59.6,161.6L58.2,160.7L57.7,160.1L56.4,159.3L54.3,158.9L53.3,158.0L52.7,155.9L52.1,154.8L52.0,153.5L50.8,151.1L51.3,149.0L50.6,148.6L49.7,149.3L48.9,148.6L47.6,149.0L45.3,148.9L43.8,148.2L42.5,148.1L41.9,147.6L40.6,147.5L39.5,146.9L38.5,146.1L37.6,145.7L37.3,143.9L36.0,144.8L33.8,145.0L33.4,143.5L32.9,142.9L31.6,142.5L31.3,141.7L32.4,140.2L32.0,139.4L32.1,137.5L31.1,135.7L30.4,134.9L29.1,134.2L28.3,134.0L27.6,134.6L26.9,134.3L26.7,132.9L26.3,132.3L24.9,131.9L24.0,131.4L22.2,131.8L21.9,132.4L21.2,131.2L20.0,130.7L18.9,131.1L17.4,129.9L17.2,129.4L18.1,129.3L18.3,128.7L19.6,128.7L20.5,127.9L21.1,128.8L22.1,128.7L22.5,128.2L23.7,127.7L23.9,127.0L24.6,126.7L22.1,124.4L22.0,123.8L22.8,122.4L22.0,121.5L22.1,119.8L21.1,118.8L21.0,116.3L21.6,115.3L21.5,114.3L21.0,113.7L16.9,111.9L14.9,111.9L14.2,112.7L14.1,113.5L13.2,113.5L12.0,112.6L11.4,111.2L11.4,110.3L10.9,109.6L11.4,108.8L12.1,108.7L12.1,108.0L11.1,107.0L10.2,105.1L10.5,103.9L10.5,102.6L12.2,102.3L13.2,100.9L12.9,99.4L12.3,99.0L12.2,98.3L13.9,95.2L15.4,94.7L17.3,94.7L20.4,92.0L21.8,92.0L21.1,90.9L21.5,89.8L23.4,90.6L24.3,90.4L24.9,90.6L27.5,88.5L28.5,88.6L28.7,89.8L29.2,90.5L29.0,91.5L29.4,92.4L31.6,92.2L32.0,91.6L33.0,91.2L33.7,91.5L34.6,90.6L35.2,91.8L36.4,90.9L37.4,89.1L38.1,88.4L38.1,87.1L39.4,85.4L39.4,84.5L40.2,83.7L41.6,83.3L42.6,83.7L44.6,83.6L45.9,84.0L47.7,83.8L49.5,83.0L51.5,83.3L52.9,81.7L54.1,80.3L54.1,79.2L55.5,78.2L56.5,78.0L57.0,77.2L59.8,75.9L62.8,74.1L63.8,74.2L65.6,73.1L66.9,73.0L67.8,71.5L68.6,71.2L70.9,71.2L71.6,70.5L71.2,69.1L71.7,68.5L71.0,65.9L71.2,65.5L70.5,63.7L71.3,61.6L74.3,60.3L73.0,59.6L72.6,58.6L74.5,57.5L75.3,57.3L76.0,57.7L76.5,57.4L76.0,55.3L75.2,54.9L75.8,53.2L73.6,47.4L72.4,44.9L72.7,42.8L72.3,40.9L72.8,38.5L72.5,37.8L73.8,37.2L73.6,36.8L71.2,35.7L69.1,36.0L68.0,35.3L67.9,34.6L69.8,33.1L71.2,33.0L73.0,32.6L73.1,32.1L75.7,31.4L77.1,31.7L79.8,30.6L83.5,29.5L84.6,28.8L85.3,28.9L85.9,30.9L87.2,31.4L89.4,30.4L90.4,30.3L92.1,31.8L93.1,31.0L93.5,28.9L93.4,27.6L91.0,27.0L90.4,26.1L91.1,23.7L92.2,21.5L92.9,17.5L93.9,15.7L95.4,10.4L96.8,7.5L97.0,4.1L98.3,3.9L100.2,4.8L101.7,5.8L105.3,7.1L106.8,7.2L107.6,6.8L110.0,6.8L110.9,7.2L112.3,7.0L112.9,7.5L113.2,9.2L114.6,8.8L116.9,6.8L117.3,6.3L120.0,6.0L120.5,4.3L121.5,3.9L121.5,1.5L120.9,0L165.5,0Z"
+  };
+  function arcPath(x1,y1,x2,y2,bend){
+    const mx=(x1+x2)/2, my=(y1+y2)/2, dx=x2-x1, dy=y2-y1;
+    const cx=mx-dy*bend, cy=my+dx*bend;
+    return "M"+x1+","+y1+"Q"+cx.toFixed(1)+","+cy.toFixed(1)+" "+x2+","+y2;
+  }
+  function selectNode(n){
+    document.querySelectorAll("#rmap .pin").forEach(g => g.classList.toggle("sel", +g.dataset.n === n));
+    document.querySelectorAll("#mapNodes li").forEach(li => li.classList.toggle("sel", +li.dataset.n === n));
+    const li = document.querySelector("#mapNodes li[data-n='"+n+"']");
+    if (li) li.scrollIntoView({behavior:"smooth", block:"nearest"});
+  }
+  function renderMap(m){
+    $("mapWrap").hidden = !m;
+    if (!m) return;
+    const byN = {}; m.nodes.forEach(o => byN[o.n] = o);
+    const col = c => "var(--"+c+")";
+    const [cx,cy] = m.cluster, I = {x:350,y:300,w:122,h:118};
+    const pin = (o,x,y) => "<g class='pin' tabindex='0' role='button' data-n='"+o.n+"' style='--c:"+col(o.c)+"' aria-label='"+o.n+". "+o.t+", "+o.tier+", "+o.place+"'>"+
+      "<circle cx='"+x+"' cy='"+y+"' r='8'/><text x='"+x+"' y='"+y+"'>"+o.n+"</text></g>";
+    let arcs = "", pins = "";
+    m.nodes.forEach(o => {
+      if (o.ix !== undefined) return;
+      const t = o.to ? byN[o.to] : {x:cx, y:cy};
+      arcs += "<path class='arc "+(o.arc||"")+"' style='--c:"+col(o.c)+"' d='"+arcPath(o.x,o.y,t.x,t.y,o.x<200?-.18:.18)+"'/>";
+      pins += pin(o,o.x,o.y);
+    });
+    let inset = "<rect class='inset' x='"+I.x+"' y='"+I.y+"' width='"+I.w+"' height='"+I.h+"' rx='6'/>"+
+      "<text class='lbl' x='"+(I.x+8)+"' y='"+(I.y+15)+"' style='letter-spacing:.04em'>HO CHI MINH CITY</text>"+
+      "<line x1='"+(I.x+8)+"' x2='"+(I.x+29.4)+"' y1='"+(I.y+I.h-10)+"' y2='"+(I.y+I.h-10)+"' stroke='currentColor' stroke-width='2'/>"+
+      "<text class='lbl' x='"+(I.x+34)+"' y='"+(I.y+I.h-7)+"' style='letter-spacing:0'>10 km</text>";
+    m.inset.forEach(([a,b]) => { const A = byN[a], B = byN[b];
+      inset += "<path class='arc' style='--c:"+col(A.c)+"' d='"+arcPath(A.ix,A.iy,B.ix,B.iy,.2)+"'/>"; });
+    m.nodes.forEach(o => { if (o.ix !== undefined) inset += pin(o,o.ix,o.iy); });
+    $("rmap").innerHTML = $("rmapT").outerHTML +
+      "<rect class='sea' width='480' height='430'/>"+
+      "<path class='land' d='"+MAPBASE.land+"'/><path class='bord' d='"+MAPBASE.borders+"'/>"+
+      "<path class='xj' d='"+MAPBASE.xinjiang+"'/>"+
+      "<text class='lbl xjl' x='92' y='52'>XINJIANG</text>"+
+      "<text class='lbl' x='255' y='190'>CHINA</text>"+
+      "<text class='lbl' x='238' y='318'>VIETNAM</text>"+
+      "<circle class='cl' cx='"+cx+"' cy='"+cy+"' r='7'/>"+
+      "<path class='lead' d='M"+(cx+7)+","+(cy-2)+"L"+I.x+","+(I.y+I.h/2)+"'/>"+
+      arcs + pins + inset;
+    $("mapHint").textContent = m.hint;
+    $("mapNote").textContent = m.note;
+    $("mapNodes").innerHTML = m.nodes.map(o =>
+      "<li data-n='"+o.n+"' style='--c:"+col(o.c)+"'><span class='num'>"+o.n+"</span><div>"+
+      "<div class='nt'>"+o.t+" <span class='nw'>· "+o.tier+"</span></div><div class='nw'>"+o.place+"</div>"+
+      "<p>"+o.p+"</p><div class='srcs'><b>Sayari</b><span>"+o.sy+"</span><b>Tradeverifyd</b><span>"+o.tv+"</span></div></div></li>").join("");
+    document.querySelectorAll("#rmap .pin").forEach(g => {
+      g.addEventListener("click", () => selectNode(+g.dataset.n));
+      g.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " "){ e.preventDefault(); selectNode(+g.dataset.n); } });
+    });
+  }
 
   function render(){
     const d = S[cur];
@@ -839,6 +986,7 @@ nav.tabs button[aria-selected="true"]{color:var(--ink);border-top-color:var(--ac
       return "<tr><td>"+l[0]+"<span class='src'>"+l[1]+"</span></td><td><span class='res' style='--c:var(--"+r[1]+")'>"+r[0]+"</span></td></tr>"; }).join("");
     $("sources").textContent = d.sources;
     $("chainNote").textContent = d.note;
+    renderMap(d.map);
   }
 
   function show(v){
