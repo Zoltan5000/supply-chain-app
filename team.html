@@ -467,6 +467,21 @@ nav.tabs button[aria-selected="true"]::before{background:var(--coral)}
     <div class="stack" id="items"></div>
 
     <div class="sec">
+      <h2>How this scales</h2>
+      <div class="card" style="font-size:.9rem">
+        <p>People can't check every supplier link by hand: one t-shirt factory has dozens of suppliers across four tiers. So links are checked by rules first, and people only see what the rules can't settle.</p>
+        <ul class="bul" style="margin-top:10px">
+          <li><b>Links come from records, not AI.</b> Every link points to a Sayari or Tradeverifyd record, so there's nothing invented to check.</li>
+          <li><b>Most links settle themselves.</b> A link that passes the HS code, recurrence, entity and direction checks is accepted automatically; one that fails is downgraded automatically, with the reason shown.</li>
+          <li><b>People review only what matters.</b> A link goes to a person only when it passes the checks but makes a negative claim about a named supplier, or the two sources disagree.</li>
+          <li><b>Each link is checked once.</b> The result is saved in the link cache and reused by every product that shares that supplier. A scan only traces companies we haven't seen before.</li>
+          <li><b>Rechecks follow the data, not the scans.</b> A new list entry or new shipments mark the affected links for a recheck. A thousand scans of the same shirt cost nothing extra.</li>
+        </ul>
+        <p class="sub" style="margin-top:10px">Draft copy. Replace with the team's final wording.</p>
+      </div>
+    </div>
+
+    <div class="sec">
       <h2>This week: one task each</h2>
       <div class="card"><ul class="week" id="week"></ul></div>
       <p class="sub" style="margin-top:10px">Owners are roles, not final assignments. Swap names in once the team agrees.</p>
@@ -548,6 +563,10 @@ nav.tabs button[aria-selected="true"]::before{background:var(--coral)}
        "<b>Build on research others already verified.</b> Sheffield Hallam University, ASPI and others checked the companies they name. Cite them, and ask about partnering.",
        "<b>Track time per check and the backlog</b> so we know whether this can scale, and how many reviewers we need."
      ]},
+    {ti:"Verify once, reuse everywhere", st:"sim", own:["Builder","Investigator"],
+     prob:"Checking the same supplier link again for every product wastes reviewer time. Each link should be checked once, saved with its evidence, and reused by every product that shares it, then rechecked only when a source changes.",
+     tools:"The prototype's link cache: link_id, from and to entity IDs, HS codes, record IDs, source, shipment count, date range, check results, status, last checked, and refresh triggers. It runs on sample data shaped like Sayari and Tradeverifyd responses. A shared database and the live APIs come next. Claude can write the storage and API code.",
+     next:"Pick where the cache lives (a small database the whole team can reach), then connect one live Sayari shipment search to the same checks."},
     {ti:"Read the label with the camera", st:"sim", own:["Builder"],
      prob:"Pull brand, RN number, country and fiber reliably from photos of wrinkled, faded or non-English labels.",
      tools:"Phone text recognition (Google ML Kit, Apple Vision) or Claude's image reading via the API. Claude can write the test code.",
