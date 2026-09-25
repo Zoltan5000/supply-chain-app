@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#f7f3e8">
+<title>Vis-a-Vis Scanner</title>
+<meta name="description" content="Mobile prototype: scan a clothing barcode with your phone camera and open its supply chain trace.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700;9..144,900&family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* Same design tokens as index.html (Vis-a-Vis / Workprint). */
+:root{
+  --bg:oklch(0.975 0.018 92); --fg:oklch(0.24 0.045 262); --card:oklch(0.995 0.008 95);
+  --muted:oklch(0.945 0.022 92); --muted-fg:oklch(0.49 0.03 262); --secondary:oklch(0.93 0.035 92);
+  --border:oklch(0.88 0.025 92); --on-color:oklch(0.98 0.012 95);
+  --coral:oklch(0.7 0.18 32); --coral-fg:oklch(0.99 0.01 95);
+  --sunflower:oklch(0.85 0.16 90); --sunflower-fg:oklch(0.26 0.05 90);
+  --lime:oklch(0.83 0.18 135); --lime-fg:oklch(0.26 0.06 150);
+  --cobalt:oklch(0.52 0.19 262); --cobalt-fg:oklch(0.98 0.012 95);
+  --green:oklch(0.6 0.15 150); --green-soft:oklch(0.93 0.07 150);
+  --amber:oklch(0.73 0.16 70); --amber-soft:oklch(0.945 0.07 85);
+  --red:oklch(0.57 0.21 27); --red-soft:oklch(0.94 0.05 30);
+  --grey:oklch(0.55 0.02 262); --grey-soft:oklch(0.92 0.01 262);
+  --accent:var(--cobalt); --ink:var(--fg); /* names used by the prototype's data */
+  --display:"Fraunces",Georgia,serif;
+  --sans:"Plus Jakarta Sans",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --shadow-card:0 14px 34px -18px color-mix(in oklab,var(--cobalt) 55%,transparent);
+  --r-xl:22px; --r-2xl:28px; --r-3xl:36px; --r-4xl:44px;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:oklch(0.2 0.03 262); --fg:oklch(0.97 0.012 92); --card:oklch(0.26 0.035 262);
+    --muted:oklch(0.3 0.035 262); --muted-fg:oklch(0.75 0.02 262); --secondary:oklch(0.3 0.035 262);
+    --border:oklch(1 0 0 / 14%); --on-color:oklch(0.18 0.03 262); --cobalt:oklch(0.72 0.15 262);
+    --cobalt-fg:oklch(0.18 0.03 262);
+    --green-soft:oklch(0.35 0.08 150); --amber-soft:oklch(0.36 0.08 80);
+    --red-soft:oklch(0.34 0.09 27); --grey-soft:oklch(0.32 0.02 262);
+    --accent:var(--cobalt); --ink:var(--fg);
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:oklch(0.2 0.03 262); --fg:oklch(0.97 0.012 92); --card:oklch(0.26 0.035 262);
+  --muted:oklch(0.3 0.035 262); --muted-fg:oklch(0.75 0.02 262); --secondary:oklch(0.3 0.035 262);
+  --border:oklch(1 0 0 / 14%); --on-color:oklch(0.18 0.03 262); --cobalt:oklch(0.72 0.15 262);
+  --cobalt-fg:oklch(0.18 0.03 262);
+  --green-soft:oklch(0.35 0.08 150); --amber-soft:oklch(0.36 0.08 80);
+  --red-soft:oklch(0.34 0.09 27); --grey-soft:oklch(0.32 0.02 262);
+  --accent:var(--cobalt); --ink:var(--fg);
+  color-scheme:dark;
+}
+
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:var(--bg);color:var(--fg);font-family:var(--sans);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased}
+h1,h2{font-family:var(--display);font-weight:700;letter-spacing:-.02em;margin:0}
+h1{font-size:1.9rem;line-height:1.08}
+h2{font-size:1.2rem;line-height:1.2}
+p{margin:0}
+button{font:inherit;color:inherit}
+button:focus-visible,a:focus-visible,input:focus-visible{outline:3px solid var(--cobalt);outline-offset:2px}
+[hidden]{display:none!important}
+.wrap{max-width:480px;margin:0 auto;padding:max(18px,env(safe-area-inset-top,0px)) 16px max(28px,env(safe-area-inset-bottom,0px))}
+.muted{color:var(--muted-fg)}
+.sub{font-size:.875rem;color:var(--muted-fg);margin-top:4px}
+.eyebrow{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted-fg)}
+.card{background:var(--card);border:2px solid var(--border);border-radius:var(--r-3xl);padding:18px}
+.sec{margin-top:24px}
+header.top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px}
+.logo{display:flex;align-items:center;gap:8px;text-decoration:none;color:inherit}
+.logo .mark{width:32px;height:32px;border-radius:12px;background:var(--coral);color:var(--coral-fg);display:grid;place-items:center;font-weight:900;font-size:.9rem}
+.logo .word{font-weight:800;font-size:1.125rem;letter-spacing:-.02em}
+.kind{font-size:.68rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;border-radius:999px;padding:4px 10px;background:var(--sunflower);color:var(--sunflower-fg)}
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;border:0;cursor:pointer;border-radius:999px;padding:15px 18px;
+  font-weight:800;font-size:1rem;margin-top:12px;text-decoration:none;text-align:center}
+.btn.dark{background:var(--fg);color:var(--bg)}
+.btn.cobalt{background:var(--cobalt);color:var(--cobalt-fg)}
+.btn.outline{background:transparent;color:var(--fg);border:2px solid var(--border)}
+.btn.sm{width:auto;padding:9px 14px;font-size:.85rem;margin-top:0}
+.textlink{display:block;margin:12px auto 0;background:none;border:0;padding:6px 4px;font-size:.875rem;font-weight:700;color:var(--cobalt);
+  text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+
+/* Camera */
+.cam{position:relative;margin-top:14px;border-radius:var(--r-3xl);overflow:hidden;background:oklch(0.26 0.04 262);aspect-ratio:3/4;max-height:62vh;width:100%}
+.cam video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.frame{position:absolute;left:10%;right:10%;top:34%;height:32%;border-radius:18px;box-shadow:0 0 0 999px rgba(0,0,0,.38)}
+.frame::before,.frame::after{content:"";position:absolute;inset:0;border-radius:18px;border:3px solid var(--sunflower)}
+.frame::after{border:0;height:3px;top:50%;left:6%;right:6%;background:var(--lime);box-shadow:0 0 14px var(--lime);animation:pulse 1.2s ease-in-out infinite}
+.found .frame::before{border-color:var(--lime)}
+@keyframes pulse{50%{opacity:.25}}
+.idle{position:absolute;inset:0;display:grid;place-items:center;text-align:center;padding:24px;color:oklch(0.97 0.012 92)}
+.idle .big{font-size:2.6rem;line-height:1}
+.idle p{font-size:.9rem;opacity:.9;margin-top:8px}
+.cap{position:absolute;left:50%;bottom:16px;transform:translateX(-50%);background:rgba(0,0,0,.62);color:#fff;font-size:.8rem;font-weight:700;
+  padding:6px 14px;border-radius:999px;white-space:nowrap;max-width:92%;overflow:hidden;text-overflow:ellipsis}
+.found .cap{background:var(--lime);color:var(--lime-fg)}
+.err{margin-top:12px;border-radius:var(--r-2xl);padding:12px 14px;background:var(--red-soft);font-size:.88rem}
+
+/* Result */
+.res{margin-top:14px;border-radius:var(--r-3xl);padding:18px;background:var(--soft,var(--card));border:2px solid var(--c,var(--border))}
+.green{--c:var(--green);--soft:var(--green-soft)} .amber{--c:var(--amber);--soft:var(--amber-soft)}
+.red{--c:var(--red);--soft:var(--red-soft)} .grey{--c:var(--grey);--soft:var(--grey-soft)}
+.vchip{display:inline-flex;border-radius:999px;font-weight:800;text-transform:uppercase;font-size:.68rem;letter-spacing:.08em;padding:4px 12px;
+  background:var(--c);color:var(--on-color)}
+.vchip.amber{color:var(--sunflower-fg)}
+.res h2{margin-top:10px}
+.res .code{font-family:ui-monospace,Menlo,monospace;font-size:.95rem;font-weight:700;letter-spacing:.04em}
+.res p{font-size:.9rem;margin-top:6px}
+.row2{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.note{width:100%;font:inherit;font-size:16px;color:var(--fg);background:var(--bg);border:2px solid var(--border);border-radius:var(--r-xl);padding:10px 14px;margin-top:10px}
+.manual{display:flex;gap:8px;margin-top:10px}
+.manual input{flex:1;min-width:0;font:inherit;font-size:16px;color:var(--fg);background:var(--bg);border:2px solid var(--border);border-radius:var(--r-xl);padding:10px 14px}
+.manual button{flex:none;border:0;border-radius:var(--r-xl);background:var(--cobalt);color:var(--cobalt-fg);font-weight:800;padding:0 18px;cursor:pointer}
+.list{list-style:none;margin:0;padding:0}
+.list li{display:grid;grid-template-columns:1fr auto;gap:2px 10px;align-items:center;padding:10px 0;border-top:2px solid var(--border);font-size:.88rem}
+.list li:first-child{border-top:0;padding-top:0}
+.list .code{font-family:ui-monospace,Menlo,monospace;font-weight:700}
+.list .when{font-size:.75rem;color:var(--muted-fg)}
+.list .x{background:none;border:0;color:var(--muted-fg);font-weight:800;cursor:pointer;padding:4px 8px}
+.pill{display:inline-flex;border-radius:999px;padding:2px 9px;font-size:.66rem;font-weight:800;text-transform:uppercase;letter-spacing:.05em;background:var(--soft);color:var(--fg)}
+.foot{margin-top:24px;font-size:.78rem;color:var(--muted-fg)}
+@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <a class="logo" href="index.html" aria-label="Vis-a-Vis, open the full prototype"><span class="mark">V</span><span class="word">Vis-a-Vis</span></a>
+    <span class="kind">Mobile prototype</span>
+  </header>
+
+  <h1>Scan a barcode</h1>
+  <p class="sub">Point your phone's camera at the barcode on a clothing tag. Products we've traced in advance open their real supply chain result.</p>
+
+  <div class="cam" id="cam">
+    <video id="video" playsinline muted autoplay></video>
+    <div class="frame" id="frame" hidden></div>
+    <div class="idle" id="idle"><div><div class="big" aria-hidden="true">▥</div><p>The camera only turns on when you tap Start. Nothing is recorded or uploaded.</p></div></div>
+    <div class="cap" id="cap" hidden aria-live="polite"></div>
+  </div>
+  <button class="btn dark" id="startBtn">Start camera</button>
+  <div class="err" id="err" hidden></div>
+
+  <div id="result" aria-live="polite"></div>
+
+  <button class="textlink" id="manualToggle" aria-expanded="false">No camera? Type the barcode number</button>
+  <form class="manual" id="manual" hidden>
+    <label class="eyebrow" for="manualIn" style="position:absolute;left:-9999px">Barcode number</label>
+    <input id="manualIn" inputmode="numeric" autocomplete="off" placeholder="e.g. 0 12345 67890 5">
+    <button type="submit">Look up</button>
+  </form>
+
+  <div class="sec">
+    <h2>Traced in advance</h2>
+    <p class="sub">These products were traced ahead of time through Sayari and Tradeverifyd, so the demo works without a server or an internet signal.</p>
+    <div class="card" style="margin-top:10px"><ul class="list" id="tracedList"></ul></div>
+  </div>
+
+  <div class="sec">
+    <h2>Waiting to be traced</h2>
+    <p class="sub">Barcodes you've scanned that aren't traced yet. They're saved on this phone only. Copy the list and send it to get them traced.</p>
+    <div class="card" style="margin-top:10px"><ul class="list" id="queue"></ul>
+      <div class="row2"><button class="btn cobalt sm" id="copyQueue">Copy list</button><button class="btn outline sm" id="clearQueue">Clear</button></div>
+    </div>
+  </div>
+
+  <a class="btn outline" href="index.html">Open the full prototype</a>
+  <p class="foot">Internal demo. Results are risk indicators, not proof. Supplier names stay withheld until a person verifies them. A barcode identifies the product and brand, not the factory, so each product is traced to its factories by hand before the demo.</p>
+</div>
+
+<script>
+(function(){
+  const $ = id => document.getElementById(id);
+
+  /* ---- Products traced in advance ----
+     Key: the 13-digit barcode (UPC-A codes get a leading 0). `scenario` opens that result in index.html.
+     Add an entry only after the product's factories have been traced through Sayari and Tradeverifyd. */
+  const TRACED = {
+    // "0012345678905": {product:"", brand:"", scenario:"", traced:"2026-09-25", verdict:"Elevated risk", color:"amber", summary:""}
+  };
+
+  /* ---- Barcodes ---- */
+  function checkDigitOk(d){
+    const body = d.slice(0,-1).split("").reverse().map(Number);
+    const sum = body.reduce((s, n, i) => s + n * (i % 2 === 0 ? 3 : 1), 0);
+    return (10 - sum % 10) % 10 === Number(d.slice(-1));
+  }
+  // Returns a 13-digit key for UPC-A and EAN-13 codes, the digits for EAN-8, or null if it isn't a retail barcode.
+  function normalize(raw){
+    const d = String(raw||"").replace(/\D/g,"");
+    if (d.length === 12 && checkDigitOk(d)) return "0" + d;
+    if ((d.length === 13 || d.length === 8) && checkDigitOk(d)) return d;
+    return null;
+  }
+  const pretty = c => c.length === 13 ? c[0]+" "+c.slice(1,7)+" "+c.slice(7) : c;
+
+  /* ---- Queue of untraced barcodes (this phone only) ---- */
+  const QK = "vav-trace-queue";
+  const getQ = () => { try { return JSON.parse(localStorage.getItem(QK) || "[]"); } catch(e){ return []; } };
+  const setQ = q => { try { localStorage.setItem(QK, JSON.stringify(q)); } catch(e){} };
+  function addToQueue(code, note){
+    const q = getQ().filter(x => x.code !== code);
+    q.unshift({code, note:note||"", at:new Date().toISOString().slice(0,16).replace("T"," ")});
+    setQ(q); renderQueue();
+  }
+  function renderQueue(){
+    const q = getQ();
+    $("queue").innerHTML = q.length ? q.map((x, i) => "<li><span><span class='code'>"+pretty(x.code)+"</span>"+
+      (x.note ? " · "+esc(x.note) : "")+"<br><span class='when'>Scanned "+x.at+"</span></span><button class='x' data-i='"+i+"' aria-label='Remove "+x.code+"'>✕</button></li>").join("")
+      : "<li class='muted'>Nothing yet. Scan a tag to add it.</li>";
+    $("queue").querySelectorAll(".x").forEach(b => b.addEventListener("click", () => { const q = getQ(); q.splice(+b.dataset.i, 1); setQ(q); renderQueue(); }));
+    $("copyQueue").disabled = $("clearQueue").disabled = !q.length;
+  }
+  const esc = t => { const d = document.createElement("div"); d.textContent = t; return d.innerHTML; };
+  function renderTraced(){
+    const t = Object.entries(TRACED);
+    $("tracedList").innerHTML = t.length ? t.map(([c, p]) => "<li class='"+p.color+"'><span><b>"+esc(p.brand)+"</b> · "+esc(p.product)+
+      "<br><span class='code' style='font-size:.8rem'>"+pretty(c)+"</span></span><span class='pill'>"+esc(p.verdict)+"</span></li>").join("")
+      : "<li class='muted'>None yet. Scan your demo shirts, copy the list below, and send it to get them traced.</li>";
+  }
+
+  /* ---- Showing a result ---- */
+  function showCode(raw){
+    const code = normalize(raw);
+    if (!code){
+      $("result").innerHTML = "<div class='res grey'><span class='vchip grey'>Not a product barcode</span><h2>Try the barcode on the tag</h2>"+
+        "<p>That code (<span class='code'>"+esc(String(raw))+"</span>) isn't a retail UPC or EAN barcode. Look for the 12 or 13-digit barcode on the price or care tag.</p></div>";
+      return;
+    }
+    const p = TRACED[code];
+    if (p){
+      $("result").innerHTML = "<div class='res "+p.color+"'><span class='vchip "+p.color+"'>"+esc(p.verdict)+"</span>"+
+        "<h2>"+esc(p.brand)+" · "+esc(p.product)+"</h2><p class='code'>"+pretty(code)+"</p><p>"+esc(p.summary)+"</p>"+
+        "<p class='muted' style='font-size:.8rem'>Traced in advance on "+p.traced+" through Sayari and Tradeverifyd.</p>"+
+        "<a class='btn cobalt' href='index.html?p="+encodeURIComponent(p.scenario)+"&from=scan'>See the full result</a></div>";
+      return;
+    }
+    const inQ = getQ().some(x => x.code === code);
+    $("result").innerHTML = "<div class='res grey'><span class='vchip grey'>Not traced yet</span><h2>We haven't traced this product yet</h2>"+
+      "<p class='code'>"+pretty(code)+"</p><p>Not traced isn't the same as clean. A barcode tells us the product and brand, not the factory, "+
+      "so each product has to be traced to its factories before it can get a result.</p>"+
+      "<input class='note' id='qNote' placeholder='Optional: brand and product, e.g. Hanes crew tee' value=''>"+
+      "<button class='btn cobalt' id='qAdd'>"+(inQ ? "Update in the list to trace" : "Add to the list to trace")+"</button></div>";
+    $("qAdd").addEventListener("click", () => { addToQueue(code, $("qNote").value.trim()); $("qAdd").textContent = "Added ✓"; $("qAdd").disabled = true; });
+  }
+
+  /* ---- Camera and decoding ----
+     Uses the browser's built-in BarcodeDetector when it can read retail barcodes (Chrome on Android).
+     Otherwise loads the bundled open-source ZXing library (iPhone Safari, desktop Firefox). Needs HTTPS. */
+  const FORMATS = ["ean_13","ean_8","upc_a","upc_e"];
+  let stream = null, timer = null, running = false;
+  function setCap(t){ $("cap").hidden = !t; $("cap").textContent = t || ""; }
+  function fail(msg){ $("err").hidden = false; $("err").innerHTML = msg; stop(); }
+  function loadZXing(){
+    return window.ZXing ? Promise.resolve(window.ZXing) : new Promise((ok, no) => {
+      const s = document.createElement("script"); s.src = "vendor/zxing-library-0.21.3.min.js";
+      s.onload = () => ok(window.ZXing); s.onerror = () => no(new Error("load")); document.head.appendChild(s);
+    });
+  }
+  async function nativeDetector(){
+    if (!("BarcodeDetector" in window)) return null;
+    try { const ok = await BarcodeDetector.getSupportedFormats(); const f = FORMATS.filter(x => ok.includes(x));
+      return f.length ? new BarcodeDetector({formats:f}) : null; } catch(e){ return null; }
+  }
+  function onDetected(value){
+    if (!running) return;
+    if (navigator.vibrate) navigator.vibrate(60);
+    $("cam").classList.add("found"); setCap("Read "+value);
+    stop(true);
+    showCode(value);
+    $("result").scrollIntoView({behavior:"smooth", block:"start"});
+  }
+  // Decodes one camera frame with ZXing (used when the browser has no built-in BarcodeDetector).
+  function zxingDecoder(Z){
+    const hints = new Map([[Z.DecodeHintType.POSSIBLE_FORMATS, [Z.BarcodeFormat.EAN_13, Z.BarcodeFormat.EAN_8, Z.BarcodeFormat.UPC_A, Z.BarcodeFormat.UPC_E]],
+                           [Z.DecodeHintType.TRY_HARDER, true]]);
+    const reader = new Z.MultiFormatReader(); reader.setHints(hints);
+    const canvas = document.createElement("canvas"), cx = canvas.getContext("2d", {willReadFrequently:true});
+    return video => {
+      const w = video.videoWidth, h = video.videoHeight; if (!w || !h) return null;
+      // Only the middle band, where the on-screen frame is: faster and fewer false reads.
+      const bh = Math.round(h * 0.5), by = Math.round((h - bh) / 2);
+      canvas.width = w; canvas.height = bh; cx.drawImage(video, 0, by, w, bh, 0, 0, w, bh);
+      try { return reader.decodeWithState(new Z.BinaryBitmap(new Z.HybridBinarizer(new Z.HTMLCanvasElementLuminanceSource(canvas)))).getText(); }
+      catch(e){ return null; }
+    };
+  }
+  async function start(){
+    $("err").hidden = true; $("result").innerHTML = ""; $("cam").classList.remove("found");
+    if (!window.isSecureContext) return fail("The camera needs a secure (https) page. Open the GitHub Pages link rather than a local file.");
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) return fail("This browser can't use the camera. Type the barcode number instead.");
+    running = true; $("startBtn").textContent = "Stop camera"; $("idle").hidden = true; $("frame").hidden = false; setCap("Starting camera…");
+    try {
+      const det = await nativeDetector();
+      const decode = det ? null : zxingDecoder(await loadZXing());
+      stream = await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:"environment"}, width:{ideal:1280}, height:{ideal:720}}, audio:false});
+      if (!running){ stop(); return; }
+      $("video").srcObject = stream; await $("video").play();
+      setCap("Hold the barcode inside the frame");
+      const tick = async () => {
+        if (!running) return;
+        let value = null;
+        if (det){ try { const r = await det.detect($("video")); if (r.length) value = r[0].rawValue; } catch(e){} }
+        else value = decode($("video"));
+        // Only accept real retail barcodes, so a half-read code doesn't show a wrong result.
+        if (value && normalize(value)){ onDetected(value); return; }
+        timer = setTimeout(tick, 150);
+      };
+      tick();
+    } catch(e){
+      const name = e && e.name;
+      fail(name === "NotAllowedError" ? "Camera permission was blocked. Allow camera access for this site in your browser settings, then tap Start again."
+        : name === "NotFoundError" ? "No camera was found. Type the barcode number instead."
+        : e && e.message === "load" ? "The barcode reader didn't load. Check your connection and try again."
+        : "The camera couldn't start. Type the barcode number instead.");
+    }
+  }
+  function stop(keepFrame){
+    running = false; clearTimeout(timer);
+    if (stream){ stream.getTracks().forEach(t => t.stop()); stream = null; }
+    const v = $("video"); if (v.srcObject){ try { v.srcObject.getTracks().forEach(t => t.stop()); } catch(e){} v.srcObject = null; }
+    $("startBtn").textContent = keepFrame ? "Scan another" : "Start camera";
+    if (!keepFrame){ $("idle").hidden = false; $("frame").hidden = true; setCap(""); }
+  }
+  $("startBtn").addEventListener("click", () => running ? stop() : start());
+  document.addEventListener("visibilitychange", () => { if (document.hidden && running) stop(); });
+
+  $("manualToggle").addEventListener("click", () => {
+    const f = $("manual"), open = f.hidden; f.hidden = !open;
+    $("manualToggle").setAttribute("aria-expanded", open ? "true" : "false"); if (open) $("manualIn").focus();
+  });
+  $("manual").addEventListener("submit", e => { e.preventDefault(); showCode($("manualIn").value); });
+  $("copyQueue").addEventListener("click", async () => {
+    const text = getQ().map(x => x.code + (x.note ? " — " + x.note : "")).join("\n");
+    try { await navigator.clipboard.writeText(text); $("copyQueue").textContent = "Copied ✓"; }
+    catch(e){ window.prompt("Copy these barcodes:", text); }
+    setTimeout(() => { $("copyQueue").textContent = "Copy list"; }, 1800);
+  });
+  $("clearQueue").addEventListener("click", () => { if (confirm("Clear the list of barcodes waiting to be traced?")){ setQ([]); renderQueue(); } });
+
+  // Exposed for testing and for adding traced products later.
+  window.VAVScanner = {normalize, showCode, TRACED};
+  renderTraced(); renderQueue();
+})();
+</script>
+</body>
+</html>
