@@ -178,7 +178,12 @@ header.top{display:flex;align-items:center;justify-content:space-between;gap:10p
      Key: the 13-digit barcode (UPC-A codes get a leading 0). `scenario` opens that result in index.html.
      Add an entry only after the product's factories have been traced through Sayari and Tradeverifyd. */
   const TRACED = {
-    // "0012345678905": {product:"", brand:"", scenario:"", traced:"2026-09-25", verdict:"Elevated risk", color:"amber", summary:""}
+    "0199420279766": {product:"MLB Yankees tee", brand:"New Era", scenario:"newera", traced:"2026-09-25", verdict:"Not enough data", color:"grey",
+      summary:"Made in Madagascar. The likely factories have no forced labor flags, but the evidence linking them to New Era is thin."},
+    "4060044176167": {product:"Black knit gloves", brand:"Beeline (CVS)", scenario:"gloves", traced:"2026-09-25", verdict:"Not enough data", color:"grey",
+      summary:"Made in China. One likely supplier, flagged for exporting goods on the US forced labor goods list. Nothing known past it."},
+    "0810092122388": {product:"New York basic cap", brand:"Robin Ruth", scenario:"cap", traced:"2026-09-25", verdict:"Not enough data", color:"grey",
+      summary:"Made in China. The supplier is a trading company, and the importer's supplier network has an unverified UFLPA lead."}
   };
 
   /* ---- Barcodes ---- */
