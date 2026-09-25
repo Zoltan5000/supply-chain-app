@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Label Scan Prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#1D2550; --paper:#EEF1F2; --card:#FFFFFF; --line:#CDD3DA; --muted:#5B6275;
+  --accent:#2F43B8; --field:#F6F8F9;
+  --green:#23734F; --amber:#A66B00; --red:#B0261D; --grey:#6B7280;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ink:#E4E7F5; --paper:#10142B; --card:#191E3A; --line:#2C3358; --muted:#9AA1BD;
+    --accent:#8C9BFF; --field:#131833; --green:#3FAE7C; --amber:#D99A2B; --red:#E4574C; --grey:#8A90A6;
+  }
+}
+:root[data-theme="dark"]{
+  --ink:#E4E7F5; --paper:#10142B; --card:#191E3A; --line:#2C3358; --muted:#9AA1BD;
+  --accent:#8C9BFF; --field:#131833; --green:#3FAE7C; --amber:#D99A2B; --red:#E4574C; --grey:#8A90A6;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;min-height:100%;background:var(--paper);color:var(--ink);
+  font-family:"Archivo",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:16px;line-height:1.45}
+main{max-width:520px;margin:0 auto;padding:16px 16px 110px}
+h1{font-size:1.7rem;font-weight:800;font-stretch:75%;letter-spacing:-.01em;margin:4px 0 2px;line-height:1.1}
+h2{font-size:1.1rem;font-weight:750;font-stretch:85%;margin:24px 0 8px}
+.hint{font-size:.88rem;color:var(--muted);margin:0 0 12px}
+.block{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px}
+section[hidden]{display:none}
+
+/* Scenario switch */
+.scen{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;margin:4px 0 14px}
+.scen button{font:inherit;font-size:.85rem;white-space:nowrap;border:1px solid var(--line);background:var(--card);
+  color:var(--ink);border-radius:999px;padding:7px 12px;cursor:pointer}
+.scen button[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+
+/* Scan screen */
+.viewfinder{position:relative;aspect-ratio:3/4;max-height:62vh;background:#2A2F45;border-radius:18px;overflow:hidden;
+  display:flex;align-items:center;justify-content:center}
+.corner{position:absolute;width:38px;height:38px;border:4px solid #fff;opacity:.9}
+.c1{top:18px;left:18px;border-right:0;border-bottom:0;border-radius:10px 0 0 0}
+.c2{top:18px;right:18px;border-left:0;border-bottom:0;border-radius:0 10px 0 0}
+.c3{bottom:18px;left:18px;border-right:0;border-top:0;border-radius:0 0 0 10px}
+.c4{bottom:18px;right:18px;border-left:0;border-top:0;border-radius:0 0 10px 0}
+.label{background:#F7F5EE;color:#222;width:62%;padding:18px 14px;border-radius:4px;text-align:center;
+  font-size:.82rem;line-height:1.5;box-shadow:0 6px 20px rgba(0,0,0,.35);transform:rotate(-2deg)}
+.label b{display:block;font-size:1.1rem;letter-spacing:.02em;margin-bottom:6px}
+.label .hl{background:transparent;transition:background-color .25s}
+.scanning .label .hl{background:#FFE58A}
+.beam{position:absolute;left:8%;right:8%;height:3px;background:#7FD1FF;box-shadow:0 0 14px #7FD1FF;top:15%;opacity:0}
+.scanning .beam{opacity:1;animation:sweep 1.4s ease-in-out infinite alternate}
+@keyframes sweep{from{top:15%}to{top:85%}}
+.readout{margin-top:12px;font-size:.9rem}
+.readout div{display:flex;justify-content:space-between;border-top:1px solid var(--line);padding:7px 0}
+.readout div:first-child{border-top:0}
+.readout span:first-child{color:var(--muted)}
+.btn{font:inherit;font-weight:700;border-radius:12px;padding:14px 16px;border:0;background:var(--accent);color:#fff;
+  cursor:pointer;width:100%;margin-top:14px;font-size:1.05rem}
+:root[data-theme="dark"] .btn{color:#10142B}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .btn{color:#10142B}}
+.btn.ghost{background:transparent;color:var(--accent);border:1px solid var(--accent)}
+button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+/* Verdict tag */
+.tag{--c:var(--grey);position:relative;color:#fff;background:var(--c);margin:10px 0 6px;
+  padding:18px 18px 18px 56px;clip-path:polygon(22px 0,100% 0,100% 100%,22px 100%,0 50%);border-radius:0 14px 14px 0}
+.tag::before{content:"";position:absolute;left:25px;top:50%;width:14px;height:14px;margin-top:-7px;border-radius:50%;
+  background:var(--paper)}
+.tag .v{font-size:2.2rem;font-weight:800;font-stretch:68%;line-height:1}
+.tag .s{font-size:.93rem;margin-top:6px;opacity:.95}
+.green{--c:var(--green)} .amber{--c:var(--amber)} .red{--c:var(--red)} .grey{--c:var(--grey)}
+
+/* Three scores */
+.scores{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
+.sc{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 8px;text-align:center}
+.ring{--p:0;--c:var(--grey);width:74px;height:74px;margin:0 auto 6px;border-radius:50%;
+  background:conic-gradient(var(--c) calc(var(--p)*1%),var(--field) 0);display:grid;place-items:center;position:relative}
+.ring::after{content:"";position:absolute;inset:8px;border-radius:50%;background:var(--card)}
+.ring b{position:relative;z-index:1;font-size:1.35rem;font-weight:800;font-stretch:75%;font-variant-numeric:tabular-nums}
+.sc .n{font-weight:700;font-size:.9rem}
+.sc .d{font-size:.76rem;color:var(--muted);line-height:1.3;margin-top:2px}
+.reasons{margin:14px 0 0;padding-left:18px;font-size:.93rem}
+.reasons li{margin:5px 0}
+.legend{display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:.84rem}
+.legend div{display:flex;gap:8px;align-items:flex-start}
+.dot{width:12px;height:12px;border-radius:50%;flex:none;margin-top:4px;background:var(--c)}
+
+/* Chain ladder */
+.ladder{list-style:none;margin:0;padding:0;position:relative}
+.ladder::before{content:"";position:absolute;left:17px;top:12px;bottom:12px;width:2px;background:var(--line)}
+.rung{position:relative;padding:0 0 16px 48px}
+.rung:last-child{padding-bottom:0}
+.rung .mk{position:absolute;left:6px;top:2px;width:24px;height:24px;border-radius:50%;background:var(--c);
+  border:3px solid var(--paper)}
+.rung.est .mk{background:transparent;border:3px dashed var(--c)}
+.rung .t{font-weight:700}
+.rung .st{display:inline-block;font-size:.75rem;font-weight:700;padding:2px 8px;border-radius:999px;margin-left:6px;
+  border:1px solid var(--c);color:var(--c);vertical-align:1px}
+.rung p{margin:3px 0 0;font-size:.9rem;color:var(--muted)}
+.countries{display:grid;gap:6px}
+.crow{display:grid;grid-template-columns:16px 1fr auto;gap:10px;align-items:center;font-size:.92rem;
+  padding:8px 0;border-top:1px solid var(--line)}
+.crow:first-child{border-top:0}
+.crow span:last-child{color:var(--muted);font-variant-numeric:tabular-nums}
+.flags h3{font-size:.95rem;margin:0 0 6px}
+.flags ul{margin:0 0 12px;padding-left:18px;font-size:.9rem}
+.flags li{margin:4px 0}
+.note{font-size:.82rem;color:var(--muted);margin-top:16px}
+
+.gap{display:flex;gap:8px;align-items:flex-start;margin-top:12px;padding:10px 12px;border:1px dashed var(--muted);
+  border-radius:10px;font-size:.86rem;color:var(--muted);background:transparent;width:100%;text-align:left;font-family:inherit;cursor:pointer}
+.gap b{color:var(--ink)}
+.status-row{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 12px;font-size:.82rem}
+.pill{display:inline-block;font-size:.74rem;font-weight:700;padding:2px 9px;border-radius:999px;border:1px solid var(--c);color:var(--c)}
+.p-work{--c:var(--green)} .p-part{--c:var(--amber)} .p-sim{--c:var(--accent)} .p-no{--c:var(--red)} .p-later{--c:var(--grey)}
+.owners{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;margin-bottom:10px}
+.owners button{font:inherit;font-size:.82rem;white-space:nowrap;border:1px solid var(--line);background:var(--card);color:var(--ink);
+  border-radius:999px;padding:6px 11px;cursor:pointer}
+.owners button[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.item{border-top:1px solid var(--line);padding:14px 0}
+.item:first-child{border-top:0;padding-top:2px}
+.item .top{display:flex;justify-content:space-between;gap:10px;align-items:baseline}
+.item .ti{font-weight:750}
+.item dl{margin:6px 0 0;font-size:.88rem;display:grid;grid-template-columns:78px 1fr;gap:4px 10px}
+.item dt{color:var(--muted)}
+.item dd{margin:0}
+.week{margin:0;padding-left:0;list-style:none;font-size:.9rem}
+.week li{padding:8px 0;border-top:1px solid var(--line)}
+.week li:first-child{border-top:0}
+.week b{display:block}
+.timer{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.timer .clock{font-size:2.4rem;font-weight:800;font-stretch:70%;font-variant-numeric:tabular-nums;line-height:1}
+.timer .phase{font-size:.9rem;color:var(--muted)}
+.timer .btn{width:auto;margin:0;padding:10px 16px;font-size:.95rem}
+.phases{list-style:none;margin:12px 0 0;padding:0;font-size:.9rem}
+.phases li{display:grid;grid-template-columns:62px 1fr;gap:10px;padding:7px 0;border-top:1px solid var(--line)}
+.phases li:first-child{border-top:0}
+.phases li.now{font-weight:700}
+.phases li.now span:first-child{color:var(--accent)}
+.phases span:first-child{color:var(--muted);font-variant-numeric:tabular-nums}
+.gaps{margin:0;padding-left:20px;font-size:.92rem}
+.gaps li{margin:6px 0}
+.pc{border-top:1px solid var(--line);padding:14px 0}
+.pc:first-child{border-top:0;padding-top:2px}
+.pc .who{font-weight:750}
+.pc .where{font-size:.82rem;color:var(--muted)}
+.task{display:flex;gap:10px;align-items:flex-start;margin-top:8px;font-size:.9rem}
+.task input{width:20px;height:20px;flex:none;margin:1px 0 0;accent-color:var(--accent)}
+.task .lbl{flex:1}
+.task .when{font-size:.75rem;font-weight:700;color:var(--accent);display:block}
+.prompt{margin-top:8px;font-size:.84rem;background:var(--field);border:1px solid var(--line);border-radius:8px;padding:8px 10px}
+.prompt b{display:block;font-size:.76rem;color:var(--muted);font-weight:700;margin-bottom:2px}
+.form label.f{display:block;font-size:.85rem;color:var(--muted);margin:12px 0 4px}
+.form label.f:first-child{margin-top:0}
+.form input[type=text],.form input[type=url],.form select,.form textarea{font:inherit;font-size:16px;color:var(--ink);
+  background:var(--field);border:1px solid var(--line);border-radius:8px;padding:9px 10px;width:100%}
+.form textarea{min-height:84px;resize:vertical}
+.form .chk{display:flex;gap:10px;align-items:flex-start;margin-top:12px;font-size:.92rem}
+.form .chk input{width:20px;height:20px;flex:none;margin:1px 0 0;accent-color:var(--accent)}
+.levels{width:100%;border-collapse:collapse;font-size:.88rem}
+.levels td{padding:8px 4px;border-top:1px solid var(--line);vertical-align:top}
+.levels tr:first-child td{border-top:0}
+.levels td:first-child{font-weight:800;font-variant-numeric:tabular-nums;width:74px}
+.pipe{list-style:none;margin:0;padding:0}
+.pipe li{display:grid;grid-template-columns:26px 1fr;gap:10px;padding:9px 0;border-top:1px solid var(--line);opacity:.35;transition:opacity .3s}
+.pipe li:first-child{border-top:0}
+.pipe li.on{opacity:1}
+.pipe .ic{width:22px;height:22px;border-radius:50%;border:2px solid var(--line);display:grid;place-items:center;font-size:.75rem;font-weight:800}
+.pipe li.on .ic{background:var(--accent);border-color:var(--accent);color:var(--card)}
+.pipe .nm{font-weight:700;font-size:.93rem}
+.pipe .out{font-size:.86rem;color:var(--muted)}
+.outcome{margin-top:12px;padding:12px 14px;border-radius:10px;border:2px solid var(--c);display:none}
+.outcome .h{font-weight:800;color:var(--c)}
+.outcome p{margin:4px 0 0;font-size:.9rem}
+.subs li{font-size:.88rem;padding:8px 0;border-top:1px solid var(--line);list-style:none}
+.subs li:first-child{border-top:0}
+.subs{margin:0;padding:0}
+.back{font:inherit;background:none;border:0;color:var(--accent);font-weight:700;padding:4px 0;cursor:pointer;font-size:.95rem}
+.databadge{display:flex;gap:10px;align-items:flex-start;margin:8px 0 10px;padding:10px 12px;border-radius:10px;
+  border:1px solid var(--c);font-size:.86rem}
+.databadge b{color:var(--c)}
+.databadge.real{--c:var(--green)} .databadge.fake{--c:var(--grey)}
+.conf-ex{font-size:.9rem}
+.conf-ex li{margin:5px 0}
+.lists{width:100%;border-collapse:collapse;font-size:.88rem}
+.lists td{padding:9px 4px;border-top:1px solid var(--line);vertical-align:top}
+.lists tr:first-child td{border-top:0}
+.lists td:first-child{width:46%}
+.lists .src{display:block;font-size:.76rem;color:var(--muted)}
+.lists .res{font-weight:700;color:var(--c)}
+.stat3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.stat3 div{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 8px;text-align:center}
+.stat3 b{display:block;font-size:1.6rem;font-weight:800;font-stretch:70%;line-height:1.1;font-variant-numeric:tabular-nums}
+.stat3 span{font-size:.76rem;color:var(--muted);line-height:1.25;display:block;margin-top:3px}
+.ent li{font-size:.9rem;padding:7px 0;border-top:1px solid var(--line);list-style:none}
+.ent li:first-child{border-top:0}
+.ent{margin:0;padding:0}
+.ent small{display:block;color:var(--muted);font-size:.78rem}
+.linkrow a{color:var(--accent);font-weight:700;text-decoration:none}
+.linkrow li{margin:7px 0;font-size:.9rem}
+nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:5;background:var(--card);border-top:1px solid var(--line);
+  padding-bottom:env(safe-area-inset-bottom,0px)}
+nav.tabs .inner{max-width:520px;margin:0 auto;display:grid;grid-template-columns:repeat(6,1fr)}
+nav.tabs button{font:inherit;font-size:.72rem;font-weight:650;background:transparent;border:0;color:var(--muted);
+  padding:14px 2px 16px;cursor:pointer;border-top:3px solid transparent}
+nav.tabs button[aria-selected="true"]{color:var(--ink);border-top-color:var(--accent)}
+@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<main>
+  <div class="scen" role="group" aria-label="Sample scenario">
+    <button data-s="test" aria-pressed="true">Real test trace</button>
+    <button data-s="good">Example: well traced</button>
+    <button data-s="match">Example: direct match</button>
+    <button data-s="unknown">Example: not enough data</button>
+  </div>
+
+  <!-- SCAN -->
+  <section id="v-scan">
+    <h1>Scan a clothing label</h1>
+    <p class="hint">Point the camera at the care label. The app reads the brand, RN number, country of origin and fiber.</p>
+    <div class="databadge" data-badge></div>
+    <div class="viewfinder" id="vf">
+      <span class="corner c1"></span><span class="corner c2"></span><span class="corner c3"></span><span class="corner c4"></span>
+      <div class="label" id="lbl"></div>
+      <div class="beam"></div>
+    </div>
+    <div class="block readout" id="readout" hidden></div>
+    <button class="btn" id="scanBtn">Scan label</button>
+    <button class="gap" data-go="todo"><span>🚧</span><span><b>Simulated.</b> Reading real labels and matching RN numbers to companies aren't built yet. See To solve.</span></button>
+  </section>
+
+  <!-- RESULT -->
+  <section id="v-result" hidden>
+    <h1 id="rTitle"></h1>
+    <p class="hint" id="rSub"></p>
+    <div class="databadge" data-badge></div>
+    <div class="tag" id="rTag"><div class="v" id="rVerdict"></div><div class="s" id="rVerdictSub"></div></div>
+    <div class="scores">
+      <div class="sc"><div class="ring" id="ringRisk"><b id="nRisk"></b></div><div class="n">Risk</div><div class="d">Forced labor risk, worst tier</div></div>
+      <div class="sc"><div class="ring" id="ringConf"><b id="nConf"></b></div><div class="n">Confidence</div><div class="d">How much is verified</div></div>
+      <div class="sc"><div class="ring" id="ringTrans"><b id="nTrans"></b></div><div class="n">Transparency</div><div class="d">How far it's traced</div></div>
+    </div>
+    <ul class="reasons" id="rReasons"></ul>
+    <button class="btn" id="toChain">See the supply chain</button>
+    <button class="btn ghost" data-go="submit">Submit a source about this product</button>
+    <button class="gap" data-go="todo"><span>🚧</span><span><b>Preset scores.</b> Scoring rules, thresholds, wage data and the price check still need the team's decisions. See To solve.</span></button>
+    <h2>How confidence works</h2>
+    <div class="block"><ul class="gaps conf-ex" style="list-style:disc">
+      <li><b>Official government lists count most.</b> A match on the UFLPA Entity List, a CBP order, or North Korean labor enforcement sets the result to red.</li>
+      <li><b>Verified beats estimated.</b> Records traced in shipment data and checked by a person count most.</li>
+      <li><b>Two sources agreeing raises confidence.</b> When Sayari and Tradeverifyd both show the same supplier or flag, the result is stronger.</li>
+      <li><b>Disagreement goes to a person.</b> If the two sources conflict, the result is flagged for human review.</li>
+      <li><b>Not checked isn't clean.</b> A company that hasn't been screened shows as unknown, never as "no problems found."</li>
+    </ul></div>
+
+    <h2>What the colors mean</h2>
+    <div class="block legend">
+      <div class="green"><span class="dot"></span><span>Low risk, with enough data to say so</span></div>
+      <div class="amber"><span class="dot"></span><span>Elevated risk or open leads</span></div>
+      <div class="red"><span class="dot"></span><span>High risk or banned-list match</span></div>
+      <div class="grey"><span class="dot"></span><span>Not enough data to judge</span></div>
+    </div>
+  </section>
+
+  <!-- CHAIN -->
+  <section id="v-chain" hidden>
+    <h1 id="cTitle"></h1>
+    <div class="databadge" data-badge></div>
+    <p class="hint">From the finished product back to raw cotton. Solid markers are traced in shipment records; dashed markers are estimates.</p>
+    <div class="block"><ol class="ladder" id="ladder"></ol></div>
+
+    <h2>Where the known suppliers are</h2>
+    <div class="block countries" id="countries"></div>
+
+    <h2>Government enforcement lists</h2>
+    <p class="hint">Official US lists are the strongest evidence. A match on any of the first three blocks goods from entering the US.</p>
+    <div class="block"><table class="lists" id="lists"></table></div>
+
+    <h2>What we found</h2>
+    <div class="block flags" id="flags"></div>
+
+    <h2>Sources</h2>
+    <div class="block" style="font-size:.9rem" id="sources"></div>
+    <p class="note" id="chainNote"></p>
+    <button class="btn ghost" data-go="submit">Know something we don't? Submit a source</button>
+    <button class="gap" data-go="todo"><span>🚧</span><span><b>Stops early.</b> Tracing yarn and cotton, and verifying leads before showing them, are open problems. See To solve.</span></button>
+  </section>
+  <!-- TO SOLVE -->
+  <section id="v-todo" hidden>
+    <h1>What we still need to solve</h1>
+    <p class="hint">Every feature the app needs, where it stands, who owns it, and how AI and existing tools can speed it up. Tap a name to see just their work.</p>
+    <div class="status-row">
+      <span class="pill p-work">Working</span><span class="pill p-part">Partly working</span>
+      <span class="pill p-sim">Simulated</span><span class="pill p-no">Not solved</span><span class="pill p-later">Later</span>
+    </div>
+    <div class="owners" id="owners" role="group" aria-label="Filter by owner"></div>
+    <div class="block" id="items"></div>
+
+    <h2>This week: one task each</h2>
+    <div class="block"><ul class="week" id="week"></ul></div>
+    <p class="note">Owners are roles, not final assignments. Swap names in once the team agrees.</p>
+  </section>
+  <!-- UFLPA -->
+  <section id="v-uflpa" hidden>
+    <h1>The UFLPA Entity List</h1>
+    <p class="hint">The single most important list for cotton apparel. A match here turns a result red automatically.</p>
+
+    <div class="stat3">
+      <div><b>187</b><span>companies listed since Aug 3, 2026</span></div>
+      <div><b>43</b><span>added July 31, 2026, the largest expansion yet</span></div>
+      <div><b>24,300+</b><span>shipments denied entry, worth nearly $1 billion</span></div>
+    </div>
+
+    <h2>What the law does</h2>
+    <div class="block" style="font-size:.93rem">
+      <p style="margin:0 0 8px">The Uyghur Forced Labor Prevention Act was signed December 23, 2021. Since June 21, 2022, US customs presumes that goods made <b>wholly or in part</b> in China's Xinjiang region, or by any company on the Entity List, were made with forced labor and bars them from entering the US.</p>
+      <p style="margin:0 0 8px">Importers can only overcome this with "clear and convincing evidence." There's no minimum amount: any traceable input from a listed company can get a whole shipment detained.</p>
+      <p style="margin:0">For apparel this matters because Xinjiang grows most of China's cotton, so cotton can pass through several countries and still trace back to the region.</p>
+    </div>
+
+    <h2>Who ends up on the list</h2>
+    <div class="block"><ul class="gaps" style="list-style:disc">
+      <li><b>Makers in Xinjiang</b> that mine, produce or manufacture goods with forced labor.</li>
+      <li><b>Companies that recruit or move workers</b> out of Xinjiang with the regional government, including Uyghurs, Kazakhs and Kyrgyz people.</li>
+      <li><b>Exporters</b> of those goods into the US.</li>
+      <li><b>Companies sourcing from Xinjiang</b> through government "poverty alleviation" or "pairing assistance" labor programs.</li>
+    </ul>
+    <p class="hint" style="margin:10px 0 0">The July 2026 additions focused on aluminum, apparel, copper, cotton, and tomatoes.</p></div>
+
+    <h2>Examples relevant to cotton and apparel</h2>
+    <p class="hint">A partial list for illustration, from the official DHS page. Always check the full, current list.</p>
+    <div class="block"><ul class="ent">
+      <li>Xinjiang Production and Construction Corps (XPCC, "Bingtuan") and its subordinate and affiliated entities<small>Listed June 21, 2022 · a huge state-run group with many affiliates, which makes matching hard</small></li>
+      <li>Changji Esquel Textile Co. Ltd. (alias Changji Yida Textile)<small>Listed June 21, 2022</small></li>
+      <li>Xinjiang Junggar Cotton and Linen Co., Ltd.<small>Listed June 21, 2022</small></li>
+      <li>Hetian Taida Apparel Co., Ltd. (alias Hetian TEDA Garment)<small>Listed June 21, 2022</small></li>
+      <li>Aksu Huafu Textiles Co. (aliases include Aksu Huafu Dyed Melange Yarn)<small>Listed June 21, 2022</small></li>
+      <li>Nanjing Synergy Textiles Co., Ltd.<small>Listed June 21, 2022</small></li>
+      <li>Yili Zhuowan Garment Manufacturing Co., Ltd.<small>Listed June 21, 2022</small></li>
+      <li>Xinjiang Tianmian Foundation Textile Co., Ltd.<small>Listed September 27, 2023</small></li>
+      <li>Xinjiang Tianshan Wool Textile Co. Ltd.<small>Listed September 27, 2023</small></li>
+      <li>Anhui Xinya New Materials Co., Ltd. (formerly Chaohu Youngor Color Spinning Technology)<small>Listed December 11, 2023</small></li>
+      <li>Henan Yumian Logistics Co., Ltd. (formerly 841 Cotton Transfer) and Heze Cotton and Linen Co., Ltd.<small>Added in a 2024 update</small></li>
+    </ul></div>
+
+    <h2>How the app will use it</h2>
+    <div class="block"><ul class="gaps" style="list-style:disc">
+      <li><b>Check every tier,</b> not just the factory. A listed spinner or cotton trader three tiers up still counts.</li>
+      <li><b>Match aliases and former names.</b> Many entries list several names, and some cover all "subsidiaries" or "affiliated entities."</li>
+      <li><b>Flag Xinjiang origin even without a listed company,</b> since the presumption covers the whole region.</li>
+      <li><b>Refresh automatically</b> whenever the list changes, and show the date it was last checked.</li>
+      <li><b>A confirmed match sets the result to red.</b> A likely-but-unconfirmed match goes to human review first.</li>
+    </ul></div>
+
+    <h2>Our real test trace</h2>
+    <div class="block" style="font-size:.92rem">No UFLPA flags appeared in Sayari's data for the Vietnam factory or its 42 suppliers. They haven't yet been checked against the official list directly, and the cotton tiers haven't been traced, so the UFLPA status stays "not checked" for now.</div>
+
+    <h2>Where to get the data</h2>
+    <div class="block"><ul class="gaps linkrow" style="list-style:disc">
+      <li><a href="https://www.dhs.gov/uflpa-entity-list" target="_blank" rel="noopener">Official DHS UFLPA Entity List</a></li>
+      <li><a href="https://www.opensanctions.org/datasets/us_dhs_uflpa/" target="_blank" rel="noopener">OpenSanctions dataset</a> · machine-readable copy the builder can load into the app</li>
+      <li><a href="https://www.cbp.gov/trade/forced-labor/enforcement" target="_blank" rel="noopener">CBP forced labor enforcement</a> · WROs, Findings and UFLPA statistics</li>
+    </ul>
+    <p class="hint" style="margin:10px 0 0">Figures as of September 25, 2026. Check DHS for changes.</p></div>
+  </section>
+
+  <!-- SUBMIT -->
+  <section id="v-submit" hidden>
+    <button class="back" id="subBack">← Back</button>
+    <h1>Submit a source</h1>
+    <p class="hint">Anyone can add evidence: a report, an article, a court record, a worker's account. Submissions start with low confidence and only count toward a score once they're checked.</p>
+
+    <h2>Why submissions count for less at first</h2>
+    <div class="block">
+      <p style="margin:0 0 10px;font-size:.92rem">Anyone can submit anything, including companies trying to boost their own score or competitors trying to hurt a rival. So every submission moves up a confidence ladder as it's checked:</p>
+      <table class="levels">
+        <tr><td>0.3</td><td><b>Submitted, not checked.</b> Visible to our team only. Doesn't change public scores.</td></tr>
+        <tr><td>0.5–0.7</td><td><b>Checked by the AI agent and backed by other data.</b> Can count as industry or country context.</td></tr>
+        <tr><td>0.85–1.0</td><td><b>Verified by a person.</b> Only now can a claim about a specific supplier affect a score.</td></tr>
+      </table>
+    </div>
+
+    <h2>Your source</h2>
+    <div class="block form">
+      <label class="f" for="sCo">Product or company</label>
+      <input type="text" id="sCo">
+      <label class="f" for="sType">Type of source</label>
+      <select id="sType">
+        <option value="0.9">Court or government record</option>
+        <option value="0.8" selected>NGO or research report</option>
+        <option value="0.7">News article</option>
+        <option value="0.6">Company disclosure</option>
+        <option value="0.6w">Worker or witness account</option>
+        <option value="0.4">Other (blog, social media, photo)</option>
+      </select>
+      <label class="f" for="sLink">Link (optional but strongly helps)</label>
+      <input type="url" id="sLink" placeholder="https://">
+      <label class="f" for="sClaim">What does it show?</label>
+      <textarea id="sClaim" placeholder="e.g. The mill supplying this factory buys cotton from a region linked to forced labor."></textarea>
+      <label class="f" for="sDir">This source…</label>
+      <select id="sDir"><option value="neg">Raises a concern</option><option value="pos">Shows an improvement or good practice</option></select>
+      <label class="chk"><input type="checkbox" id="sNames"> It names a specific supplier or factory</label>
+      <label class="chk"><input type="checkbox" id="sAnon" checked> Keep my identity private</label>
+      <button class="btn" id="sGo">Submit for checking</button>
+    </div>
+
+    <h2>How the AI agent checks it</h2>
+    <p class="hint">Simulated here. In the real app an AI agent runs these steps, and a person reviews anything that names a supplier.</p>
+    <div class="block">
+      <ol class="pipe" id="pipe"></ol>
+      <div class="outcome" id="outcome"><div class="h" id="oH"></div><p id="oP"></p></div>
+    </div>
+
+    <h2>Rules that keep this fair</h2>
+    <div class="block"><ul class="gaps" style="list-style:disc">
+      <li><b>No submission can turn a result red on its own.</b> Only verified evidence can.</li>
+      <li><b>Good news needs proof too.</b> Claims that improve a score are checked just as strictly.</li>
+      <li><b>Submitters are protected.</b> Identities stay private, and anonymous submissions are allowed.</li>
+      <li><b>Submissions are data, never instructions.</b> The agent only extracts claims and ignores anything in a document that tries to tell it what to do.</li>
+    </ul></div>
+
+    <h2>Your submissions on this phone</h2>
+    <div class="block"><ul class="subs" id="subs"></ul></div>
+  </section>
+
+  <!-- NEXT HOUR -->
+  <section id="v-hour" hidden>
+    <h1>The next hour</h1>
+    <p class="hint">Seven people, four computers, two work sprints. Everyone works in parallel so nobody waits on anyone.</p>
+
+    <div class="block">
+      <div class="timer">
+        <div><div class="clock" id="clock">60:00</div><div class="phase" id="phaseNow">Not started</div></div>
+        <button class="btn" id="timerBtn">Start the hour</button>
+      </div>
+      <ol class="phases" id="phases"></ol>
+    </div>
+
+    <h2>Where the app most needs work</h2>
+    <div class="block">
+      <ol class="gaps">
+        <li><b>Verification.</b> Nothing supplier-specific can be shown until a person checks it.</li>
+        <li><b>Label to company.</b> We can't yet turn an RN number or brand into the right company record.</li>
+        <li><b>Going upstream.</b> Tracing stops at fabric; yarn and cotton are where the risk is.</li>
+        <li><b>Rules everyone agrees on.</b> Thresholds, wording and data licensing are still drafts.</li>
+        <li><b>Real numbers.</b> Wage benchmarks and cost floors are placeholders in the scores.</li>
+      </ol>
+    </div>
+
+    <h2>Who does what</h2>
+    <p class="hint">Check tasks off as you go. Checkmarks are saved on this phone only.</p>
+    <div class="block" id="plan"></div>
+    <button class="btn ghost" id="clearChecks">Clear checkmarks</button>
+  </section>
+</main>
+
+<nav class="tabs" role="tablist" aria-label="Screens">
+  <div class="inner">
+    <button role="tab" data-v="scan" aria-selected="true">Scan</button>
+    <button role="tab" data-v="result" aria-selected="false">Score</button>
+    <button role="tab" data-v="chain" aria-selected="false">Chain</button>
+    <button role="tab" data-v="uflpa" aria-selected="false">UFLPA</button>
+    <button role="tab" data-v="todo" aria-selected="false">To solve</button>
+    <button role="tab" data-v="hour" aria-selected="false">Next hour</button>
+  </div>
+</nav>
+
+<script>
+(function(){
+  const $ = id => document.getElementById(id);
+  const S = {
+    test: {
+      real:true, lists:["partial","pending","pending","clear"],
+      badge:"<b>Real data.</b> The supply chain below comes from a live Sayari trace of a real garment factory, Worldon (Vietnam) Co., found in US customs records for cotton t-shirt shipments. Pulled September 25, 2026. The label on the scan screen is a mock-up.",
+      product:"Real test trace: Vietnam garment factory", brand:"Mock-up label", rn:"RN 000000", made:"Viet Nam", fiber:"100% cotton",
+      risk:58, conf:45, trans:30,
+      verdict:"Elevated risk", verdictSub:"Open leads upstream, cotton origin unverified",
+      reasons:[
+        "Real garment factory in Vietnam, Worldon (Vietnam) Co., found in US customs records for cotton t-shirts (HS 6109) shipped since June 2025.",
+        "Sayari found 42 real fabric and trim suppliers one tier up, mostly linked to China and Hong Kong.",
+        "2 suppliers carry supplier-specific forced labor flags that still need verification.",
+        "Tradeverifyd has no record for this factory yet and it hasn't been screened there, so the second source can't confirm anything.",
+        "Yarn and raw cotton sources haven't been traced yet.",
+        "This result reflects unverified leads and industry context. It is not a finding about the factory."
+      ],
+      tiers:[
+        {t:"Finished product", s:"Mock-up", c:"grey", est:true, p:"The label is a stand-in; we started from the factory, not a brand."},
+        {t:"Tier 1 · Garment factory", s:"Known", c:"green", p:"Worldon (Vietnam) Co., a real exporter of cotton t-shirts to the US. No sanctions matches in Sayari. Not yet screened in Tradeverifyd."},
+        {t:"Tier 2 · Fabric and trims", s:"Known", c:"amber", p:"42 real suppliers from Sayari trade data. 2 supplier-specific leads under verification."},
+        {t:"Tier 3 · Yarn spinning", s:"Unknown", c:"grey", est:true, p:"Not traced yet. Next step: repeat the trace for each Tier 2 supplier."},
+        {t:"Tier 4 · Raw cotton", s:"Estimated", c:"amber", est:true, p:"Fabric suppliers are largely China-linked, so cotton origin carries elevated risk until verified. Tradeverifyd's country trade data here is incomplete (one 2023 record, China to Vietnam, about $5.9M)."}
+      ],
+      countries:[["China",28,"amber"],["Hong Kong",16,"amber"],["Vietnam",7,"green"],["Bangladesh",6,"amber"],["Europe (various)",20,"green"]],
+      countriesNote:"Real counts from the Sayari trace. Suppliers can appear in more than one country.",
+      evidence:["Supplier lead 1: ownership link to an entity in the Xinjiang region flagged for forced labor. Unverified, name withheld.",
+                "Supplier lead 2: named as an intermediary in university forced labor research. Unverified, name withheld."],
+      context:["30 of 42 suppliers export goods on the US Department of Labor forced or child labor goods list for their country. This describes the industry and country, not the companies.",
+               "No suppliers matched sanctions lists in Sayari.",
+               "Tradeverifyd: factory not yet screened. Not checked is not the same as clean.",
+               "No UFLPA Entity List flags appeared in Sayari's data, but the factory and suppliers haven't been checked against the official DHS list, CBP orders, or North Korean labor enforcement directly."],
+      sources:"Sayari: US customs records for HS 6109 since June 2025, upstream trace one tier deep, risk flags. Tradeverifyd: cached entity check (no record) and UN Comtrade country trade flows. US Department of Labor goods list. Official list checks against DHS and CBP sources still to do. All pulled September 25, 2026.",
+      note:"Real data from a live test trace. Supplier names are withheld until verified. The factory is named only because it's where our test started."
+    },
+    good: {
+      real:false, badge:"<b>Example, not real.</b> Made-up data to show how this color looks. No real company is described.", lists:["clear","clear","clear","clear"],
+      product:"Organic cotton tee", brand:"Example brand A", rn:"RN 000001", made:"Portugal", fiber:"100% organic cotton",
+      risk:18, conf:84, trans:80,
+      verdict:"Low risk", verdictSub:"Traced to the cotton source with strong evidence",
+      reasons:["All four tiers traced in shipment records and company disclosures.","Cotton origin verified by independent testing.","No list matches at any tier."],
+      tiers:[
+        {t:"Finished product", s:"Known", c:"green", p:"Brand publishes its full supplier list."},
+        {t:"Tier 1 · Garment factory", s:"Known", c:"green", p:"2 factories in Portugal."},
+        {t:"Tier 2 · Fabric", s:"Known", c:"green", p:"1 mill, confirmed in trade data."},
+        {t:"Tier 3 · Yarn spinning", s:"Known", c:"green", p:"1 spinner, disclosed and matched."},
+        {t:"Tier 4 · Raw cotton", s:"Known", c:"green", p:"Origin confirmed by fiber testing."}
+      ],
+      countries:[["Portugal",3,"green"],["Turkey",1,"green"],["United States",1,"green"]], countriesNote:"",
+      evidence:["No supplier-specific risk findings."], context:["No products on the DOL goods list for these countries."],
+      sources:"Example data for illustration.", note:"Illustrative scenario, not a real company."
+    },
+    match: {
+      real:false, badge:"<b>Example, not real.</b> Made-up data to show how this color looks. No real company is described.", lists:["match","clear","clear","clear"],
+      product:"Basic cotton polo", brand:"Example brand B", rn:"RN 000002", made:"China", fiber:"60% cotton, 40% polyester",
+      risk:95, conf:78, trans:55,
+      verdict:"High risk", verdictSub:"A supplier matches a US banned-entity list",
+      reasons:["A Tier 2 fabric supplier matches the UFLPA Entity List. This sets the result to High automatically.","Declared import price is well below the estimated legal cost floor."],
+      tiers:[
+        {t:"Finished product", s:"Known", c:"green", p:"Brand and importer identified."},
+        {t:"Tier 1 · Garment factory", s:"Known", c:"amber", p:"1 factory in China."},
+        {t:"Tier 2 · Fabric", s:"Known", c:"red", p:"Supplier matches the UFLPA Entity List."},
+        {t:"Tier 3 · Yarn spinning", s:"Estimated", c:"red", est:true, p:"Likely linked to the listed supplier's group."},
+        {t:"Tier 4 · Raw cotton", s:"Estimated", c:"red", est:true, p:"Likely high-risk region."}
+      ],
+      countries:[["China",4,"red"]], countriesNote:"",
+      evidence:["Direct match to the UFLPA Entity List at Tier 2."], context:["Cotton from this region is on the DOL forced labor goods list."],
+      sources:"Example data for illustration.", note:"Illustrative scenario, not a real company."
+    },
+    unknown: {
+      real:false, badge:"<b>Example, not real.</b> Made-up data to show how this color looks. No real company is described.", lists:["pending","pending","pending","pending"],
+      product:"Graphic tee", brand:"Example brand C", rn:"RN 000003", made:"Imported", fiber:"Cotton blend",
+      risk:40, conf:20, trans:10,
+      verdict:"Not enough data", verdictSub:"We can't judge this product yet",
+      reasons:["The brand couldn't be matched to shipment records.","Nothing upstream is known, so the risk number isn't reliable.","Grey means unknown, not safe."],
+      tiers:[
+        {t:"Finished product", s:"Known", c:"grey", p:"Brand name read from label; RN not matched."},
+        {t:"Tier 1 · Garment factory", s:"Unknown", c:"grey", est:true, p:"Not found."},
+        {t:"Tier 2 · Fabric", s:"Unknown", c:"grey", est:true, p:"Not found."},
+        {t:"Tier 3 · Yarn spinning", s:"Unknown", c:"grey", est:true, p:"Not found."},
+        {t:"Tier 4 · Raw cotton", s:"Unknown", c:"grey", est:true, p:"Not found."}
+      ],
+      countries:[], countriesNote:"No suppliers found yet.",
+      evidence:["None."], context:["Country of origin not stated on the label."],
+      sources:"Example data for illustration.", note:"Illustrative scenario, not a real company."
+    }
+  };
+
+  const TODO = [
+    {ti:"Read the label with the camera", st:"sim", own:["Builder"],
+     prob:"Pull brand, RN number, country and fiber reliably from photos of wrinkled, faded or non-English labels.",
+     tools:"Phone text recognition (Google ML Kit, Apple Vision) or Claude's image reading via the API. Claude can write the test code.",
+     next:"Everyone photographs 5 real labels; test how many read correctly."},
+    {ti:"Match the label to a company", st:"no", own:["Investigator"],
+     prob:"RN numbers only exist on US-sold goods, and the registered company may be a licensee or importer, not the brand.",
+     tools:"FTC RN lookup, barcode databases, Sayari entity search. Claude can batch the lookups.",
+     next:"Look up the RNs from the team's labels and record the hit rate."},
+    {ti:"Find the factories (Tier 1)", st:"part", own:["Investigator","Supply chain expert"],
+     prob:"Brand names in customs data are messy; the importer of record may differ from the brand. Some countries have little customs data.",
+     tools:"Sayari shipments and supplier search, Tradeverifyd, Open Supply Hub, brand supplier lists.",
+     next:"Trace 5 well-known brands to Tier 1 and compare with their published supplier lists."},
+    {ti:"Trace yarn and cotton (Tiers 3–4)", st:"no", own:["Supply chain expert","Investigator"],
+     prob:"Visibility drops sharply upstream, where forced labor risk is highest.",
+     tools:"Sayari upstream tracing at greater depth, Tradeverifyd country trade flows (coverage is patchy), Supply Trace (open, apparel-focused).",
+     next:"Take 3 Tier 2 suppliers from the test trace and go one tier further."},
+    {ti:"Verify leads before showing them", st:"no", own:["Investigator","Lawyer"],
+     prob:"Automated flags can come from name mix-ups or partial records. Nothing supplier-specific should reach users unverified.",
+     tools:"Sayari source records, corporate registries, news and NGO reports. Claude can draft a checklist and summarize sources.",
+     next:"Write a verification checklist and run it on the 2 leads from the test trace."},
+    {ti:"Scoring rules and thresholds", st:"part", own:["Lawyer","Human rights researcher"],
+     prob:"Weights, color cutoffs, the grey rule and red-flag overrides are drafts. They need to be consistent and defensible.",
+     tools:"Existing frameworks (UN Guiding Principles, OECD guidance, KnowTheChain). Claude can stress-test rules against edge cases.",
+     next:"Agree on thresholds and write the public methodology page."},
+    {ti:"Wage and living wage data", st:"no", own:["Human rights researcher"],
+     prob:"Actual wages are rarely public; the score has to work from benchmarks without implying company-specific pay.",
+     tools:"WageIndicator, Global Living Wage Coalition benchmarks, ILO minimum wage data.",
+     next:"Build a table of minimum vs living wage for the top 10 garment-exporting countries."},
+    {ti:"Price check (cost floor)", st:"no", own:["Supply chain expert"],
+     prob:"Need realistic material, labor-minute and overhead estimates per product type and country.",
+     tools:"Declared unit values from Sayari shipments, Tradeverifyd commodity prices, industry costing norms.",
+     next:"Estimate the cost floor for a basic cotton t-shirt in 3 countries."},
+    {ti:"Data licensing and legal risk", st:"no", own:["Lawyer"],
+     prob:"What can Sayari and Tradeverifyd data be shown publicly? How are scores worded to avoid defamation? How do companies respond?",
+     tools:"Provider terms of service, media-law review. Claude can draft a wording guide and right-of-reply policy for review.",
+     next:"Review data terms and draft the right-of-reply process."},
+    {ti:"Brand-level vs item-level results", st:"no", own:["Supply chain expert","Coordinator"],
+     prob:"A label identifies the brand, not the exact factory for that item, so early scores are brand-wide.",
+     tools:"Batch codes, digital product passports (coming in the EU), brand partnerships.",
+     next:"List which brands already publish product-level traceability."},
+    {ti:"Test with real users", st:"no", own:["Designer"],
+     prob:"Do shoppers understand three scores and grey? What would make them act?",
+     tools:"This prototype. Claude can help write interview questions and sum up answers.",
+     next:"Show the prototype to 5 shoppers and 2 brand buyers; note confusion points."},
+    {ti:"User-submitted sources and verification agent", st:"sim", own:["Builder","Investigator","Lawyer"],
+     prob:"Let anyone add evidence without letting bad actors game scores. Needs an AI agent for first checks and a human review queue.",
+     tools:"Claude or Grok as the checking agent, Sayari for company matching and corroboration.",
+     next:"Investigator writes the checklist the agent follows; lawyer sets what can go public; builder tests the agent on 5 real reports."},
+    {ti:"Check official US government lists", st:"no", own:["Builder","Lawyer"],
+     prob:"Lists change often (43 companies were added to the UFLPA list in August 2026), and company names vary across languages. CBP's site offers enforcement lists and dashboards, not a searchable shipment database, so shipment records still come from providers like Sayari.",
+     tools:"DHS UFLPA Entity List, CBP Withhold Release Orders & Findings dashboard, CBP UFLPA statistics dashboard, CAATSA North Korean labor enforcement, Treasury OFAC sanctions, trade.gov Consolidated Screening List (free). Claude can write the matching code.",
+     next:"Builder downloads the UFLPA list and WRO list and checks the test-trace factory and its 42 suppliers; lawyer confirms which list sets which color."},
+    {ti:"Cross-check Sayari and Tradeverifyd", st:"no", own:["Investigator","Builder"],
+     prob:"The two sources don't always cover the same companies. Our test factory had a Sayari record but none in Tradeverifyd.",
+     tools:"Sayari and Tradeverifyd connectors. Claude can compare results side by side.",
+     next:"Run the same 5 brands through both and record where they agree, disagree or have gaps."},
+    {ti:"Environment data", st:"no", own:["Human rights researcher"],
+     prob:"The environment category is empty in every result so far.",
+     tools:"Tradeverifyd emissions profiles by country or facility, plus deforestation flags in Sayari.",
+     next:"Pull emissions data for the 3 main garment countries in the test trace."},
+    {ti:"Monitoring and alerts", st:"later", own:["Builder"],
+     prob:"Scores are one-time snapshots; suppliers can be flagged later.",
+     tools:"Tradeverifyd company monitoring.",
+     next:"After the MVP, test monitoring on the test-trace factory."},
+    {ti:"Data access through the program", st:"no", own:["Coordinator","Lawyer"],
+     prob:"Confirm whether the Tradeverifyd API access expected through the program comes through, and what its terms allow in a public app.",
+     tools:"Program organizers, provider terms of service.",
+     next:"Coordinator asks the program about API access; lawyer reviews terms."},
+    {ti:"Live app and funding", st:"later", own:["Builder","Coordinator"],
+     prob:"Connecting camera, lookups, Sayari and scoring into one working app, and paying for data access.",
+     tools:"Claude for coding help; grant funders active on forced labor data (e.g. Humanity United's Integrated Data work).",
+     next:"Coordinator lists 5 possible funders or partners; builder sketches the app architecture."},
+    {ti:"Physical cotton testing", st:"later", own:["Coordinator"],
+     prob:"Paper tracing can't prove fiber origin; lab testing can.",
+     tools:"Isotope and DNA origin-testing providers.",
+     next:"Park for now; revisit once the paper trail works."}
+  ];
+  const ST = {work:["Working","p-work"],part:["Partly working","p-part"],sim:["Simulated","p-sim"],no:["Not solved","p-no"],later:["Later","p-later"]};
+  const ROLES = ["Everyone","Coordinator","Builder","Investigator","Supply chain expert","Lawyer","Human rights researcher","Designer"];
+  let owner = "Everyone";
+  function renderTodo(){
+    $("owners").innerHTML = ROLES.map(r => "<button aria-pressed='"+(r===owner)+"' data-o='"+r+"'>"+r+"</button>").join("");
+    $("owners").querySelectorAll("button").forEach(b => b.addEventListener("click", () => { owner = b.dataset.o; renderTodo(); }));
+    const list = TODO.filter(t => owner === "Everyone" || t.own.includes(owner));
+    $("items").innerHTML = list.map(t =>
+      "<div class='item'><div class='top'><span class='ti'>"+t.ti+"</span><span class='pill "+ST[t.st][1]+"'>"+ST[t.st][0]+"</span></div>"+
+      "<dl><dt>Owner</dt><dd>"+t.own.join(", ")+"</dd><dt>Problem</dt><dd>"+t.prob+"</dd><dt>AI & tools</dt><dd>"+t.tools+"</dd><dt>Next step</dt><dd>"+t.next+"</dd></dl></div>").join("");
+    const WEEK = [
+      ["Coordinator","Run a 15-minute weekly check-in, keep this list current, and start the funder list."],
+      ["Builder","Test label reading on the team's photos using Claude or phone text recognition."],
+      ["Investigator","Verify the 2 leads from the test trace and trace 5 brands to Tier 1 in Sayari."],
+      ["Supply chain expert","Push 3 suppliers one tier further upstream and estimate one cost floor."],
+      ["Lawyer","Review data terms and draft the wording guide and right-of-reply policy."],
+      ["Human rights researcher","Build the wage benchmark table for the top 10 garment countries."],
+      ["Designer","Test this prototype with 5 people and bring back what confused them."]
+    ].filter(w => owner === "Everyone" || w[0] === owner);
+    $("week").innerHTML = WEEK.map(w => "<li><b>"+w[0]+"</b>"+w[1]+"</li>").join("");
+  }
+
+  const PHASES = [
+    [0,5,"Kickoff: everyone photographs 3 clothing labels and drops them in a shared folder"],
+    [5,35,"Sprint 1"],
+    [35,40,"Check-in: one sentence each, done or blocked"],
+    [40,55,"Sprint 2"],
+    [55,60,"Wrap-up: update the MVP spec and the To solve statuses"]
+  ];
+  const PLAN = [
+    {who:"Investigator + Supply chain expert", where:"Computer 1 · Sayari",
+     tasks:[["Sprint 1","Investigator: verify the 2 supplier leads from the test trace (right company? source holds up?)."],
+            ["Sprint 1","Supply chain expert: take 3 Tier 2 suppliers and trace one tier further toward yarn."],
+            ["Sprint 2","Together: trace 2 well-known brands to Tier 1 and compare with their published supplier lists."]],
+     prompt:"\"Using the MVP spec, give me a step-by-step checklist to verify a flagged supplier in Sayari before we show it to users.\""},
+    {who:"Lawyer + Human rights researcher", where:"Computer 2 · documents",
+     tasks:[["Sprint 1","Lawyer: set the risk thresholds and the grey rule, and draft 5 approved phrases for results."],
+            ["Sprint 1","Researcher: build a minimum vs living wage table for 5 garment countries."],
+            ["Sprint 2","Lawyer: list what to check in Sayari's and Tradeverifyd's terms. Researcher: add the wages to the scoring model."]],
+     prompt:"\"Stress-test the scoring rules in section 6 of the MVP spec. Give 10 cases where a result could be unfair or legally risky.\""},
+    {who:"Builder", where:"Computer 3 · Colab and AI",
+     tasks:[["Sprint 1","Test label reading: upload the team's label photos to Claude or Grok and record how many RN numbers and countries come out right."],
+            ["Sprint 2","Write the scoring formula in Google Colab so real numbers produce the three scores and a color."]],
+     prompt:"\"Using section 6 of the MVP spec, write Colab Python that takes supplier data and returns risk, confidence, transparency and a color.\""},
+    {who:"Coordinator", where:"Computer 4 · lookups and planning",
+     tasks:[["Sprint 1","Look up the RN numbers from the team's label photos in the FTC database and record the hit rate."],
+            ["Sprint 2","Start a list of 5 possible funders or partners, then update the MVP spec with today's decisions."]],
+     prompt:"\"Here are our meeting notes. Turn them into decisions, owners and open questions, and update section 11 of the MVP spec.\""},
+    {who:"Designer", where:"Own phone · no computer needed",
+     tasks:[["Sprint 1","Show this prototype to 3 people (friends, family, anyone nearby) and note where they get confused."],
+            ["Sprint 2","Sketch fixes for the top 2 confusion points and share them at wrap-up."]],
+     prompt:"\"Write 6 short questions to test whether shoppers understand the four colors and three scores.\""}
+  ];
+  const CK = "sc-hour-checks";
+  function getChecks(){ try{ return JSON.parse(localStorage.getItem(CK)||"{}"); }catch(e){ return {}; } }
+  function setChecks(o){ try{ localStorage.setItem(CK, JSON.stringify(o)); }catch(e){} }
+  function renderPlan(){
+    const ch = getChecks();
+    $("plan").innerHTML = PLAN.map((p,i) =>
+      "<div class='pc'><div class='who'>"+p.who+"</div><div class='where'>"+p.where+"</div>"+
+      p.tasks.map((t,j) => { const id="t"+i+"-"+j;
+        return "<label class='task'><input type='checkbox' data-id='"+id+"'"+(ch[id]?" checked":"")+"><span class='lbl'><span class='when'>"+t[0]+"</span>"+t[1]+"</span></label>"; }).join("")+
+      "<div class='prompt'><b>Prompt to try with Claude or Grok</b>"+p.prompt+"</div></div>").join("");
+    $("plan").querySelectorAll("input").forEach(c => c.addEventListener("change", () => {
+      const o = getChecks(); o[c.dataset.id] = c.checked; setChecks(o);
+    }));
+  }
+  let tStart = null, tInt = null;
+  function renderPhases(min){
+    $("phases").innerHTML = PHASES.map(ph =>
+      "<li class='"+(min!==null && min>=ph[0] && min<ph[1] ? "now" : "")+"'><span>"+ph[0]+"–"+ph[1]+" min</span><span>"+ph[2]+"</span></li>").join("");
+  }
+  function tick(){
+    const el = (Date.now()-tStart)/1000, left = Math.max(0, 3600-el), min = el/60;
+    $("clock").textContent = String(Math.floor(left/60)).padStart(2,"0")+":"+String(Math.floor(left%60)).padStart(2,"0");
+    const ph = PHASES.find(p => min>=p[0] && min<p[1]);
+    $("phaseNow").textContent = ph ? ph[2] : "Hour complete";
+    renderPhases(ph ? min : null);
+    if (left <= 0){ clearInterval(tInt); tInt=null; $("timerBtn").textContent="Restart"; }
+  }
+  function initHour(){
+    renderPlan(); renderPhases(null);
+    $("timerBtn").addEventListener("click", () => {
+      tStart = Date.now(); if (tInt) clearInterval(tInt);
+      tInt = setInterval(tick, 1000); tick(); $("timerBtn").textContent = "Restart";
+    });
+    $("clearChecks").addEventListener("click", () => { setChecks({}); renderPlan(); });
+  }
+
+  const STAGES = ["Received","Pull out the claims","Match the company","Look for supporting evidence","Rate the source","Decide where it goes"];
+  const SK = "sc-submissions";
+  function getSubs(){ try{ return JSON.parse(localStorage.getItem(SK)||"[]"); }catch(e){ return []; } }
+  function renderSubs(){
+    const l = getSubs();
+    $("subs").innerHTML = l.length ? l.slice().reverse().map(x => "<li><b>"+x.route+"</b> · confidence "+x.conf+"<br><span style='color:var(--muted)'>"+x.co+": "+x.claim+"</span></li>").join("")
+      : "<li style='color:var(--muted)'>Nothing submitted yet.</li>";
+  }
+  function renderPipe(n, outs){
+    $("pipe").innerHTML = STAGES.map((st,i) => "<li class='"+(i<n?"on":"")+"'><span class='ic'>"+(i<n?"✓":i+1)+"</span><span><span class='nm'>"+st+"</span><div class='out'>"+(i<n&&outs?outs[i]:"")+"</div></span></li>").join("");
+  }
+  function esc(t){ const d=document.createElement("div"); d.textContent=t; return d.innerHTML; }
+  function runAgent(){
+    const co = $("sCo").value.trim(), typeV = $("sType").value, cred = parseFloat(typeV), worker = typeV.endsWith("w");
+    const typeName = $("sType").selectedOptions[0].text, link = $("sLink").value.trim(), claim = $("sClaim").value.trim();
+    const pos = $("sDir").value === "pos", names = $("sNames").checked, anon = $("sAnon").checked;
+    if (!claim){ $("outcome").style.display="block"; $("outcome").style.setProperty("--c","var(--amber)");
+      $("oH").textContent="Add what the source shows"; $("oP").textContent="Describe the claim in a sentence so the agent knows what to check."; return; }
+    const corroborated = cred >= 0.7 && !!link;
+    const outs = [
+      typeName + (anon ? ". Your identity is kept private." : ".") + (worker ? " Worker accounts get extra privacy protection." : ""),
+      "Claim: “" + esc(claim.slice(0,110)) + (claim.length>110?"…":"") + "” (" + (pos?"improvement":"concern") + ")",
+      co ? "Checked “"+esc(co)+"” against company records in Sayari." : "No company named, so it's filed as industry context.",
+      corroborated ? "Found related records in shipment and risk data." : (link ? "No supporting records found yet." : "No link provided, so there's less to check."),
+      "Source type rated " + (cred>=0.85?"high":cred>=0.7?"medium-high":cred>=0.6?"medium":"low") + " credibility.",
+      ""
+    ];
+    let route, conf, color, expl;
+    if (!link && cred < 0.6){ route="Needs more evidence"; conf="0.3"; color="grey";
+      expl="Sent back with a note asking for a link or document. It stays visible to our team only."; }
+    else if (names){ route="Human review queue"; conf="0.3 until reviewed"; color="amber";
+      expl="It names a specific supplier, so a person must verify it before it can affect any score. If verified, confidence rises to 0.85–1.0."; }
+    else if (pos && cred <= 0.6){ route="Human review queue"; conf="0.3 until reviewed"; color="amber";
+      expl="Claims that improve a score need independent proof. A company's own statement isn't enough on its own."; }
+    else if (corroborated){ conf=(0.5 + Math.min(0.2,(cred-0.7))).toFixed(2); route="Accepted as context"; color="green";
+      expl="Backed by other data, so it now counts as industry or country context at confidence "+conf+". It can't make a result red by itself."; }
+    else { route="Team only"; conf="0.3"; color="grey";
+      expl="Logged for the team to follow up. It won't change public scores until more evidence turns up."; }
+    outs[5] = route + ".";
+    $("sGo").disabled = true; $("outcome").style.display = "none";
+    let n = 0; renderPipe(0, outs);
+    const iv = setInterval(() => {
+      n++; renderPipe(n, outs);
+      if (n >= STAGES.length){ clearInterval(iv); $("sGo").disabled = false;
+        $("outcome").style.display="block"; $("outcome").style.setProperty("--c","var(--"+color+")");
+        $("oH").textContent = route + " · confidence " + conf; $("oP").textContent = expl;
+        const l = getSubs(); l.push({co: co || "Industry context", claim: claim.slice(0,80), route, conf});
+        try{ localStorage.setItem(SK, JSON.stringify(l.slice(-20))); }catch(e){}
+        renderSubs(); }
+    }, 600);
+  }
+  let lastView = "result";
+  function initSubmit(){
+    renderPipe(0, null); renderSubs();
+    $("sGo").addEventListener("click", runAgent);
+    $("subBack").addEventListener("click", () => show(lastView));
+  }
+
+  const LISTS = [
+    ["UFLPA Entity List","DHS Forced Labor Enforcement Task Force · 187 entities since Aug 3, 2026"],
+    ["Withhold Release Orders & Findings","CBP forced labor enforcement dashboard"],
+    ["North Korean labor (CAATSA)","CBP enforcement of goods made with North Korean labor"],
+    ["Sanctions (incl. North Korea)","Treasury OFAC and other sanctions lists"]
+  ];
+  const RES = {clear:["No match","green"], match:["Match","red"], pending:["Not checked yet","grey"], partial:["No match in Sayari; official list not checked directly","amber"]};
+  let cur = "test";
+  const colorFor = d => d.conf < 40 ? "grey" : d.risk >= 65 ? "red" : d.risk >= 35 ? "amber" : "green";
+  const goodColor = v => v >= 65 ? "green" : v >= 40 ? "amber" : "grey";
+
+  function setRing(el, val, c){ el.style.setProperty("--p", val); el.style.setProperty("--c", "var(--"+c+")"); }
+
+  function render(){
+    const d = S[cur];
+    $("lbl").innerHTML = "<b>"+d.brand.toUpperCase()+"</b><span class='hl'>"+d.rn+"</span><br><span class='hl'>Made in "+d.made+"</span><br><span class='hl'>"+d.fiber+"</span><br>Machine wash cold";
+    $("readout").innerHTML =
+      "<div><span>Brand</span><span>"+d.brand+"</span></div>"+
+      "<div><span>RN number</span><span>"+d.rn+"</span></div>"+
+      "<div><span>Made in</span><span>"+d.made+"</span></div>"+
+      "<div><span>Fiber</span><span>"+d.fiber+"</span></div>";
+
+    document.querySelectorAll("[data-badge]").forEach(b => { b.className = "databadge " + (d.real ? "real" : "fake"); b.innerHTML = d.badge; });
+    const col = colorFor(d);
+    $("rTitle").textContent = d.product;
+    $("rSub").textContent = d.brand + " · " + d.rn + " · Made in " + d.made;
+    $("rTag").className = "tag " + col;
+    $("rVerdict").textContent = d.verdict;
+    $("rVerdictSub").textContent = d.verdictSub;
+    $("nRisk").textContent = d.risk; $("nConf").textContent = d.conf + "%"; $("nTrans").textContent = d.trans;
+    setRing($("ringRisk"), d.risk, d.conf < 40 ? "grey" : col);
+    setRing($("ringConf"), d.conf, goodColor(d.conf));
+    setRing($("ringTrans"), d.trans, goodColor(d.trans));
+    $("rReasons").innerHTML = d.reasons.map(r => "<li>"+r+"</li>").join("");
+
+    $("cTitle").textContent = d.product;
+    $("ladder").innerHTML = d.tiers.map(t =>
+      "<li class='rung "+t.c+(t.est?" est":"")+"'><span class='mk'></span><span class='t'>"+t.t+"</span><span class='st'>"+t.s+"</span><p>"+t.p+"</p></li>").join("");
+    $("countries").innerHTML = d.countries.length
+      ? d.countries.map(c => "<div class='crow "+c[2]+"'><span class='dot'></span><span>"+c[0]+"</span><span>"+c[1]+" suppliers</span></div>").join("") +
+        (d.countriesNote ? "<p class='hint' style='margin:6px 0 0'>"+d.countriesNote+"</p>" : "")
+      : "<p class='hint' style='margin:0'>"+d.countriesNote+"</p>";
+    $("flags").innerHTML =
+      "<h3>About specific suppliers</h3><ul>"+d.evidence.map(e=>"<li>"+e+"</li>").join("")+"</ul>"+
+      "<h3>Industry and country context</h3><ul>"+d.context.map(e=>"<li>"+e+"</li>").join("")+"</ul>";
+    $("lists").innerHTML = LISTS.map((l,i) => { const r = RES[d.lists[i]];
+      return "<tr><td>"+l[0]+"<span class='src'>"+l[1]+"</span></td><td><span class='res' style='--c:var(--"+r[1]+")'>"+r[0]+"</span></td></tr>"; }).join("");
+    $("sources").textContent = d.sources;
+    $("chainNote").textContent = d.note;
+  }
+
+  function show(v){
+    if (v === "submit"){ const vis = ["scan","result","chain","uflpa","todo","hour"].find(x => !$("v-"+x).hidden); if (vis) lastView = vis; $("sCo").value = S[cur].brand + " · " + S[cur].product; }
+    ["scan","result","chain","uflpa","todo","hour","submit"].forEach(x => { $("v-"+x).hidden = x !== v; });
+    document.querySelectorAll("nav.tabs button").forEach(b => b.setAttribute("aria-selected", b.dataset.v === v ? "true" : "false"));
+    window.scrollTo(0,0);
+  }
+
+  document.querySelectorAll(".scen button").forEach(b => b.addEventListener("click", () => {
+    cur = b.dataset.s;
+    document.querySelectorAll(".scen button").forEach(x => x.setAttribute("aria-pressed", x===b ? "true" : "false"));
+    render();
+  }));
+  document.querySelectorAll("nav.tabs button").forEach(b => b.addEventListener("click", () => show(b.dataset.v)));
+
+  $("scanBtn").addEventListener("click", () => {
+    const vf = $("vf"), btn = $("scanBtn");
+    btn.disabled = true; btn.textContent = "Reading label…";
+    vf.classList.add("scanning"); $("readout").hidden = true;
+    setTimeout(() => { $("readout").hidden = false; btn.textContent = "Tracing supply chain…"; }, 1300);
+    setTimeout(() => {
+      vf.classList.remove("scanning"); btn.disabled = false; btn.textContent = "Scan label";
+      show("result");
+    }, 2600);
+  });
+  $("toChain").addEventListener("click", () => show("chain"));
+  document.querySelectorAll("[data-go]").forEach(b => b.addEventListener("click", () => show(b.dataset.go)));
+  renderTodo();
+  initHour();
+  initSubmit();
+
+  render();
+})();
+</script>
+</body>
+</html>
