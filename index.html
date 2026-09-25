@@ -663,7 +663,7 @@ nav.tabs button[aria-selected="true"]::before{background:var(--coral)}
           <li><b>Needs review:</b> passes the checks but carries a negative claim about a named supplier, or Sayari and Tradeverifyd disagree. Only these go to a person.</li>
           <li><b>Not screened:</b> a source hasn't checked it yet. Never shown as clean.</li>
         </ul>
-        <p class="sub" style="margin-top:12px">Flags are risk indicators, not proof. Supplier names stay withheld until a person verifies them.</p>
+        <p class="sub" style="margin-top:12px">Flags are risk indicators, not proof. Companies are named because they appear in trade records; no link has been verified by a person yet.</p>
       </div>
     </div>
 
@@ -686,7 +686,7 @@ nav.tabs button[aria-selected="true"]::before{background:var(--coral)}
       </div>
       <div class="sec">
         <h2>What each point is</h2>
-        <p class="sub">Names are withheld until a person verifies each link. Tap a number on the map to jump to it.</p>
+        <p class="sub">Each company appears in Sayari trade records. Appearing here is a lead to check, not a finding of forced labor. Tap a number on the map to jump to it.</p>
         <div class="card"><ol class="mapnodes" id="mapNodes"></ol></div>
         <p class="sub" id="mapNote" style="margin-top:10px"></p>
       </div>
@@ -915,46 +915,46 @@ nav.tabs button[aria-selected="true"]::before{background:var(--coral)}
       ],
       countries:[["China",28,"amber"],["Hong Kong",16,"amber"],["Vietnam",7,"green"],["Bangladesh",6,"amber"],["Europe (various)",20,"green"]],
       countriesNote:"Real counts from the Sayari trace. Suppliers can appear in more than one country.",
-      evidence:["Supplier lead 1: ownership link to an entity in the Xinjiang region flagged for forced labor. Unverified, name withheld. Its link to this factory rests on 1 shipment of HS 611020 (finished cotton sweatshirts or pullovers), shipped from China to the US, received by a different company record with a similar name. It fails the HS fit, recurrence, and entity consistency checks, so it's automatically downgraded. A person should still confirm, since name searches can be fuzzy.",
-                "Supplier lead 2: named as an intermediary in university forced labor research. Unverified, name withheld.",
-                "Tier 4 lead: a raw cotton trader on the UFLPA Entity List sells to a Vietnamese yarn spinner that supplies lead 2. Both sources confirm the listing; the trade link is unverified. Name withheld.",
-                "Tier 3 lead: a Xinjiang-based company shipped cotton yarn to lead 2 in March 2019. Both sources place it in Xinjiang. The shipment is older than the UFLPA and outside Sayari's two-year window.",
-                "Two textile mills named in Sheffield Hallam University forced labor research sit at Tiers 3 and 4. Neither is confirmed as the same company in Tradeverifyd yet (similar names or the same country only, no shared registration number or street address), so both go to human review."],
+      evidence:["Supplier lead 1: ownership link to an entity in the Xinjiang region flagged for forced labor. Not identified in this demo. Its link to this factory rests on 1 shipment of HS 611020 (finished cotton sweatshirts or pullovers), shipped from China to the US, received by a different company record with a similar name. It fails the HS fit, recurrence, and entity consistency checks, so it's automatically downgraded. A person should still confirm, since name searches can be fuzzy.",
+                "Supplier lead 2: Gain Lucky (Vietnam) Co., Ltd. is named as an intermediary in Sheffield Hallam University forced labor research, according to Sayari. Unverified.",
+                "Tier 4 lead: Henan Tongzhou Cotton Trade Co., Ltd., on the UFLPA Entity List, appears in trade records selling to Brotex (Vietnam), which supplies Gain Lucky. Both sources confirm the listing; the trade link is unverified.",
+                "Tier 3 lead: Xinjiang Litai Silk Road Investment shipped cotton yarn to Gain Lucky in March 2019. Both sources place it in Xinjiang. The shipment is older than the UFLPA and outside Sayari's two-year window.",
+                "Two textile groups named in Sheffield Hallam University forced labor research, Lu Thai Textile and Anhui Huamao Textile, sit at Tiers 3 and 4. Neither is confirmed as the same company in Tradeverifyd yet (similar names or the same country only, no shared registration number or street address), so both go to human review."],
       context:["The main goods tied to the factory's name in Sayari trade records are knitted fabrics (HS 6006, 6001, 6004), labels and cartons (4821, 4819), and zipper parts (9607), which fit a t-shirt maker.",
                "30 of 42 suppliers export goods on the US Department of Labor forced or child labor goods list for their country. This describes the industry and country, not the companies.",
                "No suppliers matched sanctions lists in Sayari.",
                "Tradeverifyd: factory not yet screened. Not checked is not the same as clean.",
                "Sayari and Tradeverifyd both show a company on the UFLPA Entity List at Tier 4 (see the map). It hasn't been checked against the official DHS list directly, and nothing has been checked against CBP orders or North Korean labor enforcement yet."],
       sources:"Sayari: US customs records for HS 6109 since June 2025, upstream trace one tier deep, risk flags. Tradeverifyd: cached entity check (no record) and UN Comtrade country trade flows. US Department of Labor goods list. Forced labor map: Sayari upstream trace to Tier 4 with forced labor risk filters, plus shipment records; Tradeverifyd entity annotations (UFLPA, Sheffield Hallam University research). Official list checks against DHS and CBP sources still to do. All pulled September 25, 2026.",
-      note:"Real data from a live test trace. Supplier names are withheld until verified. The factory is named only because it's where our test started.",
+      note:"Real data from a live test trace. Companies are named for this demo because they appear in trade records. Flags are risk indicators, not proof, and no link has been verified by a person yet.",
       map:{
         hint:"Each point is a company in Sayari's trade records with a forced labor flag, placed at its registered address. Lines show the direction goods move, toward the factory in Vietnam.",
         note:"Sayari's supplier-network flags only count trade from the last two years. Sayari: upstream trace with forced labor risk filters, entity records and shipment records. Tradeverifyd: entity annotations. Pulled September 25, 2026. Map data: Natural Earth; Xinjiang boundary: AntV china-geojson.",
         cluster:[313,397],
         nodes:[
-          {n:1, c:"accent", step:"Garment sewing (cotton t-shirts)", lvl:"Indirect", lc:"amber", rk:"No flags of its own. Its risk comes through fabric suppliers 2 and 6.", x:313, y:397, ix:442.6, iy:372.1, t:"The garment factory", tier:"Tier 1", place:"Cu Chi, Ho Chi Minh City, Vietnam",
+          {n:1, c:"accent", step:"Garment sewing (cotton t-shirts)", lvl:"Indirect", lc:"amber", rk:"No flags of its own. Its risk comes through fabric suppliers 2 and 6.", x:313, y:397, ix:442.6, iy:372.1, t:"Worldon (Vietnam) Co., Ltd.", tier:"Tier 1", place:"Cu Chi, Ho Chi Minh City, Vietnam",
            p:"No forced labor flags of its own. Sayari flags its supplier network at Tiers 2 and 3 for links to UFLPA-listed, Xinjiang-based and research-named companies.",
            sy:"No direct flags. Supplier-network flags for UFLPA, Xinjiang, ASPI and Sheffield Hallam University research.", tv:"Only trade-record stubs, no annotations. Not screened."},
-          {n:2, c:"amber", step:"Fabric making", lvl:"Elevated", lc:"amber", rk:"Named as an intermediary in university forced labor research. Buys from 3, 5 and 8.", x:313, y:397, ix:377.1, iy:360.2, t:"Fabric supplier A", tier:"Tier 2", place:"Phuoc Dong industrial park, Tay Ninh, Vietnam",
+          {n:2, c:"amber", step:"Fabric making", lvl:"Elevated", lc:"amber", rk:"Named as an intermediary in university forced labor research. Buys from 3, 5 and 8.", x:313, y:397, ix:377.1, iy:360.2, t:"Gain Lucky (Vietnam) Co., Ltd.", tier:"Tier 2", place:"Phuoc Dong industrial park, Tay Ninh, Vietnam",
            p:"Supplies the factory. Buys from 3, 5 and, through another supplier, 8. Named as an intermediary in university forced labor research.",
            sy:"Named intermediary in Sheffield Hallam University forced labor research.", tv:"Only a record with a similar name, listed in China, with no shared ID or address. It can't confirm or contradict Sayari yet."},
-          {n:3, c:"amber", step:"Yarn spinning", lvl:"Elevated", lc:"amber", rk:"Buys raw cotton from a UFLPA-listed trader (4).", x:313, y:397, ix:384.1, iy:345.9, t:"Yarn spinner B", tier:"Tier 3", place:"Phuoc Dong industrial park, Tay Ninh, Vietnam",
-           p:"Supplies fabric supplier A. Sayari shows it trading directly with the UFLPA-listed cotton trader (4).",
+          {n:3, c:"amber", step:"Yarn spinning", lvl:"Elevated", lc:"amber", rk:"Buys raw cotton from a UFLPA-listed trader (4).", x:313, y:397, ix:384.1, iy:345.9, t:"Brotex (Vietnam) Co., Ltd.", tier:"Tier 3", place:"Phuoc Dong industrial park, Tay Ninh, Vietnam",
+           p:"Supplies Gain Lucky. Sayari shows it trading directly with the UFLPA-listed cotton trader (4).",
            sy:"Direct trade with a UFLPA-listed company.", tv:"Record found, no annotations."},
-          {n:4, c:"red", step:"Raw cotton trading", lvl:"High", lc:"red", rk:"On the UFLPA Entity List, in both sources. Its link to this chain isn't verified yet.", x:380.6, y:156.8, t:"Raw cotton trader", tier:"Tier 4", place:"Zhengzhou, Henan, China",
-           p:"On the UFLPA Entity List. Sells raw cotton to yarn spinner B. Its July 2026 shipments to Vietnam were declared as US and Brazilian cotton, a claim that needs checking. A listed company is presumed to use forced labor whatever it declares.",
+          {n:4, c:"red", step:"Raw cotton trading", lvl:"High", lc:"red", rk:"On the UFLPA Entity List, in both sources. Its link to this chain isn't verified yet.", x:380.6, y:156.8, t:"Henan Tongzhou Cotton Trade Co., Ltd.", tier:"Tier 4", place:"Zhengzhou, Henan, China",
+           p:"On the UFLPA Entity List. Sells raw cotton to Brotex. Its July 2026 shipments to Vietnam were declared as US and Brazilian cotton, a claim that needs checking. A listed company is presumed to use forced labor whatever it declares.",
            sy:"UFLPA Entity List. Recent law enforcement news.", tv:"UFLPA Entity List, valid from August 3, 2026. Both sources agree."},
-          {n:5, c:"red", step:"Cotton yarn", lvl:"High", lc:"red", rk:"Based in Xinjiang. Its yarn shipment was in 2019, before the UFLPA.", x:126, y:74.9, arc:"hist", t:"Xinjiang yarn exporter", tier:"Tier 3", place:"Korla, Xinjiang, China",
-           p:"Shipped 100% cotton yarn to fabric supplier A in March 2019. The UFLPA presumes all goods made in Xinjiang use forced labor. This shipment is older than the law and isn't in Sayari's two-year window.",
+          {n:5, c:"red", step:"Cotton yarn", lvl:"High", lc:"red", rk:"Based in Xinjiang. Its yarn shipment was in 2019, before the UFLPA.", x:126, y:74.9, arc:"hist", t:"Xinjiang Litai Silk Road Investment Co., Ltd.", tier:"Tier 3", place:"Korla, Xinjiang, China",
+           p:"Shipped 100% cotton yarn to Gain Lucky in March 2019. The UFLPA presumes all goods made in Xinjiang use forced labor. This shipment is older than the law and isn't in Sayari's two-year window.",
            sy:"Located in Xinjiang (by address and by name).", tv:"On Sheffield Hallam University's list of companies operating in Xinjiang. Both sources agree."},
-          {n:6, c:"amber", step:"Knit fabric making", lvl:"Elevated", lc:"amber", rk:"Buys from a mill group named in forced labor research (7).", x:455.5, y:210, t:"Fabric supplier C", tier:"Tier 2", place:"Beilun, Ningbo, Zhejiang, China",
-           p:"Supplies the factory directly. Buys from mill group 7.",
+          {n:6, c:"amber", step:"Knit fabric making", lvl:"Elevated", lc:"amber", rk:"Buys from the Lu Thai Textile group, named in forced labor research (7).", x:455.5, y:210, t:"Ningbo Shenzhou Knitting Co., Ltd.", tier:"Tier 2", place:"Beilun, Ningbo, Zhejiang, China",
+           p:"Supplies the factory directly. Buys from the Lu Thai group (7).",
            sy:"No direct flags. Supplier-network flags for UFLPA, Xinjiang, ASPI and Sheffield Hallam University research.", tv:"Not screened yet."},
-          {n:7, c:"amber", step:"Yarn and woven fabric", lvl:"Elevated", lc:"amber", rk:"Named in university research on Xinjiang cotton. Trades with a UFLPA-listed company.", x:420.4, y:133.7, to:6, t:"Textile mill group D", tier:"Tier 3", place:"Zibo, Shandong, China",
-           p:"Supplies fabric supplier C. Named in Sheffield Hallam University's \u201cLaundering Cotton\u201d research. Sayari's record merges the Chinese parent with its Vietnam subsidiary, so it's shown at the parent's address.",
+          {n:7, c:"amber", step:"Yarn and woven fabric", lvl:"Elevated", lc:"amber", rk:"Named in university research on Xinjiang cotton. Trades with a UFLPA-listed company.", x:420.4, y:133.7, to:6, t:"Lu Thai Textile group (incl. Continental Textile, Vietnam)", tier:"Tier 3", place:"Zibo, Shandong, China",
+           p:"Supplies Ningbo Shenzhou Knitting. Named in Sheffield Hallam University's \u201cLaundering Cotton\u201d research. Sayari's record merges the Chinese parent with its Vietnam subsidiary, so it's shown at the parent's address.",
            sy:"Named in Sheffield Hallam University forced labor research. Direct trade with a UFLPA-listed company.", tv:"Annotation citing Sheffield Hallam University's \u201cLaundering Cotton\u201d, but on a record that's only a possible match (no shared ID or street address), so the two sources aren't confirmed to agree."},
-          {n:8, c:"amber", step:"Cotton yarn spinning", lvl:"Review", lc:"amber", rk:"Named in forced labor research by one source only. Needs a person to review.", x:411.2, y:203.4, arc:"via", t:"Cotton yarn mill E", tier:"Tier 4", place:"Anqing, Anhui, China",
-           p:"Supplies another Vietnamese supplier that sells to fabric supplier A.",
+          {n:8, c:"amber", step:"Cotton yarn spinning", lvl:"Review", lc:"amber", rk:"Named in forced labor research by one source only. Needs a person to review.", x:411.2, y:203.4, arc:"via", t:"Anhui Huamao Textile Co., Ltd.", tier:"Tier 4", place:"Anqing, Anhui, China",
+           p:"Supplies another Vietnamese supplier that sells to Gain Lucky.",
            sy:"Named in Sheffield Hallam University forced labor research.", tv:"A record with the same name but a different registration number and address (Anqing, not Hefei), and no annotations. Only a possible match, so a person needs to confirm it's the same company."}
         ],
         inset:[[3,2],[2,1]]
@@ -1016,38 +1016,38 @@ nav.tabs button[aria-selected="true"]::before{background:var(--coral)}
     },
     newera: {
       real:true, lists:["partial","pending","pending","clear"],
-      badge:"<b>Real data, traced in advance.</b> Bought at the New Era store in NYC and traced through Sayari and Tradeverifyd on September 25, 2026. Factory names are withheld until a person verifies them.",
+      badge:"<b>Real data, traced in advance.</b> Bought at the New Era store in NYC and traced through Sayari and Tradeverifyd on September 25, 2026. Companies are named because they appear in trade records; flags are risk indicators, not proof.",
       product:"New Era MLB Yankees tee", brand:"New Era", rn:"UPC 1 99420 27976 6", made:"Madagascar", fiber:"Not on tag",
       risk:30, conf:30, trans:40,
       why:{risk:"No forced labor or list flags on the likely factories or the fabric supplier. The one Xinjiang-linked company sits behind a packaging supplier, not the cotton. Set by hand at 30 for this demo.",
            conf:"All the factory links are downgraded: each rests on one month of shipments, and the fabric went to a different company record. Nothing is verified by a person. That puts confidence below 40%, so the result is grey. Set by hand at 30%."},
       verdict:"Not enough data", verdictSub:"No flags on the likely factories, but the links are thin",
       reasons:[
-        "Your tee says Made in Madagascar. Peru's customs records show two Madagascar knitwear factories shipping t-shirts labeled New Era in 2026.",
+        "Your tee says Made in Madagascar. Peru's customs records show two Madagascar knitwear factories, World Knits Mada and Tropic Mad SA, shipping t-shirts labeled New Era in 2026.",
         "Neither factory has forced labor, sanctions or list flags in Sayari or Tradeverifyd.",
-        "One factory group bought 100% Supima cotton knit fabric from an Indian spinner and knitter. Supima is US-grown cotton. That supplier is the same company in both sources (matched by registration number and LEI).",
+        "Tropic Mad bought 100% Supima cotton knit fabric from Kumaragiri Spinners in India. Supima is US-grown cotton. That supplier is the same company in both sources (matched by registration number and LEI).",
         "US import records for this shirt didn't show up, so these are the likely factories for New Era tees from Madagascar, not proof your shirt came from them.",
         "Grey means we can't judge yet. It doesn't mean safe."
       ],
       tiers:[
         {t:"Finished product", s:"Known", c:"grey", p:"UPC 199420279766 and the tag: New Era, MLB licensed, made in Madagascar."},
-        {t:"Tier 1 · Garment factory", s:"Partly known", c:"green", est:true, p:"Two Madagascar knitwear factories ship New Era t-shirts in Peru's customs records. No flags on either. Not confirmed as the maker of this shirt."},
-        {t:"Tier 2 · Fabric and trims", s:"Partly known", c:"green", est:true, p:"An Indian spinner and knitter shipped 100% Supima cotton knit fabric, collars and cuffs to one factory group. No flags. A packaging bag supplier's network includes a Xinjiang polyester maker; bags aren't part of the shirt."},
+        {t:"Tier 1 · Garment factory", s:"Partly known", c:"green", est:true, p:"World Knits Mada and Tropic Mad SA ship New Era t-shirts in Peru's customs records. No flags on either. Not confirmed as the maker of this shirt."},
+        {t:"Tier 2 · Fabric and trims", s:"Partly known", c:"green", est:true, p:"Kumaragiri Spinners (India) shipped 100% Supima cotton knit fabric, collars and cuffs to a Tropic Mad record. No flags. A packaging bag supplier's network (Natur Tec India) includes a Xinjiang polyester maker; bags aren't part of the shirt."},
         {t:"Tier 3 · Yarn spinning", s:"Estimated", c:"grey", est:true, p:"Not traced. The fabric supplier also spins yarn, which may be where the Supima cotton was spun."},
         {t:"Tier 4 · Raw cotton", s:"Estimated", c:"grey", est:true, p:"Described as Supima (US-grown) cotton in the shipment records. That's a declaration, not proof."}
       ],
       countries:[["Madagascar",2,"green"],["India",2,"green"],["China",1,"amber"]],
       countriesNote:"Companies found in this trace. China is the Xinjiang polyester maker behind the packaging supplier.",
-      evidence:["A Xinjiang polyester maker appears in the network of a packaging bag supplier to one factory. It's packaging, not the shirt's cotton, and the link hasn't been checked against shipment records. Unverified, name withheld.",
+      evidence:["Xinjiang Blue Ridge Tunhe Polyester appears in the network of Natur Tec India, a packaging bag supplier to Tropic Mad SA. It's packaging, not the shirt's cotton, and the link hasn't been checked against shipment records. Unverified.",
                 "The Supima fabric shipments went to a separate company record with a similar name, not the factory's own record, so that link is downgraded until a person confirms they're the same company."],
       context:["Madagascar's garment exports are not on the US Department of Labor forced labor goods list.",
                "No UFLPA, sanctions or Tradeverifyd annotations on any company in this trace."],
       sources:"Sayari: Peru and Colombia customs records naming New Era (Madagascar exports, 2024–2026), Madagascar import records for the fabric supplier, upstream trace, risk flags. Tradeverifyd: entity matches and annotations. Barcode and tag photographed at the New Era store, NYC. All pulled September 25, 2026.",
-      note:"Real data traced in advance for a demo scan. Factory names are withheld until a person verifies them."
+      note:"Real data traced in advance for a demo scan. Companies are named because they appear in trade records; flags are risk indicators, not proof."
     },
     gloves: {
       real:true, lists:["partial","pending","pending","clear"],
-      badge:"<b>Real data, traced in advance.</b> Bought at CVS in NYC and traced through Sayari and Tradeverifyd on September 25, 2026. Supplier names are withheld until a person verifies them.",
+      badge:"<b>Real data, traced in advance.</b> Bought at CVS in NYC and traced through Sayari and Tradeverifyd on September 25, 2026. Companies are named because they appear in trade records; flags are risk indicators, not proof.",
       product:"Black knit gloves", brand:"Beeline (CVS)", rn:"EAN 4 060044 176167", made:"China", fiber:"Not on tag",
       risk:45, conf:25, trans:30,
       why:{risk:"China-made knit gloves, from a supplier Sayari flags for exporting goods on the US Department of Labor forced labor list. No supplier-specific or UFLPA flags. Set by hand at 45 for this demo.",
@@ -1055,14 +1055,14 @@ nav.tabs button[aria-selected="true"]::before{background:var(--coral)}
       verdict:"Not enough data", verdictSub:"One likely supplier in China, no view past it",
       reasons:[
         "The tag names the importer: Beeline Import and Services LLC (RN 131011). It's the same company in Sayari and Tradeverifyd, matched by company number.",
-        "A Hangzhou accessories supplier shipped knit gloves to Beeline in May 2026 and more gloves and hats in July 2026.",
+        "Hangzhou Haili Accessories shipped knit gloves to Beeline in May 2026 and more gloves and hats in July 2026.",
         "Sayari flags that supplier for exporting goods on the US Department of Labor forced labor goods list for China. That describes the product and country, not proof about this company.",
         "Nothing is known about where the yarn or fiber came from.",
         "Grey means we can't judge yet. It doesn't mean safe."
       ],
       tiers:[
         {t:"Finished product", s:"Known", c:"grey", p:"EAN 4060044176167. Tag: importer Beeline Import and Services LLC, RN 131011, made in China."},
-        {t:"Tier 1 · Glove factory", s:"Partly known", c:"amber", est:true, p:"A Hangzhou accessories supplier shipped gloves to Beeline in 2026. Not confirmed as this glove's maker."},
+        {t:"Tier 1 · Glove factory", s:"Partly known", c:"amber", est:true, p:"Hangzhou Haili Accessories shipped gloves to Beeline in 2026. Not confirmed as this glove's maker."},
         {t:"Tier 2 · Knit fabric", s:"Unknown", c:"grey", est:true, p:"Not traced. Shipment text mentions acrylic, viscose, polyester, nylon and elastane."},
         {t:"Tier 3 · Yarn", s:"Unknown", c:"grey", est:true, p:"Not traced."},
         {t:"Tier 4 · Fiber", s:"Unknown", c:"grey", est:true, p:"Not traced."}
@@ -1072,36 +1072,36 @@ nav.tabs button[aria-selected="true"]::before{background:var(--coral)}
       context:["Sayari flags the Hangzhou supplier for exporting goods on the US Department of Labor forced labor goods list for China.",
                "No UFLPA, sanctions or Tradeverifyd annotations on the importer or the supplier."],
       sources:"Sayari: US customs records for Beeline Import and Services (2026), entity records and risk flags. Tradeverifyd: entity matches and annotations. Tag photographed at CVS, NYC. All pulled September 25, 2026.",
-      note:"Real data traced in advance for a demo scan. The supplier's name is withheld until a person verifies it."
+      note:"Real data traced in advance for a demo scan. Companies are named because they appear in trade records; flags are risk indicators, not proof."
     },
     cap: {
       real:true, lists:["partial","pending","pending","clear"],
-      badge:"<b>Real data, traced in advance.</b> Bought at CVS in NYC and traced through Sayari and Tradeverifyd on September 25, 2026. Supplier names are withheld until a person verifies them.",
+      badge:"<b>Real data, traced in advance.</b> Bought at CVS in NYC and traced through Sayari and Tradeverifyd on September 25, 2026. Companies are named because they appear in trade records; flags are risk indicators, not proof.",
       product:"New York basic cap, CNY303-A", brand:"Robin Ruth", rn:"UPC 8 10092 12238 8", made:"China", fiber:"Not on tag",
       risk:50, conf:25, trans:25,
       why:{risk:"The importer's supplier network includes a company on the UFLPA Entity List, according to Sayari, but the path isn't known and may involve other products. Set by hand at 50 for this demo.",
            conf:"The main supplier is a trading company, and its shipments carry no HS codes, so the link fails the HS fit check. Confidence is below 40%, so the result is grey. Set by hand at 25%."},
       verdict:"Not enough data", verdictSub:"Supplier is a trading company, importer's network has a UFLPA lead",
       reasons:[
-        "The cap is a Robin Ruth souvenir cap. Robin Ruth USA's importer record received 177 shipments, mostly from China.",
-        "Its main supplier is a Hangzhou import-export trading company that shipped hats with bags, wallets and souvenirs 11 times in the last two years. A trader isn't the factory, so the maker isn't known.",
+        "The cap is a Robin Ruth souvenir cap. Robin Ruth USA imports through Tomgal LLC, whose record received 177 shipments, mostly from China.",
+        "Its main supplier, Hangzhou Tongxiang Imp. & Exp. Co., is a trading company that shipped hats with bags, wallets and souvenirs 11 times in the last two years. A trader isn't the factory, so the maker isn't known.",
         "US shipping records for these shipments carry no HS codes, so the automatic check can't confirm the goods were caps.",
         "Sayari flags the importer's supplier network (2 to 3 tiers up) for a company on the UFLPA Entity List. The path hasn't been identified yet.",
         "Grey means we can't judge yet. It doesn't mean safe."
       ],
       tiers:[
         {t:"Finished product", s:"Known", c:"grey", p:"UPC 810092122388, style CNY303-A, Robin Ruth, made in China."},
-        {t:"Tier 1 · Cap maker", s:"Partly known", c:"amber", est:true, p:"Robin Ruth USA's main supplier is a Hangzhou import-export trading company. The factory behind it isn't known."},
+        {t:"Tier 1 · Cap maker", s:"Partly known", c:"amber", est:true, p:"Robin Ruth USA's main supplier is Hangzhou Tongxiang Imp. & Exp. Co., a trading company. The factory behind it isn't known."},
         {t:"Tier 2 · Fabric and trims", s:"Unknown", c:"grey", est:true, p:"Not traced."},
         {t:"Tier 3 · Yarn", s:"Unknown", c:"grey", est:true, p:"Not traced."},
         {t:"Tier 4 · Raw cotton", s:"Unknown", c:"grey", est:true, p:"Not traced. China-made cotton goods carry elevated Xinjiang cotton risk until the source is known."}
       ],
       countries:[["China",1,"amber"]], countriesNote:"Suppliers found in this trace.",
-      evidence:["Sayari flags the importer's supplier network for a company on the UFLPA Entity List, 2 to 3 tiers up. The path and product aren't known yet. Unverified lead, name withheld."],
+      evidence:["Sayari flags the importer's supplier network for a company on the UFLPA Entity List, 2 to 3 tiers up. The path and product aren't known yet, so the listed company isn't identified. Unverified lead."],
       context:["No UFLPA, sanctions or Tradeverifyd annotations on the importer or the trading company itself.",
                "China-made cotton goods carry elevated risk of Xinjiang cotton until the source is traced."],
       sources:"Sayari: US customs records for Robin Ruth USA's importer (2023–2026), entity records, risk flags. Tradeverifyd: entity matches and annotations. Tag photographed at CVS, NYC. All pulled September 25, 2026.",
-      note:"Real data traced in advance for a demo scan. Supplier names are withheld until a person verifies them."
+      note:"Real data traced in advance for a demo scan. Companies are named because they appear in trade records; flags are risk indicators, not proof."
     }
   };
 
@@ -1306,7 +1306,7 @@ nav.tabs button[aria-selected="true"]::before{background:var(--coral)}
   const CHECK_DATE = "2026-09-25";
 
   /* ---- Rule 2: match by ID, not name ---- */
-  // Identifiers, addresses and names are stored as hashes so the public page never exposes a withheld supplier.
+  // Identifiers, addresses and names are stored as hashes so the page doesn't carry raw registration numbers or street addresses.
   function fnv(s){ let h = 0x811c9dc5; for (const ch of s){ h ^= ch.codePointAt(0); h = Math.imul(h, 0x01000193) >>> 0; } return h.toString(16).padStart(8,"0"); }
   function fold(s){ return String(s||"").replace(/đ/g,"d").replace(/Đ/g,"D").normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase(); }
   const TRANSLIT = [[/\bviet nam\b/g,"vietnam"],[/\bkuerle\b/g,"korla"],[/\bhongkong\b/g,"hong kong"]];
@@ -1472,7 +1472,7 @@ nav.tabs button[aria-selected="true"]::before{background:var(--coral)}
 
   /* ==== Sample source data ====
      Real records pulled from Sayari and Tradeverifyd on Sep 25, 2026 for the real test trace. Names, registration
-     numbers and street addresses are stored only as hashes (see fingerprint()), so no withheld supplier is exposed.
+     numbers and street addresses are stored only as hashes (see fingerprint()), so the page doesn't carry raw registration numbers or street addresses.
      The example scenarios use made-up records. */
   const FP = {"factory":{"s":{"entity_id":"xk3jODhxYqBrJtd225Y91g","fp":{"country":"VN","names":[["4f3ae32e","95522d4b"],["4f3ae32e","95522d4b"]],"ids":["80b2cc2d"],"address":["881d13e6","8d1d1bc5","24f37d4b","2e8f1227","ebc389eb","5644b0d0","4c298165","f5858a65"],"xref":[]}},"t":{"entity_id":"28a03714-e843-4dd6-a536-deb2643eb643","fp":{"country":"CN","names":[["4f3ae32e","95522d4b"],["4f3ae32e","95522d4b"]],"ids":[],"address":[],"xref":[]}}},"fabricA":{"s":{"entity_id":"1wyp71MzsLUo4kDvMOlJaA","fp":{"country":"VN","names":[["1b5426fe","f71b972b","95522d4b"],["1b5426fe","f71b972b","95522d4b"]],"ids":["f258a36a"],"address":["d46a2e8e","d4c9a5dc","fae5b84a","24f37d4b"],"xref":[]}},"t":{"entity_id":"c9f80cbe-e8f6-475e-80c3-489b67d61bb8","fp":{"country":"CN","names":[["1b5426fe","f71b972b","95522d4b"],["1b5426fe","f71b972b","95522d4b"]],"ids":[],"address":[],"xref":[]}}},"spinnerB":{"s":{"entity_id":"Ji-Wk_dCxrQDH0ejRoF8RA","fp":{"country":"VN","names":[["72c0f1cb","95522d4b"],["72c0f1cb","95522d4b"]],"ids":["62fc7a48"],"address":["e759a851","1cc63b75","fae5b84a","24f37d4b"],"xref":[]}},"t":{"entity_id":"461e4a6a-06eb-43f7-b655-99d820a6d718","fp":{"country":"VN","names":[["72c0f1cb","95522d4b"],["72c0f1cb","95522d4b"]],"ids":["6b175f15"],"address":["e759a851","1cc63b75","fae5b84a","24f37d4b"],"xref":[]}}},"cotton":{"s":{"entity_id":"XNjL1MhrG-6uMHE3mBkofg","fp":{"country":"CN","names":[["7790ee3f","e16fec8d","7c3c09a2","51366e59"]],"ids":["bfb06b7e","d775c916"],"address":["15335386","7790ee3f","9050cb28","14eb1f3f","2ab24e4b","a20bc574","f75afb6b","cd0cd94b"],"xref":[]}},"t":{"entity_id":"ddd34784-04e9-490c-a394-735db7dec651","fp":{"country":"CN","names":[["7790ee3f","e16fec8d","7c3c09a2","129abbbf"],["4db8962c"]],"ids":["bfb06b7e","d775c916"],"address":["cf563645"],"xref":[]}}},"xjyarn":{"s":{"entity_id":"z_ybDCtnTQDYBJf3nFiaww","fp":{"country":"CN","names":[["ada1b177","3a199f14","11cddca4","3d1fcc9b","75cdce8c"]],"ids":[],"address":["fd44a7ee","453f7b00","9a96b4a6"],"xref":[]}},"t":{"entity_id":"2613a9e1-c677-425a-915f-0404b558aa17","fp":{"country":"CN","names":[["ada1b177","3a199f14","11cddca4","3d1fcc9b","75cdce8c"],["9643144a"]],"ids":["fb86725f"],"address":["fd44a7ee","453f7b00"],"xref":[]}}},"fabricC":{"s":{"entity_id":"I_wdtkxd3V2mwr8PS-ETSw","fp":{"country":"CN","names":[["faf95188","a0ad7f47","1a2add79"]],"ids":["a8445f1d"],"address":["13eb1dac","508079c1","a647737a"],"xref":[]}},"t":null},"millD":{"s":{"entity_id":"vw25FFoA-R7jh8u78EdqIw","fp":{"country":"VN","names":[["d7599ae2","e536425a","c4ed61ce"],["5c31e95a","e018543b","95522d4b"],["1b3397c4","c0cae4cf","9325c30c","59859d1a"]],"ids":["2f768db3","b88e219c"],"address":["0afe9739","fc2cf8e0","618010e9"],"xref":[]}},"t":{"entity_id":"b139782b-e3ad-4131-8187-fbbf1aed52e6","fp":{"country":"CN","names":[["de1e64b0"],["5c31e95a","e018543b","59859d1a"]],"ids":["0a890d6f","34f0dc82"],"address":["a6ae1a60","9064b03e"],"xref":[]}}},"millE":{"s":{"entity_id":"FC1hQPe2_yHWdarmy-9ElQ","fp":{"country":"CN","names":[["f2b21017"],["3121a64c","c0bbbe75","112a90d4","0f29c2a6","fb080cb3","5d36813d"]],"ids":["e259fa33"],"address":["8df2997f","a68ef5fe","2fceb8f0"],"xref":[]}},"t":{"entity_id":"a3b57034-581f-49ea-95a2-d6f4c174fa1f","fp":{"country":"CN","names":[["f2b21017"],["3121a64c","afc82a3c","59859d1a"]],"ids":["0d012760","6043c2a5"],"address":["9201aa55","51c588c4"],"xref":[]}}}};
   // Sayari search_shipments response (full mode), trimmed to the fields the checks use. Supplier and buyer names removed.
@@ -1492,16 +1492,16 @@ nav.tabs button[aria-selected="true"]::before{background:var(--coral)}
   const LINKDATA = {
     test: {product:"cotton_tshirt", root:"factory",
       companies:{
-        factory: {n:1, label:"The garment factory", tier:1, flags:[], sayari:FP.factory.s, tradeverifyd:tv("factory",[])},
-        fabricA: {n:2, label:"Fabric supplier A", tier:2, flags:["Named intermediary in university forced labor research"], sayari:FP.fabricA.s, tradeverifyd:tv("fabricA",[])},
-        spinnerB:{n:3, label:"Yarn spinner B", tier:3, flags:[], sayari:FP.spinnerB.s, tradeverifyd:tv("spinnerB",[])},
-        cotton:  {n:4, label:"Raw cotton trader", tier:4, flags:["UFLPA Entity List"], sayari:FP.cotton.s, tradeverifyd:tv("cotton",["UFLPA Entity List"])},
-        xjyarn:  {n:5, label:"Xinjiang yarn exporter", tier:3, flags:["Located in Xinjiang"], sayari:FP.xjyarn.s, tradeverifyd:tv("xjyarn",["Human Rights Violation Risk"])},
-        fabricC: {n:6, label:"Fabric supplier C", tier:2, flags:[], sayari:FP.fabricC.s, tradeverifyd:null},
-        millD:   {n:7, label:"Textile mill group D", tier:3, flags:["Named in university forced labor research"], sayari:FP.millD.s, tradeverifyd:tv("millD",["Human Rights Violation Risk"])},
-        millE:   {n:8, label:"Cotton yarn mill E", tier:4, flags:["Named in university forced labor research"], sayari:FP.millE.s, tradeverifyd:tv("millE",[])},
-        otherVN: {label:"Another Vietnamese supplier", tier:3, flags:[], sayari:{entity_id:"GA-OjZLFkSQsm4HUdMh1CQ", fp:{country:"VN", names:[], ids:[], address:[]}}, tradeverifyd:null},
-        lead1:   {label:"Supplier lead 1", tier:2, flags:["Ownership link to a Xinjiang entity flagged for forced labor (unverified)"],
+        factory: {n:1, label:"Worldon (Vietnam)", tier:1, flags:[], sayari:FP.factory.s, tradeverifyd:tv("factory",[])},
+        fabricA: {n:2, label:"Gain Lucky (Vietnam)", tier:2, flags:["Named intermediary in university forced labor research"], sayari:FP.fabricA.s, tradeverifyd:tv("fabricA",[])},
+        spinnerB:{n:3, label:"Brotex (Vietnam)", tier:3, flags:[], sayari:FP.spinnerB.s, tradeverifyd:tv("spinnerB",[])},
+        cotton:  {n:4, label:"Henan Tongzhou Cotton Trade", tier:4, flags:["UFLPA Entity List"], sayari:FP.cotton.s, tradeverifyd:tv("cotton",["UFLPA Entity List"])},
+        xjyarn:  {n:5, label:"Xinjiang Litai Silk Road Investment", tier:3, flags:["Located in Xinjiang"], sayari:FP.xjyarn.s, tradeverifyd:tv("xjyarn",["Human Rights Violation Risk"])},
+        fabricC: {n:6, label:"Ningbo Shenzhou Knitting", tier:2, flags:[], sayari:FP.fabricC.s, tradeverifyd:null},
+        millD:   {n:7, label:"Lu Thai Textile group", tier:3, flags:["Named in university forced labor research"], sayari:FP.millD.s, tradeverifyd:tv("millD",["Human Rights Violation Risk"])},
+        millE:   {n:8, label:"Anhui Huamao Textile", tier:4, flags:["Named in university forced labor research"], sayari:FP.millE.s, tradeverifyd:tv("millE",[])},
+        otherVN: {label:"Gunzetal (Vietnam)", tier:3, flags:[], sayari:{entity_id:"GA-OjZLFkSQsm4HUdMh1CQ", fp:{country:"VN", names:[], ids:[], address:[]}}, tradeverifyd:null},
+        lead1:   {label:"Supplier lead 1 (not identified in this demo)", tier:2, flags:["Ownership link to a Xinjiang entity flagged for forced labor (unverified)"],
                   sayari:{entity_id:null, fp:{country:null, names:[], ids:[], address:[]}}, tradeverifyd:null, withheld:true}
       },
       links:[
@@ -1549,34 +1549,34 @@ nav.tabs button[aria-selected="true"]::before{background:var(--coral)}
   const tv2 = (k, flags) => FP2[k].t && Object.assign({source:"Tradeverifyd", flags}, FP2[k].t);
   LINKDATA.newera = {product:"cotton_tshirt", root:"dist",
     companies:{
-      dist: {label:"New Era distributor in Peru", tier:0, flags:[], sayari:FP2.ne_dist.s, tradeverifyd:null},
-      wkm:  {label:"Madagascar knitwear factory A", tier:1, flags:[], sayari:FP2.ne_wkm.s, tradeverifyd:tv2("ne_wkm",[])},
-      tms:  {label:"Madagascar knitwear factory B", tier:1, flags:[], sayari:FP2.ne_tms.s, tradeverifyd:tv2("ne_tms",[])},
-      kum:  {label:"Indian spinner and knitter", tier:2, flags:[], sayari:FP2.ne_kum.s, tradeverifyd:tv2("ne_kum",[])},
-      bag:  {label:"Indian packaging bag maker", tier:2, flags:[], sayari:FP2.ne_bag.s, tradeverifyd:null},
-      xjp:  {label:"Xinjiang polyester maker", tier:3, flags:["Located and registered in Xinjiang"], sayari:FP2.ne_xjp.s, tradeverifyd:null}},
+      dist: {label:"Comercializadora de la Plata (New Era distributor, Peru)", tier:0, flags:[], sayari:FP2.ne_dist.s, tradeverifyd:null},
+      wkm:  {label:"World Knits Mada (Madagascar)", tier:1, flags:[], sayari:FP2.ne_wkm.s, tradeverifyd:tv2("ne_wkm",[])},
+      tms:  {label:"Tropic Mad SA (Madagascar)", tier:1, flags:[], sayari:FP2.ne_tms.s, tradeverifyd:tv2("ne_tms",[])},
+      kum:  {label:"Kumaragiri Spinners (India)", tier:2, flags:[], sayari:FP2.ne_kum.s, tradeverifyd:tv2("ne_kum",[])},
+      bag:  {label:"Natur Tec India", tier:2, flags:[], sayari:FP2.ne_bag.s, tradeverifyd:null},
+      xjp:  {label:"Xinjiang Blue Ridge Tunhe Polyester", tier:3, flags:["Located and registered in Xinjiang"], sayari:FP2.ne_xjp.s, tradeverifyd:null}},
     links:[
       {from:"wkm", to:"dist", source:"Sayari", record_type:"customs shipments (Peru)", rows:[{record_id:"g27rgxCFk1rMjsSXK8Kg-Q",supplier_id:"tkkgRlStlDP6LDAX61EOzg",buyer_id:"-KU2gCxO6Ov4OJw4JLAY8w",hs:["610910"],date:"2026-07-13",source:"Sayari"},{record_id:"JhFjanF4rjvaRTDoRK932Q",supplier_id:"tkkgRlStlDP6LDAX61EOzg",buyer_id:"-KU2gCxO6Ov4OJw4JLAY8w",hs:["610910"],date:"2026-07-13",source:"Sayari"},{record_id:"R41oaLvy2p3N_AmKwvaQJA",supplier_id:"tkkgRlStlDP6LDAX61EOzg",buyer_id:"-KU2gCxO6Ov4OJw4JLAY8w",hs:["610910"],date:"2026-07-13",source:"Sayari"},{record_id:"0x_b4DLfG1ipJUoFpNHkrg",supplier_id:"tkkgRlStlDP6LDAX61EOzg",buyer_id:"-KU2gCxO6Ov4OJw4JLAY8w",hs:["610910"],date:"2026-07-13",source:"Sayari"},{record_id:"gtCVVggM9mrsrQLiWLoPHg",supplier_id:"tkkgRlStlDP6LDAX61EOzg",buyer_id:"-KU2gCxO6Ov4OJw4JLAY8w",hs:["610910"],date:"2026-07-13",source:"Sayari"}],
        note:"Peru's customs records name New Era on these t-shirts."},
       {from:"tms", to:"dist", source:"Sayari", record_type:"customs shipments (Peru)", rows:[{record_id:"tRY8vIMzZLkS9cimEtYSBg",supplier_id:"rAcSq6xgOHThXrF3ytYDMg",buyer_id:"-KU2gCxO6Ov4OJw4JLAY8w",hs:["6109100039"],date:"2026-05-22",source:"Sayari"},{record_id:"uwJas3CKiDIj4FLW6DsCeg",supplier_id:"rAcSq6xgOHThXrF3ytYDMg",buyer_id:"-KU2gCxO6Ov4OJw4JLAY8w",hs:["6109100039"],date:"2026-05-22",source:"Sayari"}],
        note:"Peru's customs records name New Era on these t-shirts."},
-      {from:"kum", to:"tms", source:"Sayari", record_type:"customs shipments (Madagascar)", receiver_note:"a separate record with a similar name and no country, not factory B's own record", rows:[{record_id:"3ZZyEDvInWcnKpso8H1sRA",supplier_id:"5aerMaqbpDTnrNDIaWXAsg",buyer_id:"Fx5q2fjZJlySfaHYDGKqMQ",hs:["611790"],date:"2024-12-26",source:"Sayari"},{record_id:"KO7Xy4oLLneiVqjtKp1lIg",supplier_id:"5aerMaqbpDTnrNDIaWXAsg",buyer_id:"Fx5q2fjZJlySfaHYDGKqMQ",hs:["611790"],date:"2024-12-26",source:"Sayari"},{record_id:"NBkc5tzkkhO07s8Ei908eQ",supplier_id:"5aerMaqbpDTnrNDIaWXAsg",buyer_id:"Fx5q2fjZJlySfaHYDGKqMQ",hs:["600623"],date:"2024-12-26",source:"Sayari"},{record_id:"nzY2GNwicQ-LeMrtYsQfuA",supplier_id:"5aerMaqbpDTnrNDIaWXAsg",buyer_id:"Fx5q2fjZJlySfaHYDGKqMQ",hs:["600623"],date:"2024-12-26",source:"Sayari"},{record_id:"LAtqv9HlKLIWS8Ajdty38A",supplier_id:"5aerMaqbpDTnrNDIaWXAsg",buyer_id:"Fx5q2fjZJlySfaHYDGKqMQ",hs:["611790"],date:"2024-12-26",source:"Sayari"},{record_id:"2e1v4cdbD6gcBXxGU8bcUg",supplier_id:"5aerMaqbpDTnrNDIaWXAsg",buyer_id:"Fx5q2fjZJlySfaHYDGKqMQ",hs:["611790"],date:"2024-12-26",source:"Sayari"},{record_id:"Kw46jvAHrAZm-2OOgpYb7g",supplier_id:"5aerMaqbpDTnrNDIaWXAsg",buyer_id:"Fx5q2fjZJlySfaHYDGKqMQ",hs:["611790"],date:"2024-12-26",source:"Sayari"},{record_id:"2xBDR7pivy_T0TQs_esbTg",supplier_id:"5aerMaqbpDTnrNDIaWXAsg",buyer_id:"Fx5q2fjZJlySfaHYDGKqMQ",hs:["611790"],date:"2024-12-26",source:"Sayari"},{record_id:"gYZ8Qnx8zGtyjh8UPiQGLQ",supplier_id:"5aerMaqbpDTnrNDIaWXAsg",buyer_id:"Fx5q2fjZJlySfaHYDGKqMQ",hs:["611790"],date:"2024-12-26",source:"Sayari"},{record_id:"JP2FBY268W6ilYhl12gtIA",supplier_id:"5aerMaqbpDTnrNDIaWXAsg",buyer_id:"Fx5q2fjZJlySfaHYDGKqMQ",hs:["611790"],date:"2024-12-26",source:"Sayari"},{record_id:"IZ4m0rAIXgWzT3ibu83IqA",supplier_id:"5aerMaqbpDTnrNDIaWXAsg",buyer_id:"Fx5q2fjZJlySfaHYDGKqMQ",hs:["611790"],date:"2024-12-26",source:"Sayari"},{record_id:"Ne83yOJcmJIBiEPtx8PJaw",supplier_id:"5aerMaqbpDTnrNDIaWXAsg",buyer_id:"Fx5q2fjZJlySfaHYDGKqMQ",hs:["611790"],date:"2024-12-26",source:"Sayari"},{record_id:"WTnY71Z6At3YE4TVO7RxvQ",supplier_id:"5aerMaqbpDTnrNDIaWXAsg",buyer_id:"Fx5q2fjZJlySfaHYDGKqMQ",hs:["611790"],date:"2024-12-26",source:"Sayari"},{record_id:"Ddp_GtS8MzAKR_JtxPCrTQ",supplier_id:"5aerMaqbpDTnrNDIaWXAsg",buyer_id:"Fx5q2fjZJlySfaHYDGKqMQ",hs:["611790"],date:"2024-12-26",source:"Sayari"},{record_id:"N46yNI631S6epk9xFlLzSQ",supplier_id:"5aerMaqbpDTnrNDIaWXAsg",buyer_id:"Fx5q2fjZJlySfaHYDGKqMQ",hs:["611790"],date:"2024-12-26",source:"Sayari"},{record_id:"Wpm3RviSFUSRr9U5ngyUWw",supplier_id:"5aerMaqbpDTnrNDIaWXAsg",buyer_id:"Fx5q2fjZJlySfaHYDGKqMQ",hs:["611790"],date:"2024-12-26",source:"Sayari"},{record_id:"390K0EdvYWbPUiGK2pP96g",supplier_id:"5aerMaqbpDTnrNDIaWXAsg",buyer_id:"Fx5q2fjZJlySfaHYDGKqMQ",hs:["611790"],date:"2024-12-26",source:"Sayari"},{record_id:"gGY2Gw5Ewc6WghVludM7aw",supplier_id:"5aerMaqbpDTnrNDIaWXAsg",buyer_id:"Fx5q2fjZJlySfaHYDGKqMQ",hs:["611790"],date:"2024-12-26",source:"Sayari"},{record_id:"knUljXcvyAZ7mobioNvhlg",supplier_id:"5aerMaqbpDTnrNDIaWXAsg",buyer_id:"Fx5q2fjZJlySfaHYDGKqMQ",hs:["611790"],date:"2024-12-26",source:"Sayari"},{record_id:"4Ek7Ddkz1Tw6xOnzpqLcow",supplier_id:"5aerMaqbpDTnrNDIaWXAsg",buyer_id:"Fx5q2fjZJlySfaHYDGKqMQ",hs:["611790"],date:"2024-12-26",source:"Sayari"},{record_id:"xMP5vBkYxaf-BwCkJ0xJBA",supplier_id:"5aerMaqbpDTnrNDIaWXAsg",buyer_id:"Fx5q2fjZJlySfaHYDGKqMQ",hs:["611790"],date:"2024-12-26",source:"Sayari"},{record_id:"zjG2TkKMRVu7N-LFSe9SAg",supplier_id:"5aerMaqbpDTnrNDIaWXAsg",buyer_id:"Fx5q2fjZJlySfaHYDGKqMQ",hs:["611790"],date:"2024-12-26",source:"Sayari"},{record_id:"Nup7LY94dLzaRbTE4WGG7Q",supplier_id:"5aerMaqbpDTnrNDIaWXAsg",buyer_id:"Fx5q2fjZJlySfaHYDGKqMQ",hs:["611790"],date:"2024-12-26",source:"Sayari"},{record_id:"s7TXnQ_QZdzA6y_pW2Ky2w",supplier_id:"5aerMaqbpDTnrNDIaWXAsg",buyer_id:"Fx5q2fjZJlySfaHYDGKqMQ",hs:["611790"],date:"2024-12-26",source:"Sayari"},{record_id:"q-dZ0gncrK1rKez5y0hZkg",supplier_id:"5aerMaqbpDTnrNDIaWXAsg",buyer_id:"Fx5q2fjZJlySfaHYDGKqMQ",hs:["611790"],date:"2024-12-26",source:"Sayari"},{record_id:"AFOLyX--dxy8UTwmqQ6tGA",supplier_id:"5aerMaqbpDTnrNDIaWXAsg",buyer_id:"Fx5q2fjZJlySfaHYDGKqMQ",hs:["611790"],date:"2024-12-26",source:"Sayari"},{record_id:"4dAQsNvyI-y7iuR1SGOKBw",supplier_id:"5aerMaqbpDTnrNDIaWXAsg",buyer_id:"Fx5q2fjZJlySfaHYDGKqMQ",hs:["600623"],date:"2024-12-26",source:"Sayari"},{record_id:"JuRi5qymgvzI6Zz6byznpg",supplier_id:"5aerMaqbpDTnrNDIaWXAsg",buyer_id:"Fx5q2fjZJlySfaHYDGKqMQ",hs:["600623"],date:"2024-12-26",source:"Sayari"},{record_id:"KCi1gmqC3ZFXvI31DJiSLg",supplier_id:"5aerMaqbpDTnrNDIaWXAsg",buyer_id:"Fx5q2fjZJlySfaHYDGKqMQ",hs:["611790"],date:"2024-12-26",source:"Sayari"},{record_id:"zvRbSD4ULANfhAIU84RxRw",supplier_id:"5aerMaqbpDTnrNDIaWXAsg",buyer_id:"Fx5q2fjZJlySfaHYDGKqMQ",hs:["611790"],date:"2024-12-26",source:"Sayari"}],
+      {from:"kum", to:"tms", source:"Sayari", record_type:"customs shipments (Madagascar)", receiver_note:"a separate record with a similar name and no country, not Tropic Mad SA's own record", rows:[{record_id:"3ZZyEDvInWcnKpso8H1sRA",supplier_id:"5aerMaqbpDTnrNDIaWXAsg",buyer_id:"Fx5q2fjZJlySfaHYDGKqMQ",hs:["611790"],date:"2024-12-26",source:"Sayari"},{record_id:"KO7Xy4oLLneiVqjtKp1lIg",supplier_id:"5aerMaqbpDTnrNDIaWXAsg",buyer_id:"Fx5q2fjZJlySfaHYDGKqMQ",hs:["611790"],date:"2024-12-26",source:"Sayari"},{record_id:"NBkc5tzkkhO07s8Ei908eQ",supplier_id:"5aerMaqbpDTnrNDIaWXAsg",buyer_id:"Fx5q2fjZJlySfaHYDGKqMQ",hs:["600623"],date:"2024-12-26",source:"Sayari"},{record_id:"nzY2GNwicQ-LeMrtYsQfuA",supplier_id:"5aerMaqbpDTnrNDIaWXAsg",buyer_id:"Fx5q2fjZJlySfaHYDGKqMQ",hs:["600623"],date:"2024-12-26",source:"Sayari"},{record_id:"LAtqv9HlKLIWS8Ajdty38A",supplier_id:"5aerMaqbpDTnrNDIaWXAsg",buyer_id:"Fx5q2fjZJlySfaHYDGKqMQ",hs:["611790"],date:"2024-12-26",source:"Sayari"},{record_id:"2e1v4cdbD6gcBXxGU8bcUg",supplier_id:"5aerMaqbpDTnrNDIaWXAsg",buyer_id:"Fx5q2fjZJlySfaHYDGKqMQ",hs:["611790"],date:"2024-12-26",source:"Sayari"},{record_id:"Kw46jvAHrAZm-2OOgpYb7g",supplier_id:"5aerMaqbpDTnrNDIaWXAsg",buyer_id:"Fx5q2fjZJlySfaHYDGKqMQ",hs:["611790"],date:"2024-12-26",source:"Sayari"},{record_id:"2xBDR7pivy_T0TQs_esbTg",supplier_id:"5aerMaqbpDTnrNDIaWXAsg",buyer_id:"Fx5q2fjZJlySfaHYDGKqMQ",hs:["611790"],date:"2024-12-26",source:"Sayari"},{record_id:"gYZ8Qnx8zGtyjh8UPiQGLQ",supplier_id:"5aerMaqbpDTnrNDIaWXAsg",buyer_id:"Fx5q2fjZJlySfaHYDGKqMQ",hs:["611790"],date:"2024-12-26",source:"Sayari"},{record_id:"JP2FBY268W6ilYhl12gtIA",supplier_id:"5aerMaqbpDTnrNDIaWXAsg",buyer_id:"Fx5q2fjZJlySfaHYDGKqMQ",hs:["611790"],date:"2024-12-26",source:"Sayari"},{record_id:"IZ4m0rAIXgWzT3ibu83IqA",supplier_id:"5aerMaqbpDTnrNDIaWXAsg",buyer_id:"Fx5q2fjZJlySfaHYDGKqMQ",hs:["611790"],date:"2024-12-26",source:"Sayari"},{record_id:"Ne83yOJcmJIBiEPtx8PJaw",supplier_id:"5aerMaqbpDTnrNDIaWXAsg",buyer_id:"Fx5q2fjZJlySfaHYDGKqMQ",hs:["611790"],date:"2024-12-26",source:"Sayari"},{record_id:"WTnY71Z6At3YE4TVO7RxvQ",supplier_id:"5aerMaqbpDTnrNDIaWXAsg",buyer_id:"Fx5q2fjZJlySfaHYDGKqMQ",hs:["611790"],date:"2024-12-26",source:"Sayari"},{record_id:"Ddp_GtS8MzAKR_JtxPCrTQ",supplier_id:"5aerMaqbpDTnrNDIaWXAsg",buyer_id:"Fx5q2fjZJlySfaHYDGKqMQ",hs:["611790"],date:"2024-12-26",source:"Sayari"},{record_id:"N46yNI631S6epk9xFlLzSQ",supplier_id:"5aerMaqbpDTnrNDIaWXAsg",buyer_id:"Fx5q2fjZJlySfaHYDGKqMQ",hs:["611790"],date:"2024-12-26",source:"Sayari"},{record_id:"Wpm3RviSFUSRr9U5ngyUWw",supplier_id:"5aerMaqbpDTnrNDIaWXAsg",buyer_id:"Fx5q2fjZJlySfaHYDGKqMQ",hs:["611790"],date:"2024-12-26",source:"Sayari"},{record_id:"390K0EdvYWbPUiGK2pP96g",supplier_id:"5aerMaqbpDTnrNDIaWXAsg",buyer_id:"Fx5q2fjZJlySfaHYDGKqMQ",hs:["611790"],date:"2024-12-26",source:"Sayari"},{record_id:"gGY2Gw5Ewc6WghVludM7aw",supplier_id:"5aerMaqbpDTnrNDIaWXAsg",buyer_id:"Fx5q2fjZJlySfaHYDGKqMQ",hs:["611790"],date:"2024-12-26",source:"Sayari"},{record_id:"knUljXcvyAZ7mobioNvhlg",supplier_id:"5aerMaqbpDTnrNDIaWXAsg",buyer_id:"Fx5q2fjZJlySfaHYDGKqMQ",hs:["611790"],date:"2024-12-26",source:"Sayari"},{record_id:"4Ek7Ddkz1Tw6xOnzpqLcow",supplier_id:"5aerMaqbpDTnrNDIaWXAsg",buyer_id:"Fx5q2fjZJlySfaHYDGKqMQ",hs:["611790"],date:"2024-12-26",source:"Sayari"},{record_id:"xMP5vBkYxaf-BwCkJ0xJBA",supplier_id:"5aerMaqbpDTnrNDIaWXAsg",buyer_id:"Fx5q2fjZJlySfaHYDGKqMQ",hs:["611790"],date:"2024-12-26",source:"Sayari"},{record_id:"zjG2TkKMRVu7N-LFSe9SAg",supplier_id:"5aerMaqbpDTnrNDIaWXAsg",buyer_id:"Fx5q2fjZJlySfaHYDGKqMQ",hs:["611790"],date:"2024-12-26",source:"Sayari"},{record_id:"Nup7LY94dLzaRbTE4WGG7Q",supplier_id:"5aerMaqbpDTnrNDIaWXAsg",buyer_id:"Fx5q2fjZJlySfaHYDGKqMQ",hs:["611790"],date:"2024-12-26",source:"Sayari"},{record_id:"s7TXnQ_QZdzA6y_pW2Ky2w",supplier_id:"5aerMaqbpDTnrNDIaWXAsg",buyer_id:"Fx5q2fjZJlySfaHYDGKqMQ",hs:["611790"],date:"2024-12-26",source:"Sayari"},{record_id:"q-dZ0gncrK1rKez5y0hZkg",supplier_id:"5aerMaqbpDTnrNDIaWXAsg",buyer_id:"Fx5q2fjZJlySfaHYDGKqMQ",hs:["611790"],date:"2024-12-26",source:"Sayari"},{record_id:"AFOLyX--dxy8UTwmqQ6tGA",supplier_id:"5aerMaqbpDTnrNDIaWXAsg",buyer_id:"Fx5q2fjZJlySfaHYDGKqMQ",hs:["611790"],date:"2024-12-26",source:"Sayari"},{record_id:"4dAQsNvyI-y7iuR1SGOKBw",supplier_id:"5aerMaqbpDTnrNDIaWXAsg",buyer_id:"Fx5q2fjZJlySfaHYDGKqMQ",hs:["600623"],date:"2024-12-26",source:"Sayari"},{record_id:"JuRi5qymgvzI6Zz6byznpg",supplier_id:"5aerMaqbpDTnrNDIaWXAsg",buyer_id:"Fx5q2fjZJlySfaHYDGKqMQ",hs:["600623"],date:"2024-12-26",source:"Sayari"},{record_id:"KCi1gmqC3ZFXvI31DJiSLg",supplier_id:"5aerMaqbpDTnrNDIaWXAsg",buyer_id:"Fx5q2fjZJlySfaHYDGKqMQ",hs:["611790"],date:"2024-12-26",source:"Sayari"},{record_id:"zvRbSD4ULANfhAIU84RxRw",supplier_id:"5aerMaqbpDTnrNDIaWXAsg",buyer_id:"Fx5q2fjZJlySfaHYDGKqMQ",hs:["611790"],date:"2024-12-26",source:"Sayari"}],
        note:"Described as 100% Supima cotton knit fabric, plus collars and cuffs."},
-      graphLink("bag", "tms", {note:"Sayari shows factory B buying compostable bags from this supplier. Bags are packaging, not part of the shirt, and the shipment records haven't been pulled."}),
+      graphLink("bag", "tms", {note:"Sayari shows Tropic Mad SA buying compostable bags from this supplier. Bags are packaging, not part of the shirt, and the shipment records haven't been pulled."}),
       graphLink("xjp", "bag", {note:"Sayari's trace puts a Xinjiang polyester maker in the bag supplier's network. Shipment records not pulled; it would only affect packaging."})
     ]};
   LINKDATA.gloves = {product:"knit_gloves", root:"bee",
     companies:{
       bee: {label:"Beeline Import and Services (importer on the tag)", tier:0, flags:[], sayari:FP2.gl_bee.s, tradeverifyd:tv2("gl_bee",[])},
-      hai: {label:"Hangzhou accessories supplier", tier:1, flags:[], sayari:FP2.gl_hai.s, tradeverifyd:tv2("gl_hai",[])}},
+      hai: {label:"Hangzhou Haili Accessories", tier:1, flags:[], sayari:FP2.gl_hai.s, tradeverifyd:tv2("gl_hai",[])}},
     links:[
       {from:"hai", to:"bee", source:"Sayari", record_type:"US customs shipments", rows:[{record_id:"FmEhT5TE_qajIqiAc9twfA",supplier_id:"Z66r4sFTfdvj1uRJCyku8w",buyer_id:"uUaGkgwPwFAVgOp3ZuLR8Q",hs:["611693"],date:"2026-05-22",source:"Sayari"},{record_id:"_uPGMVGbyl8C4qOj64A4wA",supplier_id:"Z66r4sFTfdvj1uRJCyku8w",buyer_id:"uUaGkgwPwFAVgOp3ZuLR8Q",hs:["650500"],date:"2026-07-05",source:"Sayari"},{record_id:"qRdqfUik6A5O5cvruRtzgQ",supplier_id:"Z66r4sFTfdvj1uRJCyku8w",buyer_id:"uUaGkgwPwFAVgOp3ZuLR8Q",hs:[],date:"2026-07-09",source:"Sayari"},{record_id:"ywy5_089hGedB4bsO_umTA",supplier_id:"Z66r4sFTfdvj1uRJCyku8w",buyer_id:"uUaGkgwPwFAVgOp3ZuLR8Q",hs:[],date:"2026-07-09",source:"Sayari"}],
        note:"One shipment is coded as synthetic knit gloves (HS 611693) and one as knit hats. Two July 2026 shipments describe gloves but carry no HS code, so they can't count."}
     ]};
   LINKDATA.cap = {product:"cap", root:"tom",
     companies:{
-      tom: {label:"Robin Ruth USA (importer)", tier:0, flags:[], sayari:FP2.cp_tom.s, tradeverifyd:tv2("cp_tom",[])},
-      tx:  {label:"Hangzhou import-export trading company", tier:1, flags:[], sayari:FP2.cp_tx.s, tradeverifyd:tv2("cp_tx",[])}},
+      tom: {label:"Tomgal LLC, dba Robin Ruth USA (importer)", tier:0, flags:[], sayari:FP2.cp_tom.s, tradeverifyd:tv2("cp_tom",[])},
+      tx:  {label:"Hangzhou Tongxiang Imp. & Exp. Co.", tier:1, flags:[], sayari:FP2.cp_tx.s, tradeverifyd:tv2("cp_tx",[])}},
     links:[
       {from:"tx", to:"tom", source:"Sayari", record_type:"US customs shipments", hs_note:"the product text lists hats alongside bags, wallets and souvenirs", rows:[{record_id:"t3MVBm7ZwYZWJKtHhdfH2w",supplier_id:"vTkqBE-bx1-DN7fQ-KvBYQ",buyer_id:"E-AkBKZyrdAjO2Po8_x5SQ",hs:[],date:"2025-07-11",source:"Sayari"},{record_id:"2HAk0m3IqqLSMwGeDV3Ibw",supplier_id:"vTkqBE-bx1-DN7fQ-KvBYQ",buyer_id:"E-AkBKZyrdAjO2Po8_x5SQ",hs:[],date:"2025-05-19",source:"Sayari"},{record_id:"2ozYAvCsx-JtKMmQXdaPgQ",supplier_id:"vTkqBE-bx1-DN7fQ-KvBYQ",buyer_id:"E-AkBKZyrdAjO2Po8_x5SQ",hs:[],date:"2025-05-19",source:"Sayari"},{record_id:"lqpgwNujchfylR6Fn3Ac2Q",supplier_id:"vTkqBE-bx1-DN7fQ-KvBYQ",buyer_id:"E-AkBKZyrdAjO2Po8_x5SQ",hs:[],date:"2025-04-26",source:"Sayari"},{record_id:"4uSnfx9cDRe8BD-YnJQJgQ",supplier_id:"vTkqBE-bx1-DN7fQ-KvBYQ",buyer_id:"E-AkBKZyrdAjO2Po8_x5SQ",hs:[],date:"2025-03-25",source:"Sayari"},{record_id:"iCs0-kZLx8-tPpc_AzkNIw",supplier_id:"vTkqBE-bx1-DN7fQ-KvBYQ",buyer_id:"E-AkBKZyrdAjO2Po8_x5SQ",hs:[],date:"2025-03-14",source:"Sayari"},{record_id:"vXQKVUxFiaqEPQ16VuILBg",supplier_id:"vTkqBE-bx1-DN7fQ-KvBYQ",buyer_id:"E-AkBKZyrdAjO2Po8_x5SQ",hs:[],date:"2024-12-07",source:"Sayari"},{record_id:"AlF2cn10krRSBofuNUPoaQ",supplier_id:"vTkqBE-bx1-DN7fQ-KvBYQ",buyer_id:"E-AkBKZyrdAjO2Po8_x5SQ",hs:[],date:"2024-12-06",source:"Sayari"},{record_id:"FRjr3vXhnSv1CryZGWRelg",supplier_id:"vTkqBE-bx1-DN7fQ-KvBYQ",buyer_id:"E-AkBKZyrdAjO2Po8_x5SQ",hs:[],date:"2024-11-13",source:"Sayari"},{record_id:"xKkpV29BKqiHivEyT0h3uA",supplier_id:"vTkqBE-bx1-DN7fQ-KvBYQ",buyer_id:"E-AkBKZyrdAjO2Po8_x5SQ",hs:[],date:"2024-10-14",source:"Sayari"},{record_id:"7Tmr8IGef07TIRYb5U8PTQ",supplier_id:"vTkqBE-bx1-DN7fQ-KvBYQ",buyer_id:"E-AkBKZyrdAjO2Po8_x5SQ",hs:[],date:"2024-10-09",source:"Sayari"}],
        note:"This supplier is a trading company, so the factory that made the cap isn't known."}
@@ -1614,7 +1614,7 @@ nav.tabs button[aria-selected="true"]::before{background:var(--coral)}
       const checks = r.check_results.length ? "<ul class='checks'>"+r.check_results.map(c =>
         "<li><span class='ic "+(c.pass ? "ok" : "no")+"'>"+(c.pass ? "✓" : "✗")+"</span><span><b>"+c.name+".</b> "+c.detail+".</span></li>").join("")+"</ul>" : "";
       const ids = r.record_ids.length ? r.record_ids.slice(0, 8).join(", ") + (r.record_ids.length > 8 ? " and " + (r.record_ids.length - 8) + " more" : "") : "None attached";
-      const sid = c => c.withheld ? "Withheld" : (c.sayari && c.sayari.entity_id) || "No record yet";
+      const sid = c => c.withheld ? "Not captured in this demo" : (c.sayari && c.sayari.entity_id) || "No record yet";
       return "<li class='lk "+LSTAT[r.status]+"'><div class='who'>"+coName(f)+"<span class='ar'>→</span>"+coName(t)+"</div>"+
         "<div class='lk-chips'><span class='lk-chip st'>"+r.status+"</span><span class='lk-chip'>"+r.source+" · "+r.record_type+"</span>"+
         "<span class='lk-chip'>"+r.shipment_count+" shipment"+(r.shipment_count === 1 ? "" : "s")+"</span><span class='lk-chip'>"+hs+"</span>"+
