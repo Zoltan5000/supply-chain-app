@@ -334,6 +334,38 @@ header.top{display:flex;align-items:center;justify-content:space-between;gap:10p
 .tag-lead{background:var(--grey-soft);color:var(--fg)}
 .ev-empty{font-size:.9rem;color:var(--muted-fg)}
 
+/* Supplier links and evidence */
+.lkstats{font-size:.84rem;border-radius:var(--r-2xl);padding:12px 14px;background:color-mix(in oklab,var(--cobalt) 10%,var(--card));margin-bottom:10px}
+.lkstats b{font-variant-numeric:tabular-nums}
+.lklist{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.lk{border:2px solid var(--border);border-radius:var(--r-2xl);padding:14px;background:var(--card)}
+.lk.ls-ns{border-style:dashed;background:color-mix(in oklab,var(--muted) 45%,var(--card))}
+.lk .who{font-weight:800;font-size:.92rem;line-height:1.35}
+.lk .who .ar{color:var(--muted-fg);margin:0 4px}
+.lk-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.lk-chip{font-size:.72rem;font-weight:700;border-radius:999px;padding:3px 10px;background:var(--muted);white-space:nowrap}
+.lk-chip.st{font-weight:800;text-transform:uppercase;letter-spacing:.05em;font-size:.66rem;padding:4px 10px}
+.ls-ok .lk-chip.st{background:var(--green-soft)} .ls-down .lk-chip.st{background:var(--red-soft)}
+.ls-rev .lk-chip.st{background:var(--amber-soft)} .ls-ns .lk-chip.st{background:var(--grey-soft)}
+.lk .lkwhy{font-size:.84rem;margin-top:8px}
+.lk .lkwhy p + p{margin-top:4px}
+.lk details{margin-top:8px;font-size:.82rem}
+.lk summary{cursor:pointer;font-weight:700;color:var(--cobalt)}
+.checks{list-style:none;margin:8px 0;padding:0}
+.checks li{display:grid;grid-template-columns:20px 1fr;gap:6px;padding:4px 0;border-top:1px solid var(--border)}
+.checks li:first-child{border-top:0}
+.checks .ic{font-weight:800}
+.checks .ok{color:var(--green)} .checks .no{color:var(--red)}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:4px 10px;margin-top:6px;word-break:break-word}
+.kv b{color:var(--muted-fg);font-weight:800}
+.rules ol{margin:0;padding-left:20px;font-size:.9rem}
+.rules li{margin:8px 0}
+.rules li:first-child{margin-top:0}
+.hstab{width:100%;border-collapse:collapse;font-size:.82rem;margin-top:8px}
+.hstab td{padding:6px 4px;border-top:1px solid var(--border);vertical-align:top}
+.hstab tr:first-child td{border-top:0}
+.hstab td:last-child{font-variant-numeric:tabular-nums}
+
 /* UFLPA */
 .stat3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:14px}
 .stat3 div{border-radius:var(--r-2xl);padding:14px 8px;text-align:center}
@@ -565,6 +597,35 @@ nav.tabs button[aria-selected="true"]::before{background:var(--coral)}
       <ol class="tiers" id="ladder"></ol>
     </div>
 
+    <div class="sec">
+      <h2>Supplier links and their evidence</h2>
+      <p class="sub">Every link between two companies, with the records behind it and the automatic checks it passed or failed. Only links marked "Needs review" go to a person.</p>
+      <div class="lkstats" id="linkStats"></div>
+      <ol class="lklist" id="links"></ol>
+    </div>
+
+    <div class="sec">
+      <h2>How links are checked</h2>
+      <div class="card rules">
+        <ol>
+          <li><b>Links come from records, never from AI.</b> Every link between two companies has to point to a record in Sayari or Tradeverifyd: a customs shipment, an ownership filing or a list entry. AI can summarize, rank or explain evidence, but it can't add a link, fill a gap or upgrade a status. Tier estimates from country trade data say "Estimated" and never name a company.</li>
+          <li><b>Companies are matched by ID, not name.</b> Each company is keyed by its Sayari or Tradeverifyd entity ID. Two records with similar names but different IDs are different companies unless proven otherwise, and a name match alone is only a "Possible match." To confirm that a Sayari record and a Tradeverifyd record are the same company, we need two of: registration number, address, country, or an explicit cross-reference.</li>
+          <li><b>The goods have to fit.</b> We check what was shipped, not what the company does. A fabric mill can supply a shoe maker and a t-shirt maker; what matters is whether the HS code on the shipment is a real input for what the buyer makes.</li>
+        </ol>
+        <table class="hstab" id="hsTable"></table>
+        <p class="eyebrow" style="margin:16px 0 6px">The four automatic checks</p>
+        <ol id="checkList" style="font-size:.88rem"></ol>
+        <p class="eyebrow" style="margin:16px 0 6px">What each status means</p>
+        <ul class="bul">
+          <li><b>Trade-evidenced:</b> passes all four checks. Accepted automatically.</li>
+          <li><b>Downgraded:</b> fails at least one check. Downgraded automatically, with the failed check shown.</li>
+          <li><b>Needs review:</b> passes the checks but carries a negative claim about a named supplier, or Sayari and Tradeverifyd disagree. Only these go to a person.</li>
+          <li><b>Not screened:</b> a source hasn't checked it yet. Never shown as clean.</li>
+        </ul>
+        <p class="sub" style="margin-top:12px">Flags are risk indicators, not proof. Supplier names stay withheld until a person verifies them.</p>
+      </div>
+    </div>
+
     <div id="mapWrap" hidden>
       <div class="sec">
         <h2>Where the forced labor risks are</h2>
@@ -786,7 +847,7 @@ nav.tabs button[aria-selected="true"]::before{background:var(--coral)}
       product:"Real test trace: Vietnam garment factory", brand:"Mock-up label", rn:"RN 000000", made:"Viet Nam", fiber:"100% cotton",
       risk:58, conf:45, trans:30,
       why:{risk:"The worst tier is Tier 4: a raw cotton trader on the UFLPA list. The link to this factory isn't verified yet, so the draft method puts it at 60–75 (amber), not red. Verifying the link would turn the result red. Shown now: 58, set before today's Tier 4 trace.",
-           conf:"Most findings come from shipment records (0.6) and university research (0.8). Nothing has been verified by a person yet. Sayari and Tradeverifyd agree on 3 flagged companies and disagree on 2, which go to review. Shown now: 45%."},
+           conf:"Most findings come from shipment records (0.6) and university research (0.8). Nothing has been verified by a person yet. Where the two sources are confirmed to be describing the same company (by registration number or address), they agree on 2 flagged companies; 3 more are only possible matches, so they can't count as agreement yet. Shown now: 45%."},
       verdict:"Elevated risk", verdictSub:"Open leads upstream, cotton origin unverified",
       reasons:[
         "Real garment factory in Vietnam, Worldon (Vietnam) Co., found in US customs records for cotton t-shirts (HS 6109) shipped since June 2025.",
@@ -805,12 +866,13 @@ nav.tabs button[aria-selected="true"]::before{background:var(--coral)}
       ],
       countries:[["China",28,"amber"],["Hong Kong",16,"amber"],["Vietnam",7,"green"],["Bangladesh",6,"amber"],["Europe (various)",20,"green"]],
       countriesNote:"Real counts from the Sayari trace. Suppliers can appear in more than one country.",
-      evidence:["Supplier lead 1: ownership link to an entity in the Xinjiang region flagged for forced labor. Unverified, name withheld.",
+      evidence:["Supplier lead 1: ownership link to an entity in the Xinjiang region flagged for forced labor. Unverified, name withheld. Its link to this factory rests on 1 shipment of HS 611020 (finished cotton sweatshirts or pullovers), shipped from China to the US, received by a different company record with a similar name. It fails the HS fit, recurrence, and entity consistency checks, so it's automatically downgraded. A person should still confirm, since name searches can be fuzzy.",
                 "Supplier lead 2: named as an intermediary in university forced labor research. Unverified, name withheld.",
                 "Tier 4 lead: a raw cotton trader on the UFLPA Entity List sells to a Vietnamese yarn spinner that supplies lead 2. Both sources confirm the listing; the trade link is unverified. Name withheld.",
                 "Tier 3 lead: a Xinjiang-based company shipped cotton yarn to lead 2 in March 2019. Both sources place it in Xinjiang. The shipment is older than the UFLPA and outside Sayari's two-year window.",
-                "Two textile mills named in Sheffield Hallam University forced labor research sit at Tiers 3 and 4. Both sources agree on one; only Sayari flags the other, so it goes to human review."],
-      context:["30 of 42 suppliers export goods on the US Department of Labor forced or child labor goods list for their country. This describes the industry and country, not the companies.",
+                "Two textile mills named in Sheffield Hallam University forced labor research sit at Tiers 3 and 4. Neither is confirmed as the same company in Tradeverifyd yet (similar names or the same country only, no shared registration number or street address), so both go to human review."],
+      context:["The main goods tied to the factory's name in Sayari trade records are knitted fabrics (HS 6006, 6001, 6004), labels and cartons (4821, 4819), and zipper parts (9607), which fit a t-shirt maker.",
+               "30 of 42 suppliers export goods on the US Department of Labor forced or child labor goods list for their country. This describes the industry and country, not the companies.",
                "No suppliers matched sanctions lists in Sayari.",
                "Tradeverifyd: factory not yet screened. Not checked is not the same as clean.",
                "Sayari and Tradeverifyd both show a company on the UFLPA Entity List at Tier 4 (see the map). It hasn't been checked against the official DHS list directly, and nothing has been checked against CBP orders or North Korean labor enforcement yet."],
@@ -826,7 +888,7 @@ nav.tabs button[aria-selected="true"]::before{background:var(--coral)}
            sy:"No direct flags. Supplier-network flags for UFLPA, Xinjiang, ASPI and Sheffield Hallam University research.", tv:"Only trade-record stubs, no annotations. Not screened."},
           {n:2, c:"amber", step:"Fabric making", lvl:"Elevated", lc:"amber", rk:"Named as an intermediary in university forced labor research. Buys from 3, 5 and 8.", x:313, y:397, ix:377.1, iy:360.2, t:"Fabric supplier A", tier:"Tier 2", place:"Phuoc Dong industrial park, Tay Ninh, Vietnam",
            p:"Supplies the factory. Buys from 3, 5 and, through another supplier, 8. Named as an intermediary in university forced labor research.",
-           sy:"Named intermediary in Sheffield Hallam University forced labor research.", tv:"Record found, no annotations. Sources disagree, so this needs review."},
+           sy:"Named intermediary in Sheffield Hallam University forced labor research.", tv:"Only a record with a similar name, listed in China, with no shared ID or address. It can't confirm or contradict Sayari yet."},
           {n:3, c:"amber", step:"Yarn spinning", lvl:"Elevated", lc:"amber", rk:"Buys raw cotton from a UFLPA-listed trader (4).", x:313, y:397, ix:384.1, iy:345.9, t:"Yarn spinner B", tier:"Tier 3", place:"Phuoc Dong industrial park, Tay Ninh, Vietnam",
            p:"Supplies fabric supplier A. Sayari shows it trading directly with the UFLPA-listed cotton trader (4).",
            sy:"Direct trade with a UFLPA-listed company.", tv:"Record found, no annotations."},
@@ -838,13 +900,13 @@ nav.tabs button[aria-selected="true"]::before{background:var(--coral)}
            sy:"Located in Xinjiang (by address and by name).", tv:"On Sheffield Hallam University's list of companies operating in Xinjiang. Both sources agree."},
           {n:6, c:"amber", step:"Knit fabric making", lvl:"Elevated", lc:"amber", rk:"Buys from a mill group named in forced labor research (7).", x:455.5, y:210, t:"Fabric supplier C", tier:"Tier 2", place:"Beilun, Ningbo, Zhejiang, China",
            p:"Supplies the factory directly. Buys from mill group 7.",
-           sy:"No direct flags. Supplier-network flags for UFLPA, Xinjiang, ASPI and Sheffield Hallam University research.", tv:"Not checked yet."},
+           sy:"No direct flags. Supplier-network flags for UFLPA, Xinjiang, ASPI and Sheffield Hallam University research.", tv:"Not screened yet."},
           {n:7, c:"amber", step:"Yarn and woven fabric", lvl:"Elevated", lc:"amber", rk:"Named in university research on Xinjiang cotton. Trades with a UFLPA-listed company.", x:420.4, y:133.7, to:6, t:"Textile mill group D", tier:"Tier 3", place:"Zibo, Shandong, China",
            p:"Supplies fabric supplier C. Named in Sheffield Hallam University's \u201cLaundering Cotton\u201d research. Sayari's record merges the Chinese parent with its Vietnam subsidiary, so it's shown at the parent's address.",
-           sy:"Named in Sheffield Hallam University forced labor research. Direct trade with a UFLPA-listed company.", tv:"Annotation citing Sheffield Hallam University's \u201cLaundering Cotton\u201d. Both sources agree."},
+           sy:"Named in Sheffield Hallam University forced labor research. Direct trade with a UFLPA-listed company.", tv:"Annotation citing Sheffield Hallam University's \u201cLaundering Cotton\u201d, but on a record that's only a possible match (no shared ID or street address), so the two sources aren't confirmed to agree."},
           {n:8, c:"amber", step:"Cotton yarn spinning", lvl:"Review", lc:"amber", rk:"Named in forced labor research by one source only. Needs a person to review.", x:411.2, y:203.4, arc:"via", t:"Cotton yarn mill E", tier:"Tier 4", place:"Anqing, Anhui, China",
            p:"Supplies another Vietnamese supplier that sells to fabric supplier A.",
-           sy:"Named in Sheffield Hallam University forced labor research.", tv:"Record found, no annotations. Sources disagree, so this needs review."}
+           sy:"Named in Sheffield Hallam University forced labor research.", tv:"A record with the same name but a different registration number and address (Anqing, not Hefei), and no annotations. Only a possible match, so a person needs to confirm it's the same company."}
         ],
         inset:[[3,2],[2,1]]
       }
@@ -1024,6 +1086,7 @@ nav.tabs button[aria-selected="true"]::before{background:var(--coral)}
     $("mapWrap").hidden = !m;
     if (!m) return;
     const byN = {}; m.nodes.forEach(o => byN[o.n] = o);
+    const coByN = {}; Object.values((LINKDATA[cur]||{}).companies||{}).forEach(c => { if (c.n) coByN[c.n] = c; });
     const col = c => "var(--"+c+")";
     const [cx,cy] = m.cluster, I = {x:350,y:300,w:122,h:118};
     const pin = (o,x,y) => "<g class='pin' tabindex='0' role='button' data-n='"+o.n+"' style='--c:"+col(o.c)+"' aria-label='"+o.n+". "+o.t+", "+o.tier+", "+o.place+"'>"+
@@ -1057,11 +1120,329 @@ nav.tabs button[aria-selected="true"]::before{background:var(--coral)}
     $("mapNodes").innerHTML = m.nodes.map(o =>
       "<li data-n='"+o.n+"' style='--c:"+col(o.c)+"'><span class='num'>"+o.n+"</span><div>"+
       "<div class='nt'>"+o.t+" <span class='nw'>· "+o.tier+"</span></div><div class='nw'>"+o.place+"</div>"+
-      "<p>"+o.p+"</p><div class='srcs'><b>Sayari</b><span>"+o.sy+"</span><b>Tradeverifyd</b><span>"+o.tv+"</span></div></div></li>").join("");
+      "<p>"+o.p+"</p><div class='srcs'><b>Sayari</b><span>"+o.sy+"</span><b>Tradeverifyd</b><span>"+o.tv+"</span>"+
+      (coByN[o.n] ? "<b>Same company?</b><span>"+sameCompany(coByN[o.n])+"</span>" : "")+"</div></div></li>").join("");
     document.querySelectorAll("#rmap .pin").forEach(g => {
       g.addEventListener("click", () => selectNode(+g.dataset.n));
       g.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " "){ e.preventDefault(); selectNode(+g.dataset.n); } });
     });
+  }
+
+  /* ==== Link evidence engine ====
+     Three rules:
+     1. The AI never creates a supplier link. Every link comes from a source record in Sayari or Tradeverifyd.
+     2. Companies are matched by stable entity IDs, never by name alone.
+     3. Every link is checked against the HS code chain for the product.
+     No live API calls or keys here. The functions run on sample data shaped like Sayari and Tradeverifyd
+     responses; to go live, feed real responses through the adapt* functions. */
+
+  /* Product chains. Edit or add products here. `feeds` is the buyer tier these goods are a valid input for. */
+  const PRODUCT_CHAINS = {
+    cotton_tshirt: {label:"Cotton t-shirt", steps:[
+      {tier:4, name:"Raw cotton",          hs:["5201"],                                                 feeds:3},
+      {tier:3, name:"Fiber and yarn",      hs:["5203","5205","5206"],                                   feeds:2},
+      {tier:2, name:"Fabric",              hs:["6001","6004","6006","5208","5209","5210","5211","5212"], feeds:1},
+      {tier:2, name:"Trims and packaging", hs:["5204","5807","4821","9606","9607","4819"],               feeds:1},
+      {tier:1, name:"Finished product",    hs:["6109"],                                                 feeds:0}
+    ]}
+  };
+  /* Recurrence thresholds. Placeholders: the team still has to confirm these numbers. */
+  const MIN_SHIPMENTS = 3;
+  const MIN_MONTHS = 2;
+  const CHECK_DATE = "2026-09-25";
+
+  /* ---- Rule 2: match by ID, not name ---- */
+  // Identifiers, addresses and names are stored as hashes so the public page never exposes a withheld supplier.
+  function fnv(s){ let h = 0x811c9dc5; for (const ch of s){ h ^= ch.codePointAt(0); h = Math.imul(h, 0x01000193) >>> 0; } return h.toString(16).padStart(8,"0"); }
+  function fold(s){ return String(s||"").replace(/đ/g,"d").replace(/Đ/g,"D").normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase(); }
+  const TRANSLIT = [[/\bviet nam\b/g,"vietnam"],[/\bkuerle\b/g,"korla"],[/\bhongkong\b/g,"hong kong"]];
+  const LEGAL_FORMS = ["cong ty tnhh","cong ty co phan","company limited","co ltd","co limited","limited","ltd","company","co","inc","corp","corporation","llc","jsc","tnhh"];
+  function normName(s){
+    let t = " " + fold(s).replace(/[^\p{L}\p{N}]+/gu," ") + " ";
+    TRANSLIT.forEach(([re,to]) => { t = t.replace(re,to); });
+    let prev; do { prev = t; LEGAL_FORMS.forEach(f => { t = t.replace(new RegExp(" "+f+" ","g")," "); }); } while (t !== prev);
+    return t.replace(/\s+/g," ").trim();
+  }
+  const ADDR_STOP = new Set(("road rd street st duong lo so lot no and of the zone district commune ward province city county " +
+    "xa huyen tinh phuong economic development technical technological technologic industrial park ip kcn area new side " +
+    "south north east west building floor").split(" "));
+  function addrTokens(s){
+    let t = fold(s).replace(/[^\p{L}\p{N}-]+/gu," ");
+    TRANSLIT.forEach(([re,to]) => { t = t.replace(re,to); });
+    return [...new Set(t.split(" ").filter(w => w.length > 1 && !ADDR_STOP.has(w)))];
+  }
+  const normId = s => String(s||"").toUpperCase().replace(/[^A-Z0-9]/g,"");
+  // Turns raw names, IDs and a street line into hashes. Run this on API data at ingest.
+  function fingerprint(raw){
+    return {
+      country: raw.country || null,
+      names: (raw.names||[]).map(n => normName(n).split(" ").filter(Boolean).map(fnv)),
+      ids: (raw.ids||[]).map(v => fnv(normId(v))),
+      address: raw.address ? addrTokens(raw.address).map(fnv) : [],
+      xref: raw.xref || []
+    };
+  }
+  function namesSimilar(a, b){
+    return a.names.some(x => b.names.some(y => {
+      if (x.join() === y.join()) return true;
+      const shared = x.filter(t => y.includes(t)).length;
+      return shared >= 2 && shared >= Math.min(x.length, y.length) / 2;
+    }));
+  }
+  // Compares a Sayari record with a Tradeverifyd record. Normalizing names never confirms a match on its own.
+  function matchEntities(s, t){
+    if (!s || !t) return {level:"Not screened", evidence:[], note:"No record in this source yet"};
+    const ev = [];
+    if ((s.fp.xref||[]).includes(t.entity_id) || (t.fp.xref||[]).includes(s.entity_id)) ev.push("cross-reference");
+    if (s.fp.ids.some(i => t.fp.ids.includes(i))) ev.push("registration number");
+    if (s.fp.address.filter(a => t.fp.address.includes(a)).length >= 2) ev.push("address");
+    if (s.fp.country && s.fp.country === t.fp.country) ev.push("country");
+    if (ev.length >= 2) return {level:"Confirmed", evidence:ev};
+    if (namesSimilar(s.fp, t.fp) || ev.length) return {level:"Possible match", evidence:ev.length ? ev : ["similar name only"]};
+    return {level:"Different companies", evidence:ev};
+  }
+
+  /* ---- Adapters: API response shapes in, check-ready rows out ---- */
+  const firstDate = v => { const m = String(v||"").match(/\d{4}-\d{2}-\d{2}/); return m ? m[0] : null; };
+  // Sayari search_shipments (response_mode "full"): items[] with supplier, buyer, shipments[].shipment
+  function adaptSayariShipments(resp){
+    const rows = [];
+    (resp.items||[]).forEach(it => (it.shipments||[]).forEach(w => { const s = w.shipment || w;
+      rows.push({record_id: s.shipment_id || null, supplier_id: it.supplier && it.supplier.entity_id || null,
+        buyer_id: it.buyer && it.buyer.entity_id || null,
+        hs: (s.hs_codes||[]).map(h => String(h.code||h)).filter(c => c.length >= 4),
+        date: firstDate(s.arrival_date || s.departure_date),
+        from_country: (s.departure_country||[])[0] || null, to_country: (s.arrival_country||[])[0] || null,
+        source: "Sayari", source_label: ((s.sources||[])[0]||{}).label || "Sayari trade records"});
+    }));
+    return rows;
+  }
+  // Tradeverifyd search_entities result + entity_addresses + entity_annotations
+  function adaptTradeverifydEntity(ent, addresses, annotations){
+    const addr = (addresses||[]).find(a => a.line1) || {};
+    return {entity_id: ent.entity_id, source:"Tradeverifyd",
+      fp: fingerprint({country: ent.jurisdiction, names:[ent.name].concat(ent.aliases||[]),
+        ids:(ent.external_ids||[]).map(x => x.value), address: addr.line1}),
+      flags:(annotations||[]).map(a => a.name)};
+  }
+
+  /* ---- Rule 3 and the four link checks ---- */
+  const hs4 = c => String(c).slice(0,4);
+  const stepFor = (chain, code) => chain.steps.find(s => s.hs.includes(hs4(code)));
+  const inputsFor = (chain, tier) => chain.steps.filter(s => s.feeds === tier);
+  const monthOf = d => d ? d.slice(0,7) : null;
+  const uniq = a => [...new Set(a)];
+  function linkId(ctx, l){ const f = ctx.companies[l.from], t = ctx.companies[l.to];
+    return ctx.product + ":" + ((f.sayari||{}).entity_id || "key:"+l.from) + ">" + ((t.sayari||{}).entity_id || "key:"+l.to); }
+
+  function evaluateLink(l, ctx){
+    const chain = PRODUCT_CHAINS[ctx.product], from = ctx.companies[l.from], to = ctx.companies[l.to];
+    const fromId = (from.sayari||{}).entity_id || null, toId = (to.sayari||{}).entity_id || null;
+    const rows = l.rows || [];
+    const dates = rows.map(r => r.date).filter(Boolean).sort();
+    const out = {link_id: linkId(ctx, l), from_entity_id: fromId, to_entity_id: toId,
+      hs_codes: uniq(rows.flatMap(r => r.hs)).sort(), record_ids: rows.map(r => r.record_id).filter(Boolean),
+      source: l.source, record_type: l.record_type, shipment_count: rows.length,
+      date_range: dates.length ? [dates[0], dates[dates.length-1]] : null,
+      check_results: [], status: "Not screened", last_checked: CHECK_DATE, note: l.note || "",
+      refresh_triggers: uniq(["list:"+(fromId||l.from), "list:"+(toId||l.to), "shipments:"+(fromId||l.from)+">"+(toId||l.to)])};
+    // Rule 1: no shipment records means the checks can't run. The link stays "Not screened", never Known.
+    if (!rows.length) return out;
+
+    const inputs = inputsFor(chain, to.tier), okCodes = inputs.flatMap(s => s.hs);
+    const fits = rows.filter(r => r.hs.some(c => okCodes.includes(hs4(c))));
+    const badCodes = uniq(rows.flatMap(r => r.hs).filter(c => !okCodes.includes(hs4(c))));
+    const hsCheck = {id:"hs", name:"HS fit", pass: fits.length > 0,
+      detail: fits.length
+        ? uniq(fits.flatMap(r => r.hs).filter(c => okCodes.includes(hs4(c))).map(c => stepFor(chain,c).name.toLowerCase())).join(" and ") +
+          " (HS " + uniq(fits.flatMap(r => r.hs).map(hs4)).join(", ") + ") is a valid input for a Tier " + to.tier + " buyer" +
+          (badCodes.length ? ". Other codes on these records (" + badCodes.join(", ") + ") are ignored" : "")
+        : "HS " + badCodes.join(", ") + (l.hs_label ? " (" + l.hs_label + ")" : "") + " isn't an input for a Tier " + to.tier +
+          " buyer, which takes " + inputs.map(s => s.name.toLowerCase() + " (" + s.hs.join(", ") + ")").join(" or ")};
+
+    const counted = fits.length ? fits : rows, months = uniq(counted.map(r => monthOf(r.date)).filter(Boolean));
+    const recCheck = {id:"recurrence", name:"Recurrence", pass: counted.length >= MIN_SHIPMENTS && months.length >= MIN_MONTHS,
+      detail: counted.length + " shipment" + (counted.length === 1 ? "" : "s") +
+        (months.length ? " across " + months.length + " month" + (months.length === 1 ? "" : "s") : ", date not on file") +
+        " (needs " + MIN_SHIPMENTS + "+ across " + MIN_MONTHS + "+ months)"};
+
+    const wrongBuyer = rows.filter(r => r.buyer_id !== toId), wrongSupplier = rows.filter(r => fromId && r.supplier_id !== fromId);
+    const entCheck = {id:"entity", name:"Entity consistency", pass: !wrongBuyer.length && !wrongSupplier.length && !!toId,
+      detail: wrongBuyer.length ? "Received by a different company record" + (l.receiver_note ? " (" + l.receiver_note + ")" : "") +
+          ", not the entity ID of the company in the chain"
+        : wrongSupplier.length ? "Shipped by a different entity ID than the supplier in the chain"
+        : "Shipper and receiver entity IDs match the companies in the chain"};
+
+    const reversed = rows.filter(r => toId && r.supplier_id === toId);
+    const outEnd = (ctx.outputs||{})[l.to];
+    const lateInputs = outEnd && dates.length ? dates.filter(d => d > outEnd) : [];
+    const dirCheck = {id:"direction", name:"Direction and timing", pass: !reversed.length && !lateInputs.length,
+      detail: reversed.length ? "Goods flow the wrong way: the buyer shipped to the supplier"
+        : lateInputs.length ? "Some input shipments are dated after the outputs they would feed (latest output " + outEnd + ")"
+        : "Goods flow into the buyer" + (outEnd ? ", and inputs come before its outputs (latest " + outEnd + ")" : "; no output dates on file to compare timing")};
+
+    out.check_results = [hsCheck, recCheck, entCheck, dirCheck];
+    const failed = out.check_results.filter(c => !c.pass);
+    // Needs review: a negative claim about a named supplier, or the two sources disagree on a confirmed match.
+    const disagree = [from, to].some(c => c.match && c.match.level === "Confirmed" && c.tradeverifyd &&
+      (c.flags||[]).length > 0 !== (c.tradeverifyd.flags||[]).length > 0);
+    const negative = [from, to].some(c => (c.flags||[]).length > 0);
+    out.status = failed.length ? "Downgraded" : (negative || disagree) ? "Needs review" : "Trade-evidenced";
+    out.failed = failed.map(c => c.name);
+    out.review_reason = out.status === "Needs review" ? (negative ? "carries a negative claim about a named supplier" : "Sayari and Tradeverifyd disagree") : "";
+    return out;
+  }
+
+  /* ---- Verify once, reuse everywhere: the link cache ---- */
+  const LINK_CACHE = new Map();
+  // A scan looks up cached links first. Only links not on file are checked, and only companies with no link on file need a new trace.
+  function lookupChain(ctx){
+    Object.values(ctx.companies).forEach(c => { c.match = matchEntities(c.sayari, c.tradeverifyd); });
+    let reused = 0, checked = 0;
+    const links = ctx.links.map(l => {
+      const id = linkId(ctx, l), hit = LINK_CACHE.get(id);
+      if (hit && !hit.stale){ reused++; return hit; }
+      const r = evaluateLink(l, ctx); LINK_CACHE.set(id, r); checked++; return r;
+    });
+    const touched = new Set(ctx.links.flatMap(l => [l.from, l.to]));
+    const newTraces = Object.keys(ctx.companies).filter(k => !touched.has(k));
+    return {links, reused, checked, newTraces};
+  }
+  // Rechecks come from changes in the sources (a new list entry, new shipments), not from scans.
+  function onSourceEvent(ev){
+    const key = ev.type === "new_list_entry" ? "list:" + ev.entity_id : "shipments:" + ev.from_entity_id + ">" + ev.to_entity_id;
+    let n = 0; LINK_CACHE.forEach(r => { if (r.refresh_triggers.includes(key)){ r.stale = true; n++; } });
+    return n;
+  }
+
+  /* ==== Sample source data ====
+     Real records pulled from Sayari and Tradeverifyd on Sep 25, 2026 for the real test trace. Names, registration
+     numbers and street addresses are stored only as hashes (see fingerprint()), so no withheld supplier is exposed.
+     The example scenarios use made-up records. */
+  const FP = {"factory":{"s":{"entity_id":"xk3jODhxYqBrJtd225Y91g","fp":{"country":"VN","names":[["4f3ae32e","95522d4b"],["4f3ae32e","95522d4b"]],"ids":["80b2cc2d"],"address":["881d13e6","8d1d1bc5","24f37d4b","2e8f1227","ebc389eb","5644b0d0","4c298165","f5858a65"],"xref":[]}},"t":{"entity_id":"28a03714-e843-4dd6-a536-deb2643eb643","fp":{"country":"CN","names":[["4f3ae32e","95522d4b"],["4f3ae32e","95522d4b"]],"ids":[],"address":[],"xref":[]}}},"fabricA":{"s":{"entity_id":"1wyp71MzsLUo4kDvMOlJaA","fp":{"country":"VN","names":[["1b5426fe","f71b972b","95522d4b"],["1b5426fe","f71b972b","95522d4b"]],"ids":["f258a36a"],"address":["d46a2e8e","d4c9a5dc","fae5b84a","24f37d4b"],"xref":[]}},"t":{"entity_id":"c9f80cbe-e8f6-475e-80c3-489b67d61bb8","fp":{"country":"CN","names":[["1b5426fe","f71b972b","95522d4b"],["1b5426fe","f71b972b","95522d4b"]],"ids":[],"address":[],"xref":[]}}},"spinnerB":{"s":{"entity_id":"Ji-Wk_dCxrQDH0ejRoF8RA","fp":{"country":"VN","names":[["72c0f1cb","95522d4b"],["72c0f1cb","95522d4b"]],"ids":["62fc7a48"],"address":["e759a851","1cc63b75","fae5b84a","24f37d4b"],"xref":[]}},"t":{"entity_id":"461e4a6a-06eb-43f7-b655-99d820a6d718","fp":{"country":"VN","names":[["72c0f1cb","95522d4b"],["72c0f1cb","95522d4b"]],"ids":["6b175f15"],"address":["e759a851","1cc63b75","fae5b84a","24f37d4b"],"xref":[]}}},"cotton":{"s":{"entity_id":"XNjL1MhrG-6uMHE3mBkofg","fp":{"country":"CN","names":[["7790ee3f","e16fec8d","7c3c09a2","51366e59"]],"ids":["bfb06b7e","d775c916"],"address":["15335386","7790ee3f","9050cb28","14eb1f3f","2ab24e4b","a20bc574","f75afb6b","cd0cd94b"],"xref":[]}},"t":{"entity_id":"ddd34784-04e9-490c-a394-735db7dec651","fp":{"country":"CN","names":[["7790ee3f","e16fec8d","7c3c09a2","129abbbf"],["4db8962c"]],"ids":["bfb06b7e","d775c916"],"address":["cf563645"],"xref":[]}}},"xjyarn":{"s":{"entity_id":"z_ybDCtnTQDYBJf3nFiaww","fp":{"country":"CN","names":[["ada1b177","3a199f14","11cddca4","3d1fcc9b","75cdce8c"]],"ids":[],"address":["fd44a7ee","453f7b00","9a96b4a6"],"xref":[]}},"t":{"entity_id":"2613a9e1-c677-425a-915f-0404b558aa17","fp":{"country":"CN","names":[["ada1b177","3a199f14","11cddca4","3d1fcc9b","75cdce8c"],["9643144a"]],"ids":["fb86725f"],"address":["fd44a7ee","453f7b00"],"xref":[]}}},"fabricC":{"s":{"entity_id":"I_wdtkxd3V2mwr8PS-ETSw","fp":{"country":"CN","names":[["faf95188","a0ad7f47","1a2add79"]],"ids":["a8445f1d"],"address":["13eb1dac","508079c1","a647737a"],"xref":[]}},"t":null},"millD":{"s":{"entity_id":"vw25FFoA-R7jh8u78EdqIw","fp":{"country":"VN","names":[["d7599ae2","e536425a","c4ed61ce"],["5c31e95a","e018543b","95522d4b"],["1b3397c4","c0cae4cf","9325c30c","59859d1a"]],"ids":["2f768db3","b88e219c"],"address":["0afe9739","fc2cf8e0","618010e9"],"xref":[]}},"t":{"entity_id":"b139782b-e3ad-4131-8187-fbbf1aed52e6","fp":{"country":"CN","names":[["de1e64b0"],["5c31e95a","e018543b","59859d1a"]],"ids":["0a890d6f","34f0dc82"],"address":["a6ae1a60","9064b03e"],"xref":[]}}},"millE":{"s":{"entity_id":"FC1hQPe2_yHWdarmy-9ElQ","fp":{"country":"CN","names":[["f2b21017"],["3121a64c","c0bbbe75","112a90d4","0f29c2a6","fb080cb3","5d36813d"]],"ids":["e259fa33"],"address":["8df2997f","a68ef5fe","2fceb8f0"],"xref":[]}},"t":{"entity_id":"a3b57034-581f-49ea-95a2-d6f4c174fa1f","fp":{"country":"CN","names":[["f2b21017"],["3121a64c","afc82a3c","59859d1a"]],"ids":["0d012760","6043c2a5"],"address":["9201aa55","51c588c4"],"xref":[]}}}};
+  // Sayari search_shipments response (full mode), trimmed to the fields the checks use. Supplier and buyer names removed.
+  const SAYARI_XJ_YARN = {items:[{supplier:{entity_id:"z_ybDCtnTQDYBJf3nFiaww"}, buyer:{entity_id:"1wyp71MzsLUo4kDvMOlJaA"}, shipments:[
+        {shipment:{shipment_id:"TJIS6ByxDuOs1mHfc4Y5qQ", hs_codes:[{code:"520514"}], arrival_date:"['2019-03-21']", departure_country:["CHN"], arrival_country:["VNM"], sources:[{label:"Vietnam Imports & Exports"}]}},
+        {shipment:{shipment_id:"Q70e0V3nMZrgkzIguNqpWg", hs_codes:[{code:"520524"}], arrival_date:"['2019-03-21']", departure_country:["CHN"], arrival_country:["VNM"], sources:[{label:"Vietnam Imports & Exports"}]}},
+        {shipment:{shipment_id:"feOv-frAyMFe7wSEiL5jow", hs_codes:[{code:"520514"}], arrival_date:"['2019-03-19']", departure_country:["CHN"], arrival_country:["VNM"], sources:[{label:"Vietnam Imports & Exports"}]}},
+        {shipment:{shipment_id:"9g94SlE9qoPW3dmrozhKgA", hs_codes:[{code:"520524"}], arrival_date:"['2019-03-19']", departure_country:["CHN"], arrival_country:["VNM"], sources:[{label:"Vietnam Imports & Exports"}]}},
+        {shipment:{shipment_id:"QN6ZV6jGHCFk7llQ_mcMYg", hs_codes:[{code:"520524"}], arrival_date:"['2019-03-18']", departure_country:["CHN"], arrival_country:["VNM"], sources:[{label:"Vietnam Imports & Exports"}]}},
+        {shipment:{shipment_id:"3h89DfiJKbktQ2CVnXgrAg", hs_codes:[{code:"520524"}], arrival_date:"['2019-03-18']", departure_country:["CHN"], arrival_country:["VNM"], sources:[{label:"Vietnam Imports & Exports"}]}},
+        {shipment:{shipment_id:"T6gud9DPqWYPtpMN9U6a7A", hs_codes:[{code:"520513"}], arrival_date:"['2019-03-13']", departure_country:["CHN"], arrival_country:["VNM"], sources:[{label:"Vietnam Imports & Exports"}]}},
+        {shipment:{shipment_id:"gWvLGHXbEMmulwGQqz71KQ", hs_codes:[{code:"520514"}], arrival_date:"['2019-03-13']", departure_country:["CHN"], arrival_country:["VNM"], sources:[{label:"Vietnam Imports & Exports"}]}}
+  ]}]};
+  const TRACE_NOTE = "Sayari shows a trade relationship in its network trace, but the shipment records haven't been pulled, so the checks can't run yet.";
+  const graphLink = (from, to, extra) => Object.assign({from, to, source:"Sayari", record_type:"trade relationship (network trace)", note:TRACE_NOTE}, extra||{});
+  const tv = (k, flags) => FP[k].t && Object.assign({source:"Tradeverifyd", flags}, FP[k].t);
+  const LINKDATA = {
+    test: {product:"cotton_tshirt", root:"factory",
+      companies:{
+        factory: {n:1, label:"The garment factory", tier:1, flags:[], sayari:FP.factory.s, tradeverifyd:tv("factory",[])},
+        fabricA: {n:2, label:"Fabric supplier A", tier:2, flags:["Named intermediary in university forced labor research"], sayari:FP.fabricA.s, tradeverifyd:tv("fabricA",[])},
+        spinnerB:{n:3, label:"Yarn spinner B", tier:3, flags:[], sayari:FP.spinnerB.s, tradeverifyd:tv("spinnerB",[])},
+        cotton:  {n:4, label:"Raw cotton trader", tier:4, flags:["UFLPA Entity List"], sayari:FP.cotton.s, tradeverifyd:tv("cotton",["UFLPA Entity List"])},
+        xjyarn:  {n:5, label:"Xinjiang yarn exporter", tier:3, flags:["Located in Xinjiang"], sayari:FP.xjyarn.s, tradeverifyd:tv("xjyarn",["Human Rights Violation Risk"])},
+        fabricC: {n:6, label:"Fabric supplier C", tier:2, flags:[], sayari:FP.fabricC.s, tradeverifyd:null},
+        millD:   {n:7, label:"Textile mill group D", tier:3, flags:["Named in university forced labor research"], sayari:FP.millD.s, tradeverifyd:tv("millD",["Human Rights Violation Risk"])},
+        millE:   {n:8, label:"Cotton yarn mill E", tier:4, flags:["Named in university forced labor research"], sayari:FP.millE.s, tradeverifyd:tv("millE",[])},
+        otherVN: {label:"Another Vietnamese supplier", tier:3, flags:[], sayari:{entity_id:"GA-OjZLFkSQsm4HUdMh1CQ", fp:{country:"VN", names:[], ids:[], address:[]}}, tradeverifyd:null},
+        lead1:   {label:"Supplier lead 1", tier:2, flags:["Ownership link to a Xinjiang entity flagged for forced labor (unverified)"],
+                  sayari:{entity_id:null, fp:{country:null, names:[], ids:[], address:[]}}, tradeverifyd:null, withheld:true}
+      },
+      links:[
+        {from:"lead1", to:"factory", source:"Sayari", record_type:"customs shipment", hs_label:"finished cotton sweatshirts or pullovers",
+         receiver_note:"a record with a similar name", note:"Shipped from China to the US. Record ID isn't attached in this demo; it comes from the team's Sayari search.",
+         rows:[{record_id:null, supplier_id:null, buyer_id:null, hs:["611020"], date:null, from_country:"CHN", to_country:"USA", source:"Sayari"}]},
+        {from:"xjyarn", to:"fabricA", source:"Sayari", record_type:"customs shipments", rows:adaptSayariShipments(SAYARI_XJ_YARN)},
+        graphLink("cotton", "spinnerB"),
+        graphLink("spinnerB", "fabricA"),
+        graphLink("millE", "otherVN"),
+        graphLink("otherVN", "fabricA"),
+        graphLink("fabricA", "factory"),
+        graphLink("millD", "fabricC"),
+        graphLink("fabricC", "factory")
+      ]}
+  };
+  /* Made-up records for the example scenarios. Run through the same adapters and checks as real data. */
+  function exRows(tag, from, to, hs, start, n, months){
+    const [y, m] = start.split("-").map(Number);
+    return Array.from({length:n}, (_, i) => { const mm = m + (i % months), d = new Date(Date.UTC(y, mm - 1, 5 + i));
+      return {record_id:"example-"+tag+"-"+(i+1), supplier_id:from, buyer_id:to, hs:[hs], date:d.toISOString().slice(0,10), source:"Example"}; });
+  }
+  const exCo = (id, country, name, reg) => ({entity_id:id, fp:fingerprint({country, names:[name], ids:[reg]})});
+  const exTv = (id, country, name, reg, flags) => ({entity_id:id, source:"Tradeverifyd", flags, fp:fingerprint({country, names:[name], ids:[reg]})});
+  LINKDATA.good = {product:"cotton_tshirt", root:"factory", outputs:{factory:"2026-08-31", mill:"2026-08-31"},
+    companies:{
+      factory:{label:"Garment factory", tier:1, flags:[], sayari:exCo("example-s-factory","PT","Example Garments","EX-PT-100"), tradeverifyd:exTv("example-t-factory","PT","Example Garments Lda","EX-PT-100",[])},
+      mill:   {label:"Fabric mill", tier:2, flags:[], sayari:exCo("example-s-mill","PT","Example Knits","EX-PT-200"), tradeverifyd:exTv("example-t-mill","PT","Example Knits SA","EX-PT-200",[])},
+      spinner:{label:"Yarn spinner", tier:3, flags:[], sayari:exCo("example-s-spinner","TR","Example Iplik","EX-TR-300"), tradeverifyd:exTv("example-t-spinner","TR","Example Iplik AS","EX-TR-300",[])}},
+    links:[
+      {from:"mill", to:"factory", source:"Example", record_type:"customs shipments", rows:exRows("fab","example-s-mill","example-s-factory","600622","2026-02",12,6)},
+      {from:"spinner", to:"mill", source:"Example", record_type:"customs shipments", rows:exRows("yarn","example-s-spinner","example-s-mill","520524","2026-01",9,5)}]};
+  LINKDATA.match = {product:"cotton_tshirt", root:"factory", outputs:{factory:"2026-08-31"},
+    companies:{
+      factory:{label:"Garment factory", tier:1, flags:[], sayari:exCo("example-s-cn-factory","CN","Example Apparel","EX-CN-100"), tradeverifyd:exTv("example-t-cn-factory","CN","Example Apparel Co","EX-CN-100",[])},
+      listed: {label:"Fabric supplier", tier:2, flags:["UFLPA Entity List"], sayari:exCo("example-s-listed","CN","Example Textile","EX-CN-200"), tradeverifyd:exTv("example-t-listed","CN","Example Textile Co","EX-CN-200",["UFLPA Entity List"])}},
+    links:[{from:"listed", to:"factory", source:"Example", record_type:"customs shipments", rows:exRows("uf","example-s-listed","example-s-cn-factory","600632","2026-03",7,4)}]};
+  LINKDATA.unknown = {product:"cotton_tshirt", root:"factory",
+    companies:{factory:{label:"Garment factory (brand not matched yet)", tier:1, flags:[], sayari:null, tradeverifyd:null}}, links:[]};
+
+  /* ---- Chain screen: link evidence ---- */
+  const LSTAT = {"Trade-evidenced":"ls-ok", "Downgraded":"ls-down", "Needs review":"ls-rev", "Not screened":"ls-ns"};
+  const LORDER = ["Needs review","Downgraded","Trade-evidenced","Not screened"];
+  function fmtMonth(d){ return new Date(d+"T00:00:00Z").toLocaleDateString("en-US",{month:"short", year:"numeric", timeZone:"UTC"}); }
+  function fmtRange(r){ if (!r) return "Date not on file"; const a = fmtMonth(r[0]), b = fmtMonth(r[1]); return a === b ? a : a + " – " + b; }
+  const coName = c => c.label + (c.n ? " (" + c.n + ")" : "");
+  function sameCompany(c){
+    const m = c.match || {level:"Not screened", evidence:[]};
+    if (m.level === "Not screened") return "Not screened yet";
+    return m.level + (m.evidence.length ? " (" + m.evidence.join(", ") + ")" : "");
+  }
+  function renderLinks(){
+    const ctx = LINKDATA[cur];
+    const res = lookupChain(ctx);
+    const n = s => res.links.filter(r => r.status === s).length;
+    $("linkStats").innerHTML = "<b>"+res.links.length+"</b> link"+(res.links.length === 1 ? "" : "s")+" on file: "+
+      LORDER.map(s => "<b>"+n(s)+"</b> "+s.toLowerCase()).join(", ")+".<br>This scan checked <b>"+res.checked+"</b> and reused <b>"+res.reused+
+      "</b> from the link cache. "+(res.newTraces.length ? "<b>"+res.newTraces.length+"</b> compan"+(res.newTraces.length === 1 ? "y has" : "ies have")+" no links on file and would need a new trace."
+        : "No company needs a new trace.")+" <span class='muted'>The demo keeps the cache in this browser tab; the real app would keep it in a shared database.</span>";
+    const rows = res.links.map((r, i) => ({r, l:ctx.links[i]})).sort((a, b) => LORDER.indexOf(a.r.status) - LORDER.indexOf(b.r.status));
+    $("links").innerHTML = rows.length ? rows.map(({r, l}) => {
+      const f = ctx.companies[l.from], t = ctx.companies[l.to];
+      const hs = r.hs_codes.length ? "HS " + r.hs_codes.map(c => c.slice(0,4)).filter((c, i, a) => a.indexOf(c) === i).join(", ") : "No HS codes yet";
+      let why = "";
+      if (r.status === "Downgraded") why = r.check_results.filter(c => !c.pass).map(c => "<p><b>Failed "+c.name.toLowerCase()+":</b> "+c.detail+".</p>").join("");
+      if (r.status === "Needs review") why = "<p>Passes all four checks but "+r.review_reason+", so a person reviews it before anything is shown.</p>";
+      if (r.status === "Trade-evidenced") why = "<p>Passes all four checks. Accepted automatically.</p>";
+      if (r.status === "Not screened") why = "<p>"+r.note+"</p>";
+      else if (r.note) why += "<p class='muted'>"+r.note+"</p>";
+      const checks = r.check_results.length ? "<ul class='checks'>"+r.check_results.map(c =>
+        "<li><span class='ic "+(c.pass ? "ok" : "no")+"'>"+(c.pass ? "✓" : "✗")+"</span><span><b>"+c.name+".</b> "+c.detail+".</span></li>").join("")+"</ul>" : "";
+      const ids = r.record_ids.length ? r.record_ids.slice(0, 8).join(", ") + (r.record_ids.length > 8 ? " and " + (r.record_ids.length - 8) + " more" : "") : "None attached";
+      const sid = c => c.withheld ? "Withheld" : (c.sayari && c.sayari.entity_id) || "No record yet";
+      return "<li class='lk "+LSTAT[r.status]+"'><div class='who'>"+coName(f)+"<span class='ar'>→</span>"+coName(t)+"</div>"+
+        "<div class='lk-chips'><span class='lk-chip st'>"+r.status+"</span><span class='lk-chip'>"+r.source+" · "+r.record_type+"</span>"+
+        "<span class='lk-chip'>"+r.shipment_count+" shipment"+(r.shipment_count === 1 ? "" : "s")+"</span><span class='lk-chip'>"+hs+"</span>"+
+        (r.date_range ? "<span class='lk-chip'>"+fmtRange(r.date_range)+"</span>" : "")+"</div>"+
+        "<div class='lkwhy'>"+why+"</div>"+
+        "<details><summary>Records and checks</summary>"+checks+
+        "<div class='kv'><b>Record IDs</b><span>"+ids+"</span>"+
+        "<b>Supplier</b><span>Sayari ID: "+sid(f)+". Tradeverifyd: "+sameCompany(f)+"</span>"+
+        "<b>Buyer</b><span>Sayari ID: "+sid(t)+". Tradeverifyd: "+sameCompany(t)+"</span>"+
+        "<b>Last checked</b><span>"+r.last_checked+"</span>"+
+        "<b>Rechecks when</b><span>a list adds either company, or new shipments arrive between them</span></div></details></li>";
+    }).join("") : "<li class='ev-empty'>No supplier links found yet. The factory has to be matched to a company record before any link can be traced.</li>";
+  }
+  function renderRules(){
+    const ch = PRODUCT_CHAINS.cotton_tshirt;
+    $("hsTable").innerHTML = "<tr><td colspan='3' class='eyebrow' style='padding-bottom:6px'>"+ch.label+": HS codes by tier</td></tr>"+
+      ch.steps.map(s => "<tr><td>Tier "+s.tier+"</td><td>"+s.name+"</td><td>"+s.hs.join(", ")+"</td></tr>").join("");
+    $("checkList").innerHTML = [
+      "<b>HS fit.</b> The shipment's HS code is a valid input for the buyer's tier.",
+      "<b>Recurrence.</b> At least "+MIN_SHIPMENTS+" shipments across at least "+MIN_MONTHS+" months. Draft numbers; the team still has to confirm them.",
+      "<b>Entity consistency.</b> The entity ID that received the goods is the company in the chain, not a record with a similar name.",
+      "<b>Direction and timing.</b> Goods flow into the buyer, and input shipments aren't dated after the outputs they would feed."
+    ].map(x => "<li style='margin:6px 0'>"+x+"</li>").join("");
   }
 
   /* ---- Screens in the Vis-a-Vis design ---- */
@@ -1153,6 +1534,7 @@ nav.tabs button[aria-selected="true"]::before{background:var(--coral)}
     $("context").innerHTML = d.context.map(e => "<article class='ev'><div class='tags'><span class='pill tag-ctx'>Context</span></div><p>"+e+"</p></article>").join("");
     $("sources").textContent = d.sources;
     $("chainNote").textContent = d.note;
+    renderLinks();
     renderMap(d.map);
     renderGlance(d.map);
     renderMethod(d);
@@ -1205,6 +1587,7 @@ nav.tabs button[aria-selected="true"]::before{background:var(--coral)}
   $("toMap").addEventListener("click", () => { show("chain"); $("mapWrap").scrollIntoView({block:"start"}); });
   document.querySelectorAll("[data-go]").forEach(b => b.addEventListener("click", () => show(b.dataset.go)));
   initSubmit();
+  renderRules();
 
   render();
 })();
