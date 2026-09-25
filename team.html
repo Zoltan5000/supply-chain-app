@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Vis-a-Vis Team</title>
+<meta name="description" content="Internal team page for the Vis-a-Vis prototype: open problems and the next hour's plan.">
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700;9..144,900&family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+/*
+ * Design: Vis-a-Vis / Workprint design system (coral, sunflower, lime, cobalt, cream).
+ * Data and features: the label-scan prototype. Its data blocks in the script below are copied unchanged.
+ */
+:root{
+  --bg:oklch(0.975 0.018 92); --fg:oklch(0.24 0.045 262); --card:oklch(0.995 0.008 95);
+  --muted:oklch(0.945 0.022 92); --muted-fg:oklch(0.49 0.03 262); --secondary:oklch(0.93 0.035 92);
+  --border:oklch(0.88 0.025 92); --on-color:oklch(0.98 0.012 95);
+  --coral:oklch(0.7 0.18 32); --coral-fg:oklch(0.99 0.01 95);
+  --sunflower:oklch(0.85 0.16 90); --sunflower-fg:oklch(0.26 0.05 90);
+  --lime:oklch(0.83 0.18 135); --lime-fg:oklch(0.26 0.06 150);
+  --cobalt:oklch(0.52 0.19 262); --cobalt-fg:oklch(0.98 0.012 95);
+  --green:oklch(0.6 0.15 150); --green-soft:oklch(0.93 0.07 150);
+  --amber:oklch(0.73 0.16 70); --amber-soft:oklch(0.945 0.07 85);
+  --red:oklch(0.57 0.21 27); --red-soft:oklch(0.94 0.05 30);
+  --grey:oklch(0.55 0.02 262); --grey-soft:oklch(0.92 0.01 262);
+  --accent:var(--cobalt); --ink:var(--fg); /* names used by the prototype's data */
+  --display:"Fraunces",Georgia,serif;
+  --sans:"Plus Jakarta Sans",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --shadow-card:0 14px 34px -18px color-mix(in oklab,var(--cobalt) 55%,transparent);
+  --r-xl:22px; --r-2xl:28px; --r-3xl:36px; --r-4xl:44px;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:oklch(0.2 0.03 262); --fg:oklch(0.97 0.012 92); --card:oklch(0.26 0.035 262);
+    --muted:oklch(0.3 0.035 262); --muted-fg:oklch(0.75 0.02 262); --secondary:oklch(0.3 0.035 262);
+    --border:oklch(1 0 0 / 14%); --on-color:oklch(0.18 0.03 262); --cobalt:oklch(0.72 0.15 262);
+    --cobalt-fg:oklch(0.18 0.03 262);
+    --green-soft:oklch(0.35 0.08 150); --amber-soft:oklch(0.36 0.08 80);
+    --red-soft:oklch(0.34 0.09 27); --grey-soft:oklch(0.32 0.02 262);
+    --accent:var(--cobalt); --ink:var(--fg);
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:oklch(0.2 0.03 262); --fg:oklch(0.97 0.012 92); --card:oklch(0.26 0.035 262);
+  --muted:oklch(0.3 0.035 262); --muted-fg:oklch(0.75 0.02 262); --secondary:oklch(0.3 0.035 262);
+  --border:oklch(1 0 0 / 14%); --on-color:oklch(0.18 0.03 262); --cobalt:oklch(0.72 0.15 262);
+  --cobalt-fg:oklch(0.18 0.03 262);
+  --green-soft:oklch(0.35 0.08 150); --amber-soft:oklch(0.36 0.08 80);
+  --red-soft:oklch(0.34 0.09 27); --grey-soft:oklch(0.32 0.02 262);
+  --accent:var(--cobalt); --ink:var(--fg);
+  color-scheme:dark;
+}
+
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;min-height:100vh;background:var(--bg);color:var(--fg);font-family:var(--sans);font-size:16px;
+  line-height:1.5;-webkit-font-smoothing:antialiased}
+h1,h2,h3{font-family:var(--display);font-weight:700;letter-spacing:-.02em;margin:0}
+h1{font-size:1.875rem;line-height:1.1}
+h2{font-size:1.25rem;line-height:1.2}
+h3{font-size:1.05rem;line-height:1.25}
+p{margin:0}
+a{color:inherit}
+button{font:inherit;color:inherit}
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,label.task:focus-within,.rmap .pin:focus-visible{
+  outline:3px solid var(--cobalt);outline-offset:2px}
+section[hidden],[hidden]{display:none!important}
+
+.wrap{max-width:480px;margin:0 auto;padding:max(20px,env(safe-area-inset-top,0px)) 16px 120px}
+.muted{color:var(--muted-fg)}
+.sub{font-size:.875rem;color:var(--muted-fg);margin-top:4px}
+.eyebrow{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted-fg)}
+.sec{margin-top:28px}
+.sec > .sub{margin-bottom:10px}
+.sec > h2 + .card,.sec > h2 + .stack{margin-top:10px}
+.card{background:var(--card);border:2px solid var(--border);border-radius:var(--r-3xl);padding:18px}
+.card.tight{border-radius:var(--r-2xl);padding:14px}
+.stack{display:grid;gap:10px}
+.mt{margin-top:14px}
+
+/* Header */
+header.top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px}
+.logo{display:flex;align-items:center;gap:8px;background:none;border:0;padding:0;cursor:pointer}
+.logo .mark{width:32px;height:32px;border-radius:12px;background:var(--coral);color:var(--coral-fg);display:grid;place-items:center;
+  font-weight:900;font-size:.9rem}
+.logo .word{font-weight:800;font-size:1.125rem;letter-spacing:-.02em}
+.kind{font-size:.68rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;border-radius:999px;padding:4px 10px}
+.kind.real{background:var(--lime);color:var(--lime-fg)}
+.kind.fake{background:var(--grey-soft);color:var(--fg)}
+
+/* Sample switcher */
+.scen{display:flex;gap:6px;overflow-x:auto;padding:2px 2px 6px;margin:0 -2px 16px;scrollbar-width:none}
+.scen::-webkit-scrollbar{display:none}
+.scen button{font-size:.8rem;font-weight:700;white-space:nowrap;border:2px solid var(--border);background:var(--card);
+  border-radius:999px;padding:7px 13px;cursor:pointer}
+.scen button[aria-pressed="true"]{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+
+/* Buttons */
+.btn{display:flex;align-items:center;justify-content:center;width:100%;border:0;cursor:pointer;border-radius:var(--r-2xl);
+  padding:15px 18px;font-weight:800;font-size:1rem;margin-top:12px;text-decoration:none;text-align:center}
+.btn.dark{background:var(--fg);color:var(--bg)}
+.btn.cobalt{background:var(--cobalt);color:var(--cobalt-fg);border-radius:999px}
+.btn.outline{background:transparent;color:var(--fg);border:2px solid var(--border);border-radius:999px}
+.btn.outline:hover{border-color:var(--fg)}
+.btn:disabled{opacity:.7;cursor:progress}
+.actions .btn + .btn{margin-top:8px}
+.back{background:none;border:0;padding:4px 0;font-size:.8rem;font-weight:700;color:var(--muted-fg);cursor:pointer}
+.textlink{display:block;margin:12px auto 0;background:none;border:0;padding:6px 4px;font-size:.875rem;font-weight:700;
+  color:var(--cobalt);text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+
+/* "Not built yet" note */
+.wip{display:flex;gap:10px;align-items:flex-start;width:100%;margin-top:14px;padding:12px 14px;border:2px dashed var(--border);
+  border-radius:var(--r-2xl);background:transparent;text-align:left;cursor:pointer;font-size:.84rem;color:var(--muted-fg)}
+.wip .chip{flex:none;background:var(--sunflower);color:var(--sunflower-fg);font-size:.66rem;font-weight:800;text-transform:uppercase;
+  letter-spacing:.06em;border-radius:999px;padding:3px 8px;margin-top:1px}
+.wip b{color:var(--fg)}
+.wip .go{font-weight:700;color:var(--fg);text-decoration:underline}
+
+/* Data badge */
+.databadge{border-radius:var(--r-2xl);padding:12px 14px;font-size:.84rem;margin-top:12px}
+.databadge.real{background:color-mix(in oklab,var(--lime) 22%,var(--card))}
+.databadge.fake{background:var(--grey-soft)}
+.databadge.draft{background:var(--amber-soft)}
+
+/* Scan */
+.steps{list-style:none;display:flex;gap:6px;margin:0 0 14px;padding:0}
+.steps li{flex:1;display:flex;align-items:center;gap:6px;font-size:.74rem;font-weight:700;color:var(--muted-fg);white-space:nowrap;
+  background:var(--card);border:2px solid var(--border);border-radius:999px;padding:5px 8px}
+.steps li span{width:18px;height:18px;flex:none;border-radius:50%;display:grid;place-items:center;font-size:.66rem;font-weight:800;background:var(--muted)}
+.steps li.on{color:var(--fg);border-color:var(--cobalt)}
+.steps li.on span{background:var(--cobalt);color:var(--cobalt-fg)}
+.hero{background:var(--coral);color:var(--coral-fg);border-radius:var(--r-4xl);padding:24px}
+.hero .eyebrow{color:inherit;opacity:.85}
+.hero h1{font-size:2.1rem;line-height:1.05;margin-top:6px}
+.hero p{font-size:.875rem;opacity:.92;margin-top:8px}
+.vf-card{margin-top:14px;overflow:hidden;border-radius:var(--r-3xl);border:2px solid var(--border);background:var(--card)}
+.viewfinder{position:relative;aspect-ratio:1/1;max-height:60vh;width:100%;background:oklch(0.3 0.04 262);
+  display:flex;align-items:center;justify-content:center;overflow:hidden}
+.corner{position:absolute;width:38px;height:38px;border:4px solid var(--sunflower);transition:border-color .3s}
+.c1{top:20px;left:20px;border-right:0;border-bottom:0;border-radius:14px 0 0 0}
+.c2{top:20px;right:20px;border-left:0;border-bottom:0;border-radius:0 14px 0 0}
+.c3{bottom:20px;left:20px;border-right:0;border-top:0;border-radius:0 0 0 14px}
+.c4{bottom:20px;right:20px;border-left:0;border-top:0;border-radius:0 0 14px 0}
+.vf-done .corner{border-color:var(--lime)}
+.label{background:#F7F5EE;color:#222;width:60%;padding:18px 14px;border-radius:6px;text-align:center;font-size:.82rem;
+  line-height:1.55;box-shadow:0 10px 26px rgba(0,0,0,.4);transform:rotate(-2deg);font-family:ui-monospace,Menlo,monospace}
+.label b{display:block;font-size:1.05rem;letter-spacing:.04em;margin-bottom:6px;font-family:var(--sans)}
+.label .hl{transition:background-color .25s}
+.scanning .label .hl{background:oklch(0.9 0.14 92)}
+.beam{position:absolute;left:8%;right:8%;height:4px;border-radius:4px;background:var(--lime);box-shadow:0 0 16px var(--lime);top:15%;opacity:0}
+.scanning .beam{opacity:1;animation:sweep 1.4s ease-in-out infinite alternate}
+@keyframes sweep{from{top:15%}to{top:85%}}
+.vfcap{position:absolute;left:50%;bottom:22px;transform:translateX(-50%);background:rgba(0,0,0,.6);color:#fff;font-size:.78rem;font-weight:700;
+  padding:6px 14px;border-radius:999px;white-space:nowrap;transition:background-color .3s}
+.vf-done .vfcap{background:var(--lime);color:var(--lime-fg)}
+.tips{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.tips span{font-size:.76rem;font-weight:600;color:var(--muted-fg);background:var(--muted);border-radius:999px;padding:5px 11px}
+.progress{list-style:none;margin:12px 0 0;padding:14px 16px;background:var(--card);border:2px solid var(--border);border-radius:var(--r-2xl);font-size:.9rem}
+.progress li{display:flex;gap:10px;align-items:center;padding:4px 0;color:var(--muted-fg)}
+.progress li i{width:18px;height:18px;border-radius:50%;border:2px solid var(--border);flex:none;font-style:normal;display:grid;place-items:center;font-size:.62rem}
+.progress li.run{color:var(--fg);font-weight:700}
+.progress li.run i{border-color:var(--cobalt);border-top-color:transparent;animation:spin .8s linear infinite}
+.progress li.ok{color:var(--fg)}
+.progress li.ok i{background:var(--green);border-color:var(--green);color:var(--on-color)}
+.progress li.ok i::after{content:"✓";font-weight:800}
+@keyframes spin{to{transform:rotate(360deg)}}
+.readout{padding:6px 16px 10px;font-size:.9rem}
+.readout div{display:flex;justify-content:space-between;gap:12px;border-top:2px solid var(--border);padding:9px 0}
+.readout div:first-child{border-top:0}
+.readout span:first-child{color:var(--muted-fg)}
+.readout div > span:last-child{font-weight:700;text-align:right}
+.readout .ok{color:var(--green);font-weight:800;margin-left:6px}
+.rnform label{display:block}
+.rnform .row{display:flex;gap:8px;margin-top:8px}
+.rnform input{font:inherit;font-size:16px;color:var(--fg);background:var(--bg);border:2px solid var(--border);border-radius:var(--r-xl);
+  padding:10px 14px;flex:1;min-width:0}
+.rnform input:focus{border-color:var(--cobalt);outline:none}
+.rnform button{flex:none;border:0;border-radius:var(--r-xl);background:var(--cobalt);color:var(--cobalt-fg);font-weight:800;padding:0 18px;cursor:pointer}
+
+/* Sample shelf */
+.shelf{display:grid;gap:10px}
+.shelf button{display:flex;gap:12px;align-items:center;text-align:left;width:100%;border:2px solid transparent;border-radius:var(--r-3xl);
+  padding:12px;cursor:pointer}
+.shelf button[aria-pressed="true"]{border-color:var(--fg)}
+.acc-lime{background:color-mix(in oklab,var(--lime) 22%,var(--bg))}
+.acc-coral{background:color-mix(in oklab,var(--coral) 16%,var(--bg))}
+.acc-sunflower{background:color-mix(in oklab,var(--sunflower) 26%,var(--bg))}
+.acc-cobalt{background:color-mix(in oklab,var(--cobalt) 15%,var(--bg))}
+.tee{width:64px;height:64px;flex:none;border-radius:20px;background:var(--card);display:grid;place-items:center;box-shadow:var(--shadow-card)}
+.tee svg{width:40px;height:40px}
+.shelf .nm{display:block;font-weight:800;line-height:1.2}
+.shelf .meta{display:block;font-size:.75rem;color:var(--muted-fg);margin-top:2px}
+
+/* Verdict */
+.vchip{display:inline-flex;align-items:center;border-radius:999px;font-weight:800;text-transform:uppercase;background:var(--c);color:var(--on-color)}
+.vchip.sm{font-size:.66rem;letter-spacing:.06em;padding:3px 10px;margin-top:6px}
+.vchip.lg{font-size:.8rem;letter-spacing:.12em;padding:6px 16px}
+.vchip.amber{color:var(--sunflower-fg)}
+.verdict{border-radius:var(--r-3xl);padding:20px;background:var(--soft);margin-top:14px}
+.verdict h2{font-size:1.875rem;margin-top:12px;line-height:1.15}
+.verdict p{font-size:.875rem;margin-top:4px;opacity:.85}
+.green{--c:var(--green);--soft:var(--green-soft)} .amber{--c:var(--amber);--soft:var(--amber-soft)}
+.red{--c:var(--red);--soft:var(--red-soft)} .grey{--c:var(--grey);--soft:var(--grey-soft)}
+.banner{margin-top:12px;border-radius:var(--r-3xl);padding:16px;border:2px solid var(--c);background:var(--soft);font-size:.875rem}
+.banner.grey{border-color:var(--border)}
+.banner .eyebrow{color:var(--fg);font-weight:800}
+.banner p{margin-top:4px}
+
+/* Three scores: dial, dots, bar. Different shapes on purpose. */
+.scores{display:grid;gap:12px;margin-top:14px}
+.dial{position:relative;width:132px;margin:10px auto 0}
+.dial svg{width:100%;display:block}
+.dial .num{position:absolute;left:0;right:0;bottom:-2px;text-align:center;font-size:1.9rem;font-weight:800;line-height:1}
+.band{text-align:center;font-weight:800;font-size:.875rem;margin-top:6px;color:var(--c)}
+.score-note{font-size:.76rem;color:var(--muted-fg);margin-top:6px}
+.center{text-align:center}
+.big{font-size:1.9rem;font-weight:800;line-height:1;margin-top:8px}
+.big small{font-size:1rem;font-weight:700;color:var(--muted-fg)}
+.dots{display:flex;gap:4px;margin-top:12px}
+.dots span{height:20px;flex:1;border-radius:999px;background:var(--muted)}
+.dots span.on{background:var(--cobalt)}
+.bar{height:20px;border-radius:999px;background:var(--muted);overflow:hidden;margin-top:12px}
+.bar span{display:block;height:100%;border-radius:999px;background:var(--sunflower);transition:width .4s}
+
+.reasons{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.reasons li{position:relative;padding:12px 14px 12px 34px;border-radius:var(--r-xl);background:var(--muted);font-size:.9rem}
+.reasons li::before{content:"";position:absolute;left:14px;top:19px;width:8px;height:8px;border-radius:50%;background:var(--cobalt)}
+.bul{margin:0;padding-left:18px;font-size:.9rem}
+.bul li{margin:7px 0}
+.bul li:first-child{margin-top:0}
+.bul li:last-child{margin-bottom:0}
+.legend{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.legend div{border-radius:var(--r-xl);padding:12px;background:var(--soft);font-size:.82rem}
+.legend b{display:block;margin-bottom:2px}
+.footer{margin-top:28px;border-radius:var(--r-3xl);background:color-mix(in oklab,var(--muted) 75%,transparent);padding:16px;font-size:.75rem;color:var(--muted-fg)}
+.footer button{background:none;border:0;padding:0;margin-top:6px;font-weight:700;text-decoration:underline;cursor:pointer;color:var(--fg);font-size:.75rem}
+
+/* Method */
+.method h2{margin-bottom:6px}
+.method > p{font-size:.9rem;margin-bottom:10px}
+.mrows{display:grid;gap:6px;margin:10px 0}
+.mrows div{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;background:var(--muted);border-radius:16px;padding:9px 12px;font-size:.85rem}
+.mrows b{font-variant-numeric:tabular-nums;white-space:nowrap}
+.formula{background:color-mix(in oklab,var(--sunflower) 24%,var(--card));border-radius:16px;padding:10px 12px;font-size:.85rem;font-weight:600;margin:10px 0}
+.method .this{margin-top:12px;border-radius:16px;padding:12px 14px;background:color-mix(in oklab,var(--cobalt) 12%,var(--card));font-size:.88rem}
+.method .this b{display:block;font-size:.68rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--cobalt);margin-bottom:2px}
+
+/* Chain */
+.tiers{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.tier{border:2px solid var(--border);border-radius:var(--r-2xl);padding:14px;background:var(--card)}
+.tier.est{border-style:dashed;background:color-mix(in oklab,var(--muted) 45%,var(--card))}
+.tier .row{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.tier .t{font-weight:800;font-size:.95rem;line-height:1.3}
+.tier p{font-size:.84rem;color:var(--muted-fg);margin-top:6px}
+.tier .pills{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex:none}
+.pill{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:3px 10px;font-size:.66rem;font-weight:800;
+  text-transform:uppercase;letter-spacing:.05em;white-space:nowrap}
+.pill.soft{background:var(--soft);color:var(--fg)}
+.pill.risk{background:transparent;border:2px solid var(--c);color:var(--fg)}
+.pill .d{width:8px;height:8px;border-radius:50%;background:var(--c)}
+.st-known{--soft:var(--green-soft)} .st-partly-known,.st-estimated,.st-lead{--soft:var(--amber-soft)} .st-unknown,.st-mock-up{--soft:var(--grey-soft)}
+
+/* At a glance */
+.glance h3{font-family:var(--sans);font-size:.72rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--muted-fg);margin:16px 0 4px}
+.glance h3:first-child{margin-top:0}
+.gl{display:grid;grid-template-columns:26px 1fr auto;gap:10px;align-items:start;width:100%;text-align:left;background:none;border:0;
+  border-top:2px solid var(--border);padding:12px 2px;cursor:pointer}
+.glance h3 + .gl{border-top:0}
+.gl:hover b{text-decoration:underline}
+.gl .num,.mapnodes .num{width:24px;height:24px;border-radius:50%;background:var(--c);color:var(--on-color);font-size:.75rem;font-weight:800;display:grid;place-items:center}
+.gl b{display:block;font-size:.92rem}
+.gl .stp{display:block;font-size:.82rem}
+.gl .why{display:block;font-size:.8rem;color:var(--muted-fg);margin-top:2px}
+.gl .pill{border:2px solid var(--c);color:var(--fg);margin-top:2px}
+
+/* Map */
+.rmap{padding:8px;overflow:hidden}
+.rmap svg{display:block;width:100%;height:auto;color:var(--fg);border-radius:26px}
+.rmap .sea{fill:color-mix(in oklab,var(--cobalt) 7%,var(--card))}
+.rmap .land{fill:var(--muted);stroke:var(--border);stroke-width:.6}
+.rmap .bord{fill:none;stroke:color-mix(in oklab,var(--fg) 22%,transparent);stroke-width:.7}
+.rmap .xj{fill:var(--red);fill-opacity:.14;stroke:var(--red);stroke-width:1;stroke-dasharray:3 2}
+.rmap .arc{fill:none;stroke:var(--c);stroke-width:2;stroke-linecap:round;opacity:.9}
+.rmap .arc.hist{stroke-dasharray:5 4}
+.rmap .arc.via{stroke-dasharray:.5 4}
+.rmap .pin{cursor:pointer;outline:none}
+.rmap .pin circle{fill:var(--c);stroke:var(--card);stroke-width:2}
+.rmap .pin text{font-family:var(--sans);font-size:10px;font-weight:800;fill:var(--on-color);text-anchor:middle;dominant-baseline:central;pointer-events:none}
+.rmap .pin.sel circle,.rmap .pin:focus-visible circle{stroke:var(--fg);stroke-width:2.5}
+.rmap .lbl{font-family:var(--sans);font-size:10px;font-weight:800;letter-spacing:.1em;fill:var(--muted-fg)}
+.rmap .lbl.xjl{fill:var(--red)}
+.rmap .inset{fill:var(--card);stroke:var(--fg);stroke-width:1.2}
+.rmap .lead{fill:none;stroke:var(--fg);stroke-width:1;stroke-dasharray:2 2}
+.rmap .cl{fill:none;stroke:var(--fg);stroke-width:1.5}
+.maplegend{display:grid;grid-template-columns:1fr 1fr;gap:8px 12px;font-size:.76rem;margin-top:12px;color:var(--muted-fg)}
+.maplegend div{display:flex;gap:8px;align-items:center}
+.maplegend .d{width:10px;height:10px;border-radius:50%;flex:none;background:var(--c)}
+.maplegend svg{flex:none;color:var(--fg)}
+.mapnodes{list-style:none;margin:0;padding:0}
+.mapnodes li{display:grid;grid-template-columns:26px 1fr;gap:10px;padding:12px 8px;border-top:2px solid var(--border);border-radius:18px;transition:background-color .2s}
+.mapnodes li:first-child{border-top:0}
+.mapnodes li.sel{background:color-mix(in oklab,var(--cobalt) 12%,var(--card));border-top-color:transparent}
+.mapnodes li.sel + li{border-top-color:transparent}
+.mapnodes .nt{font-weight:800;font-size:.92rem}
+.mapnodes .nw{font-size:.78rem;color:var(--muted-fg);font-weight:400}
+.mapnodes p{margin-top:4px;font-size:.86rem}
+.mapnodes .srcs{display:grid;grid-template-columns:auto 1fr;gap:3px 10px;margin-top:8px;font-size:.78rem}
+.mapnodes .srcs b{color:var(--muted-fg);font-weight:800}
+
+.crow{display:grid;grid-template-columns:1fr auto;gap:4px 10px;align-items:center;font-size:.9rem;padding:9px 0;border-top:2px solid var(--border)}
+.crow:first-child{border-top:0;padding-top:0}
+.crow .cn{display:flex;align-items:center;gap:8px;font-weight:700}
+.crow .cn .d{width:10px;height:10px;border-radius:50%;background:var(--c)}
+.crow .ct{color:var(--muted-fg);font-size:.82rem;font-variant-numeric:tabular-nums}
+.crow .track{grid-column:1/-1;height:8px;border-radius:999px;background:var(--muted);overflow:hidden}
+.crow .track span{display:block;height:100%;border-radius:999px;background:var(--c)}
+
+.lrow{display:flex;flex-direction:column;align-items:flex-start;gap:8px;padding:12px 0;border-top:2px solid var(--border);font-size:.9rem}
+.lrow:first-child{border-top:0;padding-top:0}
+.lrow:last-child{padding-bottom:0}
+.lrow .nm{font-weight:700}
+.lrow .src{display:block;font-size:.75rem;color:var(--muted-fg);font-weight:400}
+.lrow .pill{white-space:normal;text-transform:none;letter-spacing:0;font-size:.8rem;border-radius:14px;padding:4px 12px}
+
+.ev{border:2px solid var(--border);border-radius:var(--r-2xl);padding:14px;background:var(--card)}
+.ev .tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
+.ev p{font-size:.9rem}
+.tag-find{background:var(--cobalt);color:var(--cobalt-fg)}
+.tag-ctx{background:var(--sunflower);color:var(--sunflower-fg)}
+.tag-lead{background:var(--grey-soft);color:var(--fg)}
+.ev-empty{font-size:.9rem;color:var(--muted-fg)}
+
+/* UFLPA */
+.stat3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:14px}
+.stat3 div{border-radius:var(--r-2xl);padding:14px 8px;text-align:center}
+.stat3 b{display:block;font-family:var(--display);font-size:1.6rem;line-height:1.1;font-variant-numeric:tabular-nums}
+.stat3 span{display:block;font-size:.72rem;line-height:1.3;margin-top:4px}
+.ent{list-style:none;margin:0;padding:0}
+.ent li{font-size:.9rem;font-weight:700;padding:10px 0;border-top:2px solid var(--border)}
+.ent li:first-child{border-top:0;padding-top:0}
+.ent li:last-child{padding-bottom:0}
+.ent small{display:block;color:var(--muted-fg);font-size:.76rem;font-weight:400;margin-top:2px}
+.links a{color:var(--cobalt);font-weight:700;text-decoration:none}
+.links a:hover{text-decoration:underline}
+.prose{font-size:.92rem}
+.prose p + p{margin-top:10px}
+
+/* To solve */
+.status-row{display:flex;gap:6px;flex-wrap:wrap;margin:12px 0}
+.s-work{--c:var(--green);--soft:var(--green-soft)} .s-part{--c:var(--amber);--soft:var(--amber-soft)}
+.s-sim{--c:var(--cobalt);--soft:color-mix(in oklab,var(--cobalt) 18%,var(--card))}
+.s-no{--c:var(--red);--soft:var(--red-soft)} .s-later{--c:var(--grey);--soft:var(--grey-soft)}
+.chips{display:flex;gap:6px;overflow-x:auto;padding:2px 2px 6px;margin:0 -2px 8px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chips button{font-size:.8rem;font-weight:700;white-space:nowrap;border:2px solid var(--border);background:var(--card);
+  border-radius:999px;padding:6px 12px;cursor:pointer}
+.chips button[aria-pressed="true"]{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.item .top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.item .ti{font-weight:800;line-height:1.3}
+.item dl{margin:10px 0 0;font-size:.86rem;display:grid;grid-template-columns:84px 1fr;gap:6px 10px}
+.item dt{color:var(--muted-fg);font-weight:700}
+.item dd{margin:0}
+.item.pri{border-color:var(--red);background:color-mix(in oklab,var(--red-soft) 55%,var(--card))}
+.toplbl{display:inline-block;background:var(--red);color:var(--on-color);font-size:.66rem;font-weight:800;letter-spacing:.08em;
+  text-transform:uppercase;border-radius:999px;padding:3px 10px;margin-bottom:8px}
+.acts-h{margin-top:12px;font-weight:800;font-size:.9rem}
+.acts{margin:6px 0 0;padding-left:20px;font-size:.86rem}
+.acts li{margin:7px 0}
+.week{list-style:none;margin:0;padding:0}
+.week li{padding:10px 0;border-top:2px solid var(--border);font-size:.9rem}
+.week li:first-child{border-top:0;padding-top:0}
+.week li:last-child{padding-bottom:0}
+.week b{display:block}
+
+/* Submit */
+.levels{display:grid;gap:8px;margin-top:12px}
+.levels div{display:grid;grid-template-columns:76px 1fr;gap:10px;align-items:start;border-radius:var(--r-xl);padding:10px 12px;font-size:.86rem;background:var(--soft)}
+.levels b.n{font-family:var(--display);font-size:1.05rem;font-variant-numeric:tabular-nums}
+.form label.f{display:block;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted-fg);margin:14px 0 6px}
+.form label.f:first-child{margin-top:0}
+.form input[type=text],.form input[type=url],.form select,.form textarea{font:inherit;font-size:16px;color:var(--fg);background:var(--bg);
+  border:2px solid var(--border);border-radius:var(--r-xl);padding:11px 14px;width:100%}
+.form input:focus,.form select:focus,.form textarea:focus{border-color:var(--cobalt);outline:none}
+.form textarea{min-height:92px;resize:vertical}
+.form .chk{display:flex;gap:10px;align-items:flex-start;margin-top:12px;font-size:.92rem}
+.form .chk input,.task input{width:20px;height:20px;flex:none;margin:1px 0 0;accent-color:var(--cobalt)}
+.pipe{list-style:none;margin:0;padding:0}
+.pipe li{display:grid;grid-template-columns:28px 1fr;gap:10px;padding:10px 0;border-top:2px solid var(--border);opacity:.4;transition:opacity .3s}
+.pipe li:first-child{border-top:0;padding-top:0}
+.pipe li.on{opacity:1}
+.pipe .ic{width:26px;height:26px;border-radius:50%;background:var(--muted);display:grid;place-items:center;font-size:.75rem;font-weight:800}
+.pipe li.on .ic{background:var(--cobalt);color:var(--cobalt-fg)}
+.pipe .nm{font-weight:700;font-size:.92rem}
+.pipe .out{font-size:.84rem;color:var(--muted-fg)}
+.outcome{margin-top:14px;padding:14px 16px;border-radius:var(--r-2xl);border:2px solid var(--c);background:var(--soft);display:none}
+.outcome .h{font-weight:800}
+.outcome p{margin-top:4px;font-size:.9rem}
+.subs{list-style:none;margin:0;padding:0}
+.subs li{font-size:.88rem;padding:10px 0;border-top:2px solid var(--border)}
+.subs li:first-child{border-top:0;padding-top:0}
+.subs li:last-child{padding-bottom:0}
+
+/* Next hour */
+.timer{background:var(--cobalt);color:var(--cobalt-fg);border-radius:var(--r-3xl);padding:20px;display:flex;align-items:center;
+  justify-content:space-between;gap:12px;margin-top:14px}
+.timer .clock{font-family:var(--display);font-size:2.6rem;line-height:1;font-variant-numeric:tabular-nums}
+.timer .phase{font-size:.84rem;opacity:.9;margin-top:4px}
+.timer button{flex:none;border:0;border-radius:999px;background:var(--cobalt-fg);color:var(--cobalt);font-weight:800;padding:11px 16px;cursor:pointer}
+.phases{list-style:none;margin:0;padding:0}
+.phases li{display:grid;grid-template-columns:70px 1fr;gap:10px;padding:9px 0;border-top:2px solid var(--border);font-size:.88rem}
+.phases li:first-child{border-top:0;padding-top:0}
+.phases li:last-child{padding-bottom:0}
+.phases span:first-child{color:var(--muted-fg);font-variant-numeric:tabular-nums}
+.phases li.now{font-weight:800}
+.phases li.now span:first-child{color:var(--cobalt)}
+.topbox{border-color:var(--red);background:color-mix(in oklab,var(--red-soft) 55%,var(--card))}
+.olist{margin:0;padding-left:20px;font-size:.9rem}
+.olist li{margin:7px 0}
+.olist li:first-child{margin-top:0}
+.olist li:last-child{margin-bottom:0}
+.pc .who{font-weight:800}
+.pc .where{font-size:.78rem;color:var(--muted-fg)}
+.task{display:flex;gap:10px;align-items:flex-start;margin-top:10px;font-size:.9rem;cursor:pointer}
+.task .when{display:block;font-size:.68rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--cobalt)}
+.prompt{margin-top:12px;font-size:.84rem;background:color-mix(in oklab,var(--sunflower) 22%,var(--card));border-radius:var(--r-xl);padding:10px 12px}
+.prompt b{display:block;font-size:.68rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;margin-bottom:2px}
+
+/* Bottom tabs */
+nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:5;background:var(--card);border-top:2px solid var(--border);
+  padding-bottom:env(safe-area-inset-bottom,0px)}
+nav.tabs .inner{max-width:480px;margin:0 auto;display:grid;grid-template-columns:repeat(6,1fr)}
+nav.tabs button{position:relative;font-size:.7rem;font-weight:700;background:transparent;border:0;color:var(--muted-fg);
+  padding:16px 2px 18px;cursor:pointer}
+nav.tabs button::before{content:"";position:absolute;top:0;left:22%;right:22%;height:4px;border-radius:0 0 6px 6px;background:transparent}
+nav.tabs button[aria-selected="true"]{color:var(--fg)}
+nav.tabs button[aria-selected="true"]::before{background:var(--coral)}
+
+@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <a class="logo" href="index.html" style="text-decoration:none"><span class="mark">V</span><span class="word">Vis-a-Vis</span></a>
+    <span class="kind fake">Team only</span>
+  </header>
+  <div class="databadge draft" style="margin:0 0 18px"><b>Internal.</b> Open problems and work plans for the team. The consumer app doesn't link here. <a href="index.html" style="font-weight:700">Open the app</a></div>
+
+  <main>
+  <!-- TO SOLVE -->
+  <section id="v-todo">
+    <h1>What we still need to solve</h1>
+    <p class="sub">Every feature the app needs, where it stands, who owns it, and how AI and existing tools can speed it up. Tap a name to see just their work.</p>
+    <div class="status-row">
+      <span class="pill soft s-work"><span class="d"></span>Working</span>
+      <span class="pill soft s-part"><span class="d"></span>Partly working</span>
+      <span class="pill soft s-sim"><span class="d"></span>Simulated</span>
+      <span class="pill soft s-no"><span class="d"></span>Not solved</span>
+      <span class="pill soft s-later"><span class="d"></span>Later</span>
+    </div>
+    <div class="chips" id="owners" role="group" aria-label="Filter by owner"></div>
+    <div class="stack" id="items"></div>
+
+    <div class="sec">
+      <h2>This week: one task each</h2>
+      <div class="card"><ul class="week" id="week"></ul></div>
+      <p class="sub" style="margin-top:10px">Owners are roles, not final assignments. Swap names in once the team agrees.</p>
+    </div>
+  </section>
+
+  <!-- NEXT HOUR -->
+  <section id="v-hour" hidden>
+    <h1>The next hour</h1>
+    <p class="sub">Seven people, four computers, two work sprints. Everyone works in parallel so nobody waits on anyone.</p>
+
+    <div class="timer">
+      <div><div class="clock" id="clock">60:00</div><div class="phase" id="phaseNow">Not started</div></div>
+      <button id="timerBtn">Start the hour</button>
+    </div>
+    <div class="card mt"><ol class="phases" id="phases"></ol></div>
+
+    <div class="sec">
+      <h2>Top priority today: the verification bottleneck</h2>
+      <div class="card topbox">
+        <p style="font-size:.92rem;margin-bottom:10px">We can't name a supplier until a person verifies the link, and one product can have hundreds of links. Today's forced labor map found 8 flagged companies, and all of them are still anonymous. This hour's tasks attack that from four sides:</p>
+        <ol class="olist">
+          <li><b>Evidence:</b> a verification checklist, tested and timed on the 4 map links. <i>Investigator</i></li>
+          <li><b>Rules:</b> which links count as strong enough to check quickly. <i>Supply chain expert</i></li>
+          <li><b>Wording:</b> what we can safely say at each evidence level, plus a right-of-reply notice. <i>Lawyer</i></li>
+          <li><b>Speed:</b> a Claude prompt that drafts the verification memo for a person to sign off. <i>Builder</i></li>
+        </ol>
+        <button class="btn outline" data-go="todo">See all 9 action steps</button>
+      </div>
+    </div>
+
+    <div class="sec">
+      <h2>Where the app most needs work</h2>
+      <div class="card">
+        <ol class="olist">
+          <li><b>Verification and naming.</b> Nothing supplier-specific, including names, can be shown until a person checks it. This is the bottleneck.</li>
+          <li><b>Label to company.</b> We can't yet turn an RN number or brand into the right company record.</li>
+          <li><b>Going upstream.</b> Tracing now reaches cotton for one factory, but only for two suppliers, and it isn't automated.</li>
+          <li><b>Rules everyone agrees on.</b> Thresholds, wording and data licensing are still drafts.</li>
+          <li><b>Real numbers.</b> Wage benchmarks and cost floors are placeholders in the scores.</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="sec">
+      <h2>Who does what</h2>
+      <p class="sub">Check tasks off as you go. Checkmarks are saved on this phone only.</p>
+      <div class="stack" id="plan"></div>
+      <button class="btn outline" id="clearChecks">Clear checkmarks</button>
+    </div>
+  </section>
+  </main>
+</div>
+
+<nav class="tabs" role="tablist" aria-label="Team screens">
+  <div class="inner" style="grid-template-columns:repeat(2,1fr)">
+    <button role="tab" data-v="todo" aria-selected="true">To solve</button>
+    <button role="tab" data-v="hour" aria-selected="false">Next hour</button>
+  </div>
+</nav>
+
+<script>
+(function(){
+  const $ = id => document.getElementById(id);
+  /* ---- Data from the prototype, unchanged ---- */
+  const TODO = [
+    {top:true, ti:"The verification bottleneck: we can't name anyone until a person checks it", st:"no", own:["Investigator","Lawyer","Builder","Coordinator","Designer"],
+     prob:"Every supplier-specific claim needs a person to verify it before a name can be shown. One factory's map turned up 8 flagged companies across 4 tiers, and a factory has dozens of suppliers, so one product can mean hundreds of links. If verifying stays slow, the app can only show anonymous leads: shoppers can't act on them, and companies can't answer them.",
+     tools:"Sayari source records and registration numbers, Tradeverifyd annotations, official lists, published NGO and university research. Claude can gather the evidence for each link and draft a verification memo for a person to sign off.",
+     next:"Pilot the checklist on the 4 links in today's forced labor map and time each one.",
+     steps:[
+       "<b>Split the question in two.</b> \u201cIs this company on a list?\u201d can be checked automatically against official lists and registration numbers. \u201cIs it in this product's chain?\u201d needs evidence. Only the second needs a person.",
+       "<b>Name listed companies without claiming more than we know.</b> The UFLPA list is public. The lawyer writes wording that names a listed company while making clear the link is unproven, e.g. \u201cappears in trade records upstream of this factory.\u201d",
+       "<b>Score each link's strength automatically:</b> number of shipments, how recent, whether the product fits the step (raw cotton → yarn → fabric), and matching registration numbers. Strong links get a quick check; weak ones stay anonymous.",
+       "<b>Let Claude do the legwork.</b> It pulls source records, sample shipments and identifiers into a one-page memo per link, so a person signs off in minutes, not an hour.",
+       "<b>Review what would change a color first.</b> A UFLPA lead can turn a result red; a research mention at Tier 4 can wait.",
+       "<b>Verify once, reuse everywhere.</b> Save each verified company link so every product sharing that supplier benefits.",
+       "<b>Give companies a right of reply.</b> Notify them before naming them, with a set window (e.g. 14 days) to respond with evidence.",
+       "<b>Build on research others already verified.</b> Sheffield Hallam University, ASPI and others checked the companies they name. Cite them, and ask about partnering.",
+       "<b>Track time per check and the backlog</b> so we know whether this can scale, and how many reviewers we need."
+     ]},
+    {ti:"Read the label with the camera", st:"sim", own:["Builder"],
+     prob:"Pull brand, RN number, country and fiber reliably from photos of wrinkled, faded or non-English labels.",
+     tools:"Phone text recognition (Google ML Kit, Apple Vision) or Claude's image reading via the API. Claude can write the test code.",
+     next:"Everyone photographs 5 real labels; test how many read correctly."},
+    {ti:"Match the label to a company", st:"no", own:["Investigator"],
+     prob:"RN numbers only exist on US-sold goods, and the registered company may be a licensee or importer, not the brand.",
+     tools:"FTC RN lookup, barcode databases, Sayari entity search. Claude can batch the lookups.",
+     next:"Look up the RNs from the team's labels and record the hit rate."},
+    {ti:"Find the factories (Tier 1)", st:"part", own:["Investigator","Supply chain expert"],
+     prob:"Brand names in customs data are messy; the importer of record may differ from the brand. Some countries have little customs data.",
+     tools:"Sayari shipments and supplier search, Tradeverifyd, Open Supply Hub, brand supplier lists.",
+     next:"Trace 5 well-known brands to Tier 1 and compare with their published supplier lists."},
+    {ti:"Trace yarn and cotton (Tiers 3–4)", st:"no", own:["Supply chain expert","Investigator"],
+     prob:"Visibility drops sharply upstream, where forced labor risk is highest.",
+     tools:"Sayari upstream tracing at greater depth, Tradeverifyd country trade flows (coverage is patchy), Supply Trace (open, apparel-focused).",
+     next:"Take 3 Tier 2 suppliers from the test trace and go one tier further."},
+    {ti:"Scoring rules and thresholds", st:"part", own:["Lawyer","Human rights researcher"],
+     prob:"Weights, color cutoffs, the grey rule and red-flag overrides are drafts. They need to be consistent and defensible.",
+     tools:"Existing frameworks (UN Guiding Principles, OECD guidance, KnowTheChain). Claude can stress-test rules against edge cases.",
+     next:"Agree on thresholds and write the public methodology page."},
+    {ti:"Wage and living wage data", st:"no", own:["Human rights researcher"],
+     prob:"Actual wages are rarely public; the score has to work from benchmarks without implying company-specific pay.",
+     tools:"WageIndicator, Global Living Wage Coalition benchmarks, ILO minimum wage data.",
+     next:"Build a table of minimum vs living wage for the top 10 garment-exporting countries."},
+    {ti:"Price check (cost floor)", st:"no", own:["Supply chain expert"],
+     prob:"Need realistic material, labor-minute and overhead estimates per product type and country.",
+     tools:"Declared unit values from Sayari shipments, Tradeverifyd commodity prices, industry costing norms.",
+     next:"Estimate the cost floor for a basic cotton t-shirt in 3 countries."},
+    {ti:"Data licensing and legal risk", st:"no", own:["Lawyer"],
+     prob:"What can Sayari and Tradeverifyd data be shown publicly? How are scores worded to avoid defamation? How do companies respond?",
+     tools:"Provider terms of service, media-law review. Claude can draft a wording guide and right-of-reply policy for review.",
+     next:"Review data terms and draft the right-of-reply process."},
+    {ti:"Brand-level vs item-level results", st:"no", own:["Supply chain expert","Coordinator"],
+     prob:"A label identifies the brand, not the exact factory for that item, so early scores are brand-wide.",
+     tools:"Batch codes, digital product passports (coming in the EU), brand partnerships.",
+     next:"List which brands already publish product-level traceability."},
+    {ti:"Test with real users", st:"no", own:["Designer"],
+     prob:"Do shoppers understand three scores and grey? What would make them act?",
+     tools:"This prototype. Claude can help write interview questions and sum up answers.",
+     next:"Show the prototype to 5 shoppers and 2 brand buyers; note confusion points."},
+    {ti:"User-submitted sources and verification agent", st:"sim", own:["Builder","Investigator","Lawyer"],
+     prob:"Let anyone add evidence without letting bad actors game scores. Needs an AI agent for first checks and a human review queue.",
+     tools:"Claude or Grok as the checking agent, Sayari for company matching and corroboration.",
+     next:"Investigator writes the checklist the agent follows; lawyer sets what can go public; builder tests the agent on 5 real reports."},
+    {ti:"Check official US government lists", st:"no", own:["Builder","Lawyer"],
+     prob:"Lists change often (43 companies were added to the UFLPA list in August 2026), and company names vary across languages. CBP's site offers enforcement lists and dashboards, not a searchable shipment database, so shipment records still come from providers like Sayari.",
+     tools:"DHS UFLPA Entity List, CBP Withhold Release Orders & Findings dashboard, CBP UFLPA statistics dashboard, CAATSA North Korean labor enforcement, Treasury OFAC sanctions, trade.gov Consolidated Screening List (free). Claude can write the matching code.",
+     next:"Builder downloads the UFLPA list and WRO list and checks the test-trace factory and its 42 suppliers; lawyer confirms which list sets which color."},
+    {ti:"Cross-check Sayari and Tradeverifyd", st:"no", own:["Investigator","Builder"],
+     prob:"The two sources don't always cover the same companies. Our test factory had a Sayari record but none in Tradeverifyd.",
+     tools:"Sayari and Tradeverifyd connectors. Claude can compare results side by side.",
+     next:"Run the same 5 brands through both and record where they agree, disagree or have gaps."},
+    {ti:"Environment data", st:"no", own:["Human rights researcher"],
+     prob:"The environment category is empty in every result so far.",
+     tools:"Tradeverifyd emissions profiles by country or facility, plus deforestation flags in Sayari.",
+     next:"Pull emissions data for the 3 main garment countries in the test trace."},
+    {ti:"Monitoring and alerts", st:"later", own:["Builder"],
+     prob:"Scores are one-time snapshots; suppliers can be flagged later.",
+     tools:"Tradeverifyd company monitoring.",
+     next:"After the MVP, test monitoring on the test-trace factory."},
+    {ti:"Data access through the program", st:"no", own:["Coordinator","Lawyer"],
+     prob:"Confirm whether the Tradeverifyd API access expected through the program comes through, and what its terms allow in a public app.",
+     tools:"Program organizers, provider terms of service.",
+     next:"Coordinator asks the program about API access; lawyer reviews terms."},
+    {ti:"Live app and funding", st:"later", own:["Builder","Coordinator"],
+     prob:"Connecting camera, lookups, Sayari and scoring into one working app, and paying for data access.",
+     tools:"Claude for coding help; grant funders active on forced labor data (e.g. Humanity United's Integrated Data work).",
+     next:"Coordinator lists 5 possible funders or partners; builder sketches the app architecture."},
+    {ti:"Physical cotton testing", st:"later", own:["Coordinator"],
+     prob:"Paper tracing can't prove fiber origin; lab testing can.",
+     tools:"Isotope and DNA origin-testing providers.",
+     next:"Park for now; revisit once the paper trail works."}
+  ];
+  const PHASES = [
+    [0,5,"Kickoff: everyone photographs 3 clothing labels and drops them in a shared folder"],
+    [5,35,"Sprint 1"],
+    [35,40,"Check-in: one sentence each, done or blocked"],
+    [40,55,"Sprint 2"],
+    [55,60,"Wrap-up: update the MVP spec and the To solve statuses"]
+  ];
+  const PLAN = [
+    {who:"Investigator + Supply chain expert", where:"Computer 1 · Sayari",
+     tasks:[["Sprint 1","Investigator: verify the 4 links in the forced labor map (right company? do the shipments hold up?). Time each one."],
+            ["Sprint 1","Supply chain expert: write link-strength rules: how many shipments, how recent, and which products make a link strong."],
+            ["Sprint 2","Together: trace 2 well-known brands to Tier 1 and compare with their published supplier lists."]],
+     prompt:"\"Using the MVP spec, give me a step-by-step checklist to verify a flagged supplier in Sayari before we show it to users.\""},
+    {who:"Lawyer + Human rights researcher", where:"Computer 2 · documents",
+     tasks:[["Sprint 1","Lawyer: draft the wording ladder: what we can say about a company at each evidence level, from \u201cappears in trade records\u201d to \u201cverified supplier.\u201d"],
+            ["Sprint 1","Researcher: build a minimum vs living wage table for 5 garment countries."],
+            ["Sprint 2","Lawyer: draft the right-of-reply notice and set the response window. Researcher: add the wages to the scoring model."]],
+     prompt:"\"Stress-test the scoring rules in section 6 of the MVP spec. Give 10 cases where a result could be unfair or legally risky.\""},
+    {who:"Builder", where:"Computer 3 · Colab and AI",
+     tasks:[["Sprint 1","Test label reading: upload the team's label photos to Claude or Grok and record how many RN numbers and countries come out right."],
+            ["Sprint 2","Build a Claude prompt that turns one link's Sayari records into a one-page verification memo, and test it on the 4 map links."]],
+     prompt:"\"Using section 6 of the MVP spec, write Colab Python that takes supplier data and returns risk, confidence, transparency and a color.\""},
+    {who:"Coordinator", where:"Computer 4 · lookups and planning",
+     tasks:[["Sprint 1","Look up the RN numbers from the team's label photos in the FTC database and record the hit rate."],
+            ["Sprint 2","List groups that already verify companies (Sheffield Hallam University, ASPI, Supply Trace) and draft a partnership email. Update the MVP spec."]],
+     prompt:"\"Here are our meeting notes. Turn them into decisions, owners and open questions, and update section 11 of the MVP spec.\""},
+    {who:"Designer", where:"Own phone · no computer needed",
+     tasks:[["Sprint 1","Show the map screen to 3 people: do anonymous leads make sense? What would it take for them to trust a named company?"],
+            ["Sprint 2","Sketch fixes for the top 2 confusion points and share them at wrap-up."]],
+     prompt:"\"Write 6 short questions to test whether shoppers understand the four colors and three scores.\""}
+  ];
+  const WEEK_ALL = [
+      ["Coordinator","Run a 15-minute weekly check-in, keep this list current, and start the funder list."],
+      ["Builder","Prototype the Claude prompt that turns a link's Sayari records into a one-page verification memo."],
+      ["Investigator","Write the verification checklist, run it on the 4 links in the forced labor map, and time each one."],
+      ["Supply chain expert","Push 3 suppliers one tier further upstream and estimate one cost floor."],
+      ["Lawyer","Draft the wording ladder (what we can say at each evidence level) and the right-of-reply notice."],
+      ["Human rights researcher","Build the wage benchmark table for the top 10 garment countries."],
+      ["Designer","Test this prototype with 5 people and bring back what confused them."]
+    ];
+
+  /* ---- To solve ---- */
+  const ST = {work:["Working","s-work"],part:["Partly working","s-part"],sim:["Simulated","s-sim"],no:["Not solved","s-no"],later:["Later","s-later"]};
+  const ROLES = ["Everyone","Coordinator","Builder","Investigator","Supply chain expert","Lawyer","Human rights researcher","Designer"];
+  let owner = "Everyone";
+  function renderTodo(){
+    $("owners").innerHTML = ROLES.map(r => "<button aria-pressed='"+(r===owner)+"' data-o='"+r+"'>"+r+"</button>").join("");
+    $("owners").querySelectorAll("button").forEach(b => b.addEventListener("click", () => { owner = b.dataset.o; renderTodo(); }));
+    const list = TODO.filter(t => owner === "Everyone" || t.own.includes(owner));
+    $("items").innerHTML = list.map(t =>
+      "<div class='card tight item"+(t.top?" pri":"")+"'>"+(t.top?"<span class='toplbl'>Top priority today</span>":"")+
+      "<div class='top'><span class='ti'>"+t.ti+"</span><span class='pill soft "+ST[t.st][1]+"'><span class='d'></span>"+ST[t.st][0]+"</span></div>"+
+      "<dl><dt>Owner</dt><dd>"+t.own.join(", ")+"</dd><dt>Problem</dt><dd>"+t.prob+"</dd><dt>AI &amp; tools</dt><dd>"+t.tools+"</dd><dt>Next step</dt><dd>"+t.next+"</dd></dl>"+
+      (t.steps ? "<div class='acts-h'>Action steps to brainstorm</div><ol class='acts'>"+t.steps.map(x => "<li>"+x+"</li>").join("")+"</ol>" : "")+
+      "</div>").join("");
+    const WEEK = WEEK_ALL.filter(w => owner === "Everyone" || w[0] === owner);
+    $("week").innerHTML = WEEK.map(w => "<li><b>"+w[0]+"</b>"+w[1]+"</li>").join("");
+  }
+
+  /* ---- Next hour ---- */
+  const CK = "sc-hour-checks";
+  function getChecks(){ try{ return JSON.parse(localStorage.getItem(CK)||"{}"); }catch(e){ return {}; } }
+  function setChecks(o){ try{ localStorage.setItem(CK, JSON.stringify(o)); }catch(e){} }
+  function renderPlan(){
+    const ch = getChecks();
+    $("plan").innerHTML = PLAN.map((p,i) =>
+      "<div class='card tight pc'><div class='who'>"+p.who+"</div><div class='where'>"+p.where+"</div>"+
+      p.tasks.map((t,j) => { const id="t"+i+"-"+j;
+        return "<label class='task'><input type='checkbox' data-id='"+id+"'"+(ch[id]?" checked":"")+"><span><span class='when'>"+t[0]+"</span>"+t[1]+"</span></label>"; }).join("")+
+      "<div class='prompt'><b>Prompt to try with Claude or Grok</b>"+p.prompt+"</div></div>").join("");
+    $("plan").querySelectorAll("input").forEach(c => c.addEventListener("change", () => {
+      const o = getChecks(); o[c.dataset.id] = c.checked; setChecks(o);
+    }));
+  }
+  let tStart = null, tInt = null;
+  function renderPhases(min){
+    $("phases").innerHTML = PHASES.map(ph =>
+      "<li class='"+(min!==null && min>=ph[0] && min<ph[1] ? "now" : "")+"'><span>"+ph[0]+"–"+ph[1]+" min</span><span>"+ph[2]+"</span></li>").join("");
+  }
+  function tick(){
+    const el = (Date.now()-tStart)/1000, left = Math.max(0, 3600-el), min = el/60;
+    $("clock").textContent = String(Math.floor(left/60)).padStart(2,"0")+":"+String(Math.floor(left%60)).padStart(2,"0");
+    const ph = PHASES.find(p => min>=p[0] && min<p[1]);
+    $("phaseNow").textContent = ph ? ph[2] : "Hour complete";
+    renderPhases(ph ? min : null);
+    if (left <= 0){ clearInterval(tInt); tInt=null; $("timerBtn").textContent="Restart"; }
+  }
+  function initHour(){
+    renderPlan(); renderPhases(null);
+    $("timerBtn").addEventListener("click", () => {
+      tStart = Date.now(); if (tInt) clearInterval(tInt);
+      tInt = setInterval(tick, 1000); tick(); $("timerBtn").textContent = "Restart";
+    });
+    $("clearChecks").addEventListener("click", () => { setChecks({}); renderPlan(); });
+  }
+
+  const VIEWS = ["todo","hour"];
+  function show(v){
+    VIEWS.forEach(x => { $("v-"+x).hidden = x !== v; });
+    document.querySelectorAll("nav.tabs button").forEach(b => b.setAttribute("aria-selected", b.dataset.v === v ? "true" : "false"));
+    try{ history.replaceState(null, "", "#"+v); }catch(e){}
+    window.scrollTo(0,0);
+  }
+  document.querySelectorAll("nav.tabs button").forEach(b => b.addEventListener("click", () => show(b.dataset.v)));
+  document.querySelectorAll("[data-go]").forEach(b => b.addEventListener("click", () => show(b.dataset.go)));
+  renderTodo();
+  initHour();
+  show(location.hash === "#hour" ? "hour" : "todo");
+})();
+</script>
+</body>
+</html>
